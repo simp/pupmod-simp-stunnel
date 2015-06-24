@@ -173,17 +173,17 @@ class stunnel (
   }
 
   file { '/etc/rc.d/init.d/stunnel':
-    ensure   => 'present',
-    owner    => 'root',
-    group    => 'root',
-    mode     => '0750',
-    source   => 'puppet:///modules/stunnel/stunnel',
-    tag      => 'firstrun',
-    notify   => [
+    ensure  => 'present',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0750',
+    source  => 'puppet:///modules/stunnel/stunnel',
+    tag     => 'firstrun',
+    notify  => [
       Exec['stunnel_chkconfig_update'],
       Service['stunnel']
     ],
-    require  => Package['stunnel']
+    require => Package['stunnel']
   }
 
 
@@ -232,33 +232,33 @@ class stunnel (
     }
 
     file { "${l_chroot}/etc/resolv.conf":
-      ensure   => 'file',
-      owner    => 'root',
-      group    => 'root',
-      mode     => '0644',
-      source   => 'file:///etc/resolv.conf',
-      tag      => 'firstrun',
-      require  => Package['stunnel']
+      ensure  => 'file',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      source  => 'file:///etc/resolv.conf',
+      tag     => 'firstrun',
+      require => Package['stunnel']
     }
 
     file { "${l_chroot}/etc/nsswitch.conf":
-      ensure   => 'file',
-      owner    => 'root',
-      group    => 'root',
-      mode     => '0644',
-      source   => 'file:///etc/nsswitch.conf',
-      tag      => 'firstrun',
-      require  => Package['stunnel']
+      ensure  => 'file',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      source  => 'file:///etc/nsswitch.conf',
+      tag     => 'firstrun',
+      require => Package['stunnel']
     }
 
     file { "${l_chroot}/etc/hosts":
-      ensure   => 'file',
-      owner    => 'root',
-      group    => 'root',
-      mode     => '0644',
-      source   => 'file:////etc/hosts',
-      tag      => 'firstrun',
-      require  => Package['stunnel']
+      ensure  => 'file',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      source  => 'file:////etc/hosts',
+      tag     => 'firstrun',
+      require => Package['stunnel']
     }
 
     file { "${l_chroot}/var":
