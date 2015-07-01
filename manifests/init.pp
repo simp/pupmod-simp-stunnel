@@ -13,7 +13,7 @@
 #
 # [*pid*]
 #   Type: Absolute Path
-#   Default: '/var/run/stunnel/stunnel.pid'
+#   Default: '/var/run/stunnel.pid'
 #
 #   The PID file. Relative to the chroot jail! Let the startup script
 #   handle it by default.
@@ -116,7 +116,7 @@
 #
 class stunnel (
   $chroot = '/var/stunnel',
-  $pid = '/var/run/stunnel/stunnel.pid',
+  $pid = '/var/run/stunnel.pid',
   $setuid = 'stunnel',
   $setgid = 'stunnel',
   $stunnel_debug = 'err',
