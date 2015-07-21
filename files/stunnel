@@ -26,20 +26,22 @@ chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/chroot[
 
 # Find the pid file, normal by default
 pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
+piddir=`dirname "${pidfile}"`
 
 # Find the UID/GID of stunnel
-user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
-group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
+user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
+group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
 
 # Set the SELinux Contexts Properly
-if [ -z ${pidfile} ]; then
-    mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 `dirname ${pidfile}`
-    chown ${user}:${group} `dirname ${pidfile}`
-    pidfile="/var/run/stunnel.pid";
+if [ -z "${pidfile}" ]; then
+    if [ ! -d "${piddir}" ]; then
+      mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "${piddir}"
+      chown ${user}:${group} "${piddir}"
+    fi
 fi
 if [ -n $chroot ]; then
-    mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 ${chroot}`dirname ${pidfile}`
-    chown ${user}:${group} ${chroot}`dirname ${pidfile}`
+    mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "${chroot}${piddir}"
+    chown ${user}:${group} "${chroot}${piddir}"
     pidfile="${chroot}${pidfile}";
 fi
 
@@ -50,17 +52,15 @@ fi
 
 RETVAL=0
 prog='stunnel'
+lock_file="/var/lock/subsys/${prog}"
 
 # Destroy any stunnel processes that this script doesn't know about.
 # It's a bit dangerous, but they'll end up interfering otherwise.
 kill_floaters() {
   retval=1
-  if [ ! -f ${pidfile} ]; then
-    ps -ef | grep $exec | grep -qv grep
-    if [ $? -eq 0 ]; then
-      killall -q $exec 2>&1 > /dev/null
-      retval=0
-    fi
+  if [ ! -f "${pidfile}" ]; then
+    pkill -u $user $exec
+    retval=$?
   fi
 
   return $retval
@@ -69,20 +69,23 @@ kill_floaters() {
 start() {
   echo -n $"Starting ${prog}: "
   kill_floaters
-  daemon --pidfile=${pidfile} $exec $conf
+  daemon --pidfile="${pidfile}" $exec $conf
   RETVAL=$?
-  echo
-  [ $RETVAL -eq 0 ] && touch $lockfile
+  if [ -d `dirname $lock_file` ]; then
+    touch $lock_file
+  fi
   echo
   return $RETVAL
 }
 
 stop() {
   echo -n $"Shutting down stunnel: "
-  kill_floaters ||  killproc -p ${pidfile} $prog
+  kill_floaters ||  killproc -p "${pidfile}" $prog
   RETVAL=$?
+  if [ -f $lock_file ]; then
+    rm $lock_file
+  fi
   echo
-  [ $RETVAL -eq 0 ] && rm -f $lockfile
   return $RETVAL
 }
 
@@ -104,11 +107,11 @@ case "$1" in
     $1
     ;;
   condrestart)
-    status -p ${pidfile} $prog >/dev/null 2>&1 || exit 0
+    status -p "${pidfile}" $prog >/dev/null 2>&1 || exit 0
     restart
     ;;
   status)
-    status -p ${pidfile} stunnel
+    status -p "${pidfile}" stunnel
   ;;
     *)
   echo $"Usage: $0 {start|stop|restart|condrestart|status}"
