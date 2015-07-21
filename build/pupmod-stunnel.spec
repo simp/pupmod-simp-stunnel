@@ -1,7 +1,7 @@
 Summary: Stunnel Puppet Module
 Name: pupmod-stunnel
 Version: 4.2.0
-Release: 8
+Release: 9
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -57,6 +57,11 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Wed Jul 21 2015 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-9
+- Moved stunnel's default pid location back to /var/run/stunnel/stunnel.pid.
+- Stunnel's init script now only creates and chowns the pid file directory
+  if it does not exist.
+
 * Wed Jul 01 2015 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-8
 - Stunnel's default pid file location moved from /var/run/stunnel/stunnel.pid
   to /var/run/stunnel.pid

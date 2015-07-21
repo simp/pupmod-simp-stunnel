@@ -33,9 +33,12 @@ group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setgid[[
 
 # Set the SELinux Contexts Properly
 if [ -z ${pidfile} ]; then
-    mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 `dirname ${pidfile}`
-    chown ${user}:${group} `dirname ${pidfile}`
-    pidfile="/var/run/stunnel.pid";
+    piddir=`dirname ${pidfile}`
+    if [ ! -d ${piddir} ]; then
+      mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 ${piddir}
+      chown ${user}:${group} `dirname ${pidfile}`
+    fi
+    pidfile="/var/run/stunnel/stunnel.pid";
 fi
 if [ -n $chroot ]; then
     mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 ${chroot}`dirname ${pidfile}`
