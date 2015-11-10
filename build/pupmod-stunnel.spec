@@ -1,16 +1,17 @@
 Summary: Stunnel Puppet Module
 Name: pupmod-stunnel
 Version: 4.2.0
-Release: 9
+Release: 10
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-Requires: pupmod-concat >= 4.0.0-0
+Requires: pupmod-simpcat >= 4.0.0-0
 Requires: pupmod-iptables >= 2.0.0-0
 Requires: pupmod-pki >= 3.0.0-0
 Requires: pupmod-openldap >= 2.0.0-0
 Requires: pupmod-common >= 4.1.0-4
+Requires: pupmod-simplib >= 1.0.0-0
 Requires: puppet >= 3.3.0
 Buildarch: noarch
 Requires: simp-bootstrap >= 4.2.0
@@ -57,7 +58,10 @@ fi
 # Post uninstall stuff
 
 %changelog
-* Wed Jul 21 2015 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-9
+* Mon Nov 09 2015 Chris Tessmer <chris.tessmer@onypoint.com> - 4.2.0-10
+- migration to simplib and simpcat (lib/ only)
+
+* Tue Jul 21 2015 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-9
 - Moved stunnel's default pid location back to /var/run/stunnel/stunnel.pid.
 - Stunnel's init script now only creates and chowns the pid file directory
   if it does not exist.
