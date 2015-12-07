@@ -10,7 +10,6 @@ Requires: pupmod-simpcat >= 4.0.0-0
 Requires: pupmod-iptables >= 2.0.0-0
 Requires: pupmod-pki >= 3.0.0-0
 Requires: pupmod-openldap >= 2.0.0-0
-Requires: pupmod-common >= 4.1.0-4
 Requires: pupmod-simplib >= 1.0.0-0
 Requires: puppet >= 3.3.0
 Buildarch: noarch

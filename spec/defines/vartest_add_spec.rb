@@ -366,127 +366,110 @@ describe 'stunnel::add' do
      end
   end
 
-  describe "RHEL 6" do
-    it_behaves_like "a fact set vartest add"
+  context 'supported operating systems' do
+    on_supported_os.each do |os, facts|
+      context "on #{os}" do
+        let(:facts){ facts }
+        it_behaves_like "a fact set vartest add"
 
-    let(:facts) {{
-      :fqdn => 'spec.test',
-      :uid_min => '500',
-      :grub_version => '0.97',
-      :hardwaremodel => 'x86_64',
-      :operatingsystem => 'RedHat',
-      :lsbmajdistrelease => '6',
-      :operatingsystemmajrelease => '6'
-    }}
+        if facts[:operatingsystemmajrelease] == '6'
+          variable_test(
+            'nfs',
+            :session_cache_timeout,
+            '12345',
+            { :params => {
+                :connect => ['2049'],
+                :client => false,
+                :accept => '20490'
+            },
+            :key_str => 'session'
+          })
+        elsif facts[:operatingsystemmajrelease] == '7'
+          ['foo','foo:bar'].each do |sni_opts|
+            variable_test(
+              'nfs',
+              :sni,
+              'foo:bar',
+              { :params => {
+                  :connect => ['2049'],
+                  :client => false,
+                  :accept => '20490'
+              }
+            })
+          end
 
-    variable_test(
-      'nfs',
-      :session_cache_timeout,
-      '12345',
-      { :params => {
-          :connect => ['2049'],
-          :client => false,
-          :accept => '20490'
-      },
-      :key_str => 'session'
-    })
-  end
+          variable_test(
+            'nfs',
+            :curve,
+            'jello_puddin_pops',
+            { :params => {
+                :connect => ['2049'],
+                :client => false,
+                :accept => '20490'
+            }
+          })
 
-  describe "RHEL 7" do
-    it_behaves_like "a fact set vartest add"
+          variable_test(
+            'nfs',
+            :engine_num,
+            '5',
+            { :params => {
+                :connect => ['2049'],
+                :client => false,
+                :accept => '20490'
+            },
+            :key_str => 'engineNum'
+          })
 
-    let(:facts) {{
-      :fqdn => 'spec.test',
-      :uid_min => '500',
-      :grub_version => '0.97',
-      :hardwaremodel => 'x86_64',
-      :operatingsystem => 'RedHat',
-      :lsbmajdistrelease => '7',
-      :operatingsystemmajrelease => '7'
-    }}
+          variable_test(
+            'nfs',
+            :session_cache_size,
+            '12345',
+            { :params => {
+                :connect => ['2049'],
+                :client => false,
+                :accept => '20490'
+            },
+            :key_str => 'sessionCacheSize'
+          })
 
-    ['foo','foo:bar'].each do |sni_opts|
-      variable_test(
-        'nfs',
-        :sni,
-        'foo:bar',
-        { :params => {
-            :connect => ['2049'],
-            :client => false,
-            :accept => '20490'
-        }
-      })
+          variable_test(
+            'nfs',
+            :session_cache_timeout,
+            '12345',
+            { :params => {
+                :connect => ['2049'],
+                :client => false,
+                :accept => '20490'
+            },
+            :key_str => 'sessionCacheTimeout'
+          })
+
+          variable_test(
+            'nfs',
+            :reset,
+            true,
+            { :params => {
+                :connect => ['2049'],
+                :client => false,
+                :accept => '20490'
+            },
+            :val_str => 'yes'
+          })
+
+          variable_test(
+            'nfs',
+            :renegotiation,
+            true,
+            { :params => {
+                :connect => ['2049'],
+                :client => false,
+                :accept => '20490'
+            },
+            :val_str => 'yes'
+          })
+        end
+      end
     end
-
-    variable_test(
-      'nfs',
-      :curve,
-      'jello_puddin_pops',
-      { :params => {
-          :connect => ['2049'],
-          :client => false,
-          :accept => '20490'
-      }
-    })
-
-    variable_test(
-      'nfs',
-      :engine_num,
-      '5',
-      { :params => {
-          :connect => ['2049'],
-          :client => false,
-          :accept => '20490'
-      },
-      :key_str => 'engineNum'
-    })
-
-    variable_test(
-      'nfs',
-      :session_cache_size,
-      '12345',
-      { :params => {
-          :connect => ['2049'],
-          :client => false,
-          :accept => '20490'
-      },
-      :key_str => 'sessionCacheSize'
-    })
-
-    variable_test(
-      'nfs',
-      :session_cache_timeout,
-      '12345',
-      { :params => {
-          :connect => ['2049'],
-          :client => false,
-          :accept => '20490'
-      },
-      :key_str => 'sessionCacheTimeout'
-    })
-
-    variable_test(
-      'nfs',
-      :reset,
-      true,
-      { :params => {
-          :connect => ['2049'],
-          :client => false,
-          :accept => '20490'
-      },
-      :val_str => 'yes'
-    })
-
-    variable_test(
-      'nfs',
-      :renegotiation,
-      true,
-      { :params => {
-          :connect => ['2049'],
-          :client => false,
-          :accept => '20490'
-      },
-      :val_str => 'yes'
-    })
   end
 end
