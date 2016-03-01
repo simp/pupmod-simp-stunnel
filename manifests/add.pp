@@ -400,6 +400,8 @@ define stunnel::add(
   validate_net_list($client_nets,'^any$')
   validate_bool($use_iptables)
 
+  compliance_map()
+
   # Validation for RHEL6/7 Options. Defaulting to 7.
   if ($::operatingsystem in ['Red Hat','CentOS']) and ($::operatingsystemmajrelease < '7') {
     if $::stunnel::fips {

@@ -149,6 +149,8 @@ class stunnel (
   if $rnd_overwrite { validate_bool($rnd_overwrite) }
   validate_array($socket_options)
 
+  compliance_map()
+
   if ( str2bool($::selinux_enforced) ) or !($chroot or str2bool($::selinux_enforced)) {
     $l_chroot = false
   }

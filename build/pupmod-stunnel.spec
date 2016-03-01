@@ -1,7 +1,7 @@
 Summary: Stunnel Puppet Module
 Name: pupmod-stunnel
 Version: 4.2.0
-Release: 10
+Release: 11
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -15,6 +15,7 @@ Requires: puppet >= 3.3.0
 Buildarch: noarch
 Requires: simp-bootstrap >= 4.2.0
 Obsoletes: pupmod-stunnel-test
+Requires: pupmod-onyxpoint-compliance_markup
 
 Prefix: /etc/puppet/environments/simp/modules
 
@@ -57,6 +58,9 @@ fi
 # Post uninstall stuff
 
 %changelog
+* Tue Mar 01 2016 Ralph Wright <ralph.wright@onyxpoint.com> - 4.2.0-11
+- Added compliance function support
+
 * Mon Nov 09 2015 Chris Tessmer <chris.tessmer@onypoint.com> - 4.2.0-10
 - migration to simplib and simpcat (lib/ only)
 
