@@ -11,8 +11,8 @@ bool_translate = {
 if has_variable?('setgid') then
   stunnel_conf << ["# This file managed by Puppet. Manual changes will be erased!\n"]
 
-  if @l_chroot then
-    stunnel_conf << "chroot = #{@l_chroot}"
+  if @_chroot then
+    stunnel_conf << "chroot = #{@_chroot}"
   end
 
   stunnel_conf << "setgid = #{@setgid}"
@@ -80,10 +80,10 @@ else
     stunnel_conf << "sni = #{@sni}"
   end
 
-  stunnel_conf << "key = #{@key}"
-  stunnel_conf << "cert = #{@cert}"
-  stunnel_conf << "CApath = #{@ca_path}"
-  stunnel_conf << "CRLpath = #{@crl_path}"
+  stunnel_conf << "key = #{@_key}"
+  stunnel_conf << "cert = #{@_cert}"
+  stunnel_conf << "CApath = #{@_ca_path}"
+  stunnel_conf << "CRLpath = #{@_crl_path}"
   stunnel_conf << "ciphers = #{@ciphers.join(':')}"
 
   if @curve then

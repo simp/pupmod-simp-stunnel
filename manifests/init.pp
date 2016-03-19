@@ -11,6 +11,33 @@
 #   The location of the chroot jail. Do NOT make this anything under
 #   /var/run.
 #
+# [*key*]
+#   Type: Absolute Path
+#   Default: /etc/pki/private/${::fqdn}.pem
+#
+#   Path and name of the private SSL key file.
+#
+# [*cert*]
+#   Type: Absolute Path
+#   Default: /etc/pki/public/${::fqdn}.pub
+#
+#   Path and name of the public SSL certificate.
+#
+# [*ca_source*]
+#   Type: Absolute Path
+#   Default: '/etc/pki/cacerts'
+#     Since stunnel runs in a chroot, you need to copy the appropriate
+#     CA certificates in from an external source.
+#
+#     This should be the full path to a directory containing hashed versions of
+#     the CA certificates.
+#
+# [*crl_source*]
+#   Type: Absolute Path
+#   Default: '/etc/pki/crl'
+#     Since stunnel runs in a chroot, you need to copy the appropriate
+#     CRL in from an external source.
+#
 # [*pid*]
 #   Type: Absolute Path
 #   Default: '/var/run/stunnel/stunnel.pid'
@@ -110,12 +137,24 @@
 #
 #   If populated, provides an array of socket options of the form '^(a|l|r):.+=.+(:.+)?$'.
 #
+# [*use_simp_pki*]
+#   Type: Boolean
+#   Default: true
+#
+#   If true, use the SIMP PKI module for key management.
+#   Note: This module needs the pki::copy method from the SIMP pki module but
+#         does not need to have SIMP actuallly manage the keys.
+
 # == Authors
 #
 # * Trevor Vaughan <tvaughan@onyxpoint.com>
 #
 class stunnel (
   $chroot = '/var/stunnel',
+  $key = "/etc/pki/private/${::fqdn}.pem",
+  $cert = "/etc/pki/public/${::fqdn}.pub",
+  $ca_source = '/etc/pki/cacerts',
+  $crl_source = '/etc/pki/crl',
   $pid = '/var/run/stunnel/stunnel.pid',
   $setuid = 'stunnel',
   $setgid = 'stunnel',
@@ -130,10 +169,21 @@ class stunnel (
   $rnd_bytes = false,
   $rnd_file = false,
   $rnd_overwrite = false,
-  $socket_options = []
+  $socket_options = [],
+  $use_simp_pki = defined('$::use_simp_pki') ? { true => $::use_simp_pki, default => hiera('use_simp_pki', true) }
 ) {
+  if ( str2bool($::selinux_enforced) ) or !($chroot or str2bool($::selinux_enforced)) {
+    $_chroot = false
+  }
+  else {
+    $_chroot = $chroot
+  }
 
-  if $l_chroot { validate_absolute_path($l_chroot) }
+  if $_chroot { validate_absolute_path($_chroot) }
+  validate_absolute_path($key)
+  validate_absolute_path($cert)
+  validate_absolute_path($ca_source)
+  validate_absolute_path($crl_source)
   if $pid { validate_absolute_path($pid) }
   validate_string($setuid)
   validate_string($setgid)
@@ -151,11 +201,8 @@ class stunnel (
 
   compliance_map()
 
-  if ( str2bool($::selinux_enforced) ) or !($chroot or str2bool($::selinux_enforced)) {
-    $l_chroot = false
-  }
-  else {
-    $l_chroot = $chroot
+  if $use_simp_pki {
+    include '::pki'
   }
 
   concat_build { 'stunnel':
@@ -211,9 +258,9 @@ class stunnel (
     audit     => content
   }
 
-  if $l_chroot {
-    # The l_chroot directory
-    file { $l_chroot:
+  if $_chroot {
+    # The _chroot directory
+    file { $_chroot:
       ensure  => 'directory',
       owner   => 'root',
       group   => $setgid,
@@ -223,8 +270,8 @@ class stunnel (
     }
 
     # The following two entries are required to be able to properly resolve
-    # hosts using the l_chroot directory.
-    file { "${l_chroot}/etc":
+    # hosts using the _chroot directory.
+    file { "${_chroot}/etc":
       ensure  => 'directory',
       owner   => 'root',
       group   => 'root',
@@ -233,7 +280,7 @@ class stunnel (
       require => Package['stunnel']
     }
 
-    file { "${l_chroot}/etc/resolv.conf":
+    file { "${_chroot}/etc/resolv.conf":
       ensure  => 'file',
       owner   => 'root',
       group   => 'root',
@@ -243,7 +290,7 @@ class stunnel (
       require => Package['stunnel']
     }
 
-    file { "${l_chroot}/etc/nsswitch.conf":
+    file { "${_chroot}/etc/nsswitch.conf":
       ensure  => 'file',
       owner   => 'root',
       group   => 'root',
@@ -253,39 +300,55 @@ class stunnel (
       require => Package['stunnel']
     }
 
-    file { "${l_chroot}/etc/hosts":
+    file { "${_chroot}/etc/hosts":
       ensure  => 'file',
       owner   => 'root',
       group   => 'root',
       mode    => '0644',
-      source  => 'file:////etc/hosts',
+      source  => 'file:///etc/hosts',
       tag     => 'firstrun',
       require => Package['stunnel']
     }
 
-    file { "${l_chroot}/var":
+    file { "${_chroot}/var":
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
       mode   => '0644'
     }
 
-    file { "${l_chroot}/var/run":
+    file { "${_chroot}/var/run":
       ensure => 'directory',
       owner  => $setuid,
       group  => $setgid,
       mode   => '0644'
     }
 
-    pki::copy { "${l_chroot}/etc":
+    file { "${_chroot}/var/run/stunnel":
+      ensure => 'directory',
+      owner  => $setuid,
       group  => $setgid,
-      notify => Service['stunnel']
+      mode   => '0644'
     }
 
-    File["${l_chroot}/etc/resolv.conf"] -> Service['stunnel']
-    File["${l_chroot}/etc/nsswitch.conf"] -> Service['stunnel']
-    File["${l_chroot}/etc/hosts"] -> Service['stunnel']
-    File["${l_chroot}/var/run"] -> Service['stunnel']
+    file { "${_chroot}/etc/pki":
+      ensure => 'directory',
+      owner  => 'root',
+      group  => $setgid,
+      mode   => '0640'
+    }
+
+    file { "${_chroot}/etc/pki/cacerts":
+      source  => "file://${ca_source}",
+      group   => $setgid,
+      recurse => true,
+      notify  => Service['stunnel']
+    }
+
+    File["${_chroot}/etc/resolv.conf"] -> Service['stunnel']
+    File["${_chroot}/etc/nsswitch.conf"] -> Service['stunnel']
+    File["${_chroot}/etc/hosts"] -> Service['stunnel']
+    File["${_chroot}/var/run"] -> Service['stunnel']
   }
 
   group { $setgid:
@@ -299,7 +362,6 @@ class stunnel (
     ensure => 'latest',
     tag    => 'firstrun'
   }
-
 
   service { 'stunnel':
     ensure     => 'running',

@@ -1,7 +1,7 @@
 Summary: Stunnel Puppet Module
 Name: pupmod-stunnel
-Version: 4.2.0
-Release: 11
+Version: 4.2.1
+Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
 Source: %{name}-%{version}-%{release}.tar.gz
@@ -17,7 +17,7 @@ Requires: simp-bootstrap >= 4.2.0
 Obsoletes: pupmod-stunnel-test
 Requires: pupmod-onyxpoint-compliance_markup
 
-Prefix: /etc/puppet/environments/simp/modules
+Prefix: %{_sysconfdir}/puppet/environments/simp/modules
 
 %description
 This Puppet module provides the capability to configure stunnel channels on your
@@ -50,14 +50,15 @@ mkdir -p %{buildroot}/%{prefix}/stunnel
 %post
 #!/bin/sh
 
-if [ -d %{prefix}/stunnel/plugins ]; then
-  /bin/mv %{prefix}/stunnel/plugins %{prefix}/stunnel/plugins.bak
-fi
-
 %postun
 # Post uninstall stuff
 
 %changelog
+* Sat Mar 19 2016 Trevor Vaughan <tvaughan@onyxpoint.comm> - 4.2.1-0
+- Migrated use_simp_pki to a global catalyst.
+- Fixed several ordering issues.
+- Increase safety by moving the public and private keys out of the chroot jail.
+
 * Tue Mar 01 2016 Ralph Wright <ralph.wright@onyxpoint.com> - 4.2.0-11
 - Added compliance function support
 

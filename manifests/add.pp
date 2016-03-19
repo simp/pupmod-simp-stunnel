@@ -59,13 +59,13 @@
 #
 # [*key*]
 #   Type: Absolute Path
-#   Default: /etc/pki/private/${::fqdn}.pem
+#   Default: $::stunnel::key
 #
 #   Path and name of the private SSL key file.
 #
 # [*cert*]
 #   Type: Absolute Path
-#   Default: /etc/pki/public/${::fqdn}.pub
+#   Default: $::stunnel::cert
 #
 #   Path and name of the public SSL certificate.
 #
@@ -73,7 +73,8 @@
 #   Type: Absolute Path
 #   Default: /etc/pki/cacerts
 #
-#   Path to the OpenSSL compatible CA certificates.
+#   Path to the OpenSSL compatible CA certificates. Note, this path is relative
+#   to the chroot path if set and is expected to be a directory.
 #
 # [*crl_path*]
 #   Type: Absolute Path
@@ -298,8 +299,8 @@ define stunnel::add(
   $client = true,
   $failover = 'rr',
   $sni = false,
-  $key = "/etc/pki/private/${::fqdn}.pem",
-  $cert = "/etc/pki/public/${::fqdn}.pub",
+  $key = '',
+  $cert = '',
   $ca_path = '/etc/pki/cacerts',
   $crl_path = '/etc/pki/crl',
   $ciphers = ['HIGH','-SSLv2'],
@@ -334,44 +335,13 @@ define stunnel::add(
   $client_nets = 'any',
   $use_iptables = true
 ) {
-  include 'stunnel'
-
-  concat_fragment { "stunnel+stunnel_${name}.conf":
-    content => template('stunnel/stunnel.erb')
-  }
-
-  # The rules are pulled together from the accept_* and connect_*
-  # variables.
-  #
-  # This is only enabled if the system is a server.
-  if $use_iptables and !$client {
-    include 'iptables'
-
-    $dport = split($accept,':')
-
-    iptables::add_tcp_stateful_listen { "allow_stunnel_${name}":
-      client_nets => $client_nets,
-      dports      => $dport[-1]
-    }
-  }
-
-  if $libwrap and !$client {
-    include 'tcpwrappers'
-
-    tcpwrappers::allow { "allow_stunnel_${name}":
-      pattern => nets2ddq($client_nets)
-    }
-  }
+  include '::stunnel'
 
   validate_array($connect)
   validate_re_array($connect,'^(.+:)?\d+$')
   validate_re($accept,'^(.+:)?\d+$')
   validate_bool($client)
   validate_array_member($failover,['rr','prio'])
-  validate_absolute_path($key)
-  validate_absolute_path($cert)
-  validate_absolute_path($ca_path)
-  validate_absolute_path($crl_path)
   validate_array($ciphers)
   validate_array($options)
   validate_between($verify, 0, 4)
@@ -399,8 +369,6 @@ define stunnel::add(
   if $timeout_idle { validate_integer($timeout_idle) }
   validate_net_list($client_nets,'^any$')
   validate_bool($use_iptables)
-
-  compliance_map()
 
   # Validation for RHEL6/7 Options. Defaulting to 7.
   if ($::operatingsystem in ['Red Hat','CentOS']) and ($::operatingsystemmajrelease < '7') {
@@ -431,5 +399,63 @@ define stunnel::add(
     if $engine_num { validate_integer($engine_num) }
     validate_bool($libwrap)
     if $session_cache_size { validate_integer($session_cache_size) }
+  }
+
+  if empty($key) {
+    $_key = $::stunnel::key
+  }
+  else {
+    $_key = $key
+    validate_absolute_path($key)
+  }
+  if empty($cert) {
+    $_cert = $::stunnel::cert
+  }
+  else {
+    $_cert = $cert
+    validate_absolute_path($cert)
+  }
+  if empty($ca_path) {
+    $_ca_path = $::stunnel::ca_path
+  }
+  else {
+    $_ca_path = $ca_path
+    validate_absolute_path($ca_path)
+  }
+  if empty($crl_path) {
+    $_crl_path = $::stunnel::crl_path
+  }
+  else {
+    $_crl_path = $crl_path
+    validate_absolute_path($crl_path)
+  }
+
+  compliance_map()
+
+  concat_fragment { "stunnel+stunnel_${name}.conf":
+    content => template('stunnel/stunnel.erb')
+  }
+
+  # The rules are pulled together from the accept_* and connect_*
+  # variables.
+  #
+  # This is only enabled if the system is a server.
+  if $use_iptables and !$client {
+    include '::iptables'
+
+    $dport = split($accept,':')
+
+    iptables::add_tcp_stateful_listen { "allow_stunnel_${name}":
+      client_nets => $client_nets,
+      dports      => $dport[-1]
+    }
+  }
+
+  if $libwrap and !$client {
+    include '::tcpwrappers'
+
+    tcpwrappers::allow { "allow_stunnel_${name}":
+      pattern => nets2ddq($client_nets)
+    }
   }
 }

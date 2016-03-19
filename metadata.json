@@ -1,6 +1,6 @@
 {
   "name":    "simp-stunnel",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "author":  "simp",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",
@@ -10,23 +10,23 @@
   "tags": [ "simp", "stunnel", "pki", "tls", "ssl" ],
   "dependencies": [
     {
-      "name": "simp-iptables",
+      "name": "simp/iptables",
       "version_requirement": ">= 2.0.0"
     },
     {
-      "name": "simp-openldap",
+      "name": "simp/openldap",
       "version_requirement": ">= 2.0.0"
     },
     {
-      "name": "simp-pki",
+      "name": "simp/pki",
       "version_requirement": ">= 3.0.0"
     },
     {
-      "name": "simp-simpcat",
+      "name": "simp/simpcat",
       "version_requirement": ">= 4.0.0"
     },
     {
-      "name": "simp-simplib",
+      "name": "simp/simplib",
       "version_requirement": ">= 1.0.0"
     },
     {
