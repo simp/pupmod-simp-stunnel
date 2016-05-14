@@ -27,7 +27,7 @@ end
 
 describe 'stunnel' do
   context 'supported operating systems' do
-    on_supported_os.each do |os, facts|
+    on_supported_os({:selinux_mode => :disabled}).each do |os, facts|
       context "on #{os}" do
         let(:facts){ facts }
 

@@ -1,6 +1,6 @@
 Summary: Stunnel Puppet Module
 Name: pupmod-stunnel
-Version: 4.2.1
+Version: 4.2.2
 Release: 0
 License: Apache License, Version 2.0
 Group: Applications/System
@@ -54,6 +54,9 @@ mkdir -p %{buildroot}/%{prefix}/stunnel
 # Post uninstall stuff
 
 %changelog
+* Wed May 18 2016 Chris Tessmer <chris.tessmer@onypoint.com> - 4.2.2-0
+- Sanitize code for `STRICT_VARIABLES=yes`
+
 * Sat Mar 19 2016 Trevor Vaughan <tvaughan@onyxpoint.comm> - 4.2.1-0
 - Migrated use_simp_pki to a global catalyst.
 - Fixed several ordering issues.
