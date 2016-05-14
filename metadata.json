@@ -1,13 +1,19 @@
 {
-  "name":    "simp-stunnel",
-  "version": "4.2.1",
-  "author":  "simp",
+  "name": "simp-stunnel",
+  "version": "4.2.2",
+  "author": "simp",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",
-  "source":  "https://github.com/simp/pupmod-simp-stunnel",
+  "source": "https://github.com/simp/pupmod-simp-stunnel",
   "project_page": "https://github.com/simp/pupmod-simp-stunnel",
-  "issues_url":   "https://simp-project.atlassian.net",
-  "tags": [ "simp", "stunnel", "pki", "tls", "ssl" ],
+  "issues_url": "https://simp-project.atlassian.net",
+  "tags": [
+    "simp",
+    "stunnel",
+    "pki",
+    "tls",
+    "ssl"
+  ],
   "dependencies": [
     {
       "name": "simp/iptables",

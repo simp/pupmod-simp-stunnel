@@ -8,7 +8,7 @@ bool_translate = {
 
 # This is just a stupid way to differentate between global options and
 # service options
-if has_variable?('setgid') then
+if scope.function_defined(['$setgid']) then
   stunnel_conf << ["# This file managed by Puppet. Manual changes will be erased!\n"]
 
   if @_chroot then
@@ -25,7 +25,7 @@ if has_variable?('setgid') then
   end
 
   if @compression then
-    stunnel_conf << "compression = #{compression}"
+    stunnel_conf << "compression = #{@compression}"
   end
 
   if @egd then
