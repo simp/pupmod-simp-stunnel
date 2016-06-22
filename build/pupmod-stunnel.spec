@@ -1,235 +1,291 @@
-Summary: Stunnel Puppet Module
-Name: pupmod-stunnel
-Version: 4.2.2
-Release: 0
-License: Apache License, Version 2.0
-Group: Applications/System
-Source: %{name}-%{version}-%{release}.tar.gz
-Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-Requires: pupmod-simpcat >= 4.0.0-0
-Requires: pupmod-iptables >= 2.0.0-0
-Requires: pupmod-pki >= 3.0.0-0
-Requires: pupmod-openldap >= 2.0.0-0
-Requires: pupmod-simplib >= 1.0.0-0
-Requires: puppet >= 3.3.0
-Buildarch: noarch
-Requires: simp-bootstrap >= 4.2.0
-Obsoletes: pupmod-stunnel-test
-Requires: pupmod-onyxpoint-compliance_markup
+%{lua:
 
-Prefix: %{_sysconfdir}/puppet/environments/simp/modules
+--
+-- When you build you must to pass this along so that we know how
+-- to get the preliminary information.
+-- This directory should hold the following items:
+--   * 'build' directory
+--   * 'CHANGELOG' <- The RPM formatted Changelog
+--   * 'metadata.json'
+--
+-- Example:
+--   rpmbuild -D 'pup_module_info_dir /home/user/project/puppet_module' -ba SPECS/specfile.spec
+--
+
+src_dir = rpm.expand('%{pup_module_info_dir}')
+if string.match(src_dir, '^%%') then
+  src_dir = './'
+end
+
+-- These UNKNOWN entries should break the build if something bad happens
+
+module_name = "UNKNOWN"
+module_version = "UNKNOWN"
+module_license = "UNKNOWN"
+
+-- Default to 0
+module_release = '0'
+
+}
+
+%{lua:
+-- Pull the Relevant Metadata out of the Puppet module metadata.json.
+
+metadata = ''
+metadata_file = io.open(src_dir .. "/metadata.json","r")
+if metadata_file then
+  metadata = metadata_file:read("*all")
+end
+
+-- This starts as an empty string so that we can build it later
+module_requires = ''
+
+}
+
+%{lua:
+
+-- Get the Module Name and put it in the correct format
+
+local name_match = string.match(metadata, '"name":%s+"(.-)"%s*,')
+
+if name_match then
+  local i = 0
+  for str in string.gmatch(name_match,'[^-]+') do
+    if i ~= 0 then
+      if i == 1 then
+        module_name = str
+      else
+        module_name = (module_name .. '-' .. str)
+      end
+    end
+
+    i = i+1
+  end
+end
+
+}
+
+%{lua:
+
+-- Get the Module Version
+-- This will not be processed at all
+
+local version_match = string.match(metadata, '"version":%s+"(.-)"%s*,')
+
+if version_match then
+  module_version = version_match
+end
+
+}
+
+%{lua:
+
+-- Get the Module License
+-- This will not be processed at all
+
+local license_match = string.match(metadata, '"license":%s+"(.-)"%s*,')
+
+if license_match then
+  module_license = license_match
+end
+
+}
+
+%{lua:
+
+-- Get the Module Summary
+-- This will not be processed at all
+
+local summary_match = string.match(metadata, '"summary":%s+"(.-)"%s*,')
+
+if summary_match then
+  module_summary = summary_match
+end
+
+}
+
+%{lua:
+
+-- Get the Module Source line for the URL string
+-- This will not be processed at all
+
+local source_match = string.match(metadata, '"source":%s+"(.-)"%s*,')
+
+if source_match then
+  module_source = source_match
+end
+
+}
+
+%{lua:
+
+-- Snag the RPM-specific items out of the 'build/rpm_metadata' directory
+
+-- First, the Release Number
+
+local rel_file = io.open(src_dir .. "/build/rpm_metadata/release", "r")
+if rel_file then
+  for line in rel_file:lines() do
+    is_comment = string.match(line, "^%s*#")
+    is_blank = string.match(line, "^%s*$")
+
+    if not (is_comment or is_blank) then
+      module_release = line
+      break
+    end
+  end
+end
+
+}
+
+%{lua:
+
+-- Next, the Requirements
+local req_file = io.open(src_dir .. "/build/rpm_metadata/requires", "r")
+if req_file then
+  for line in req_file:lines() do
+    valid_line = (string.match(line, "^Requires: ") or string.match(line, "^Obsoletes: ") or string.match(line, "^Provides: "))
+
+    if valid_line then
+      module_requires = (module_requires .. "\n" .. line)
+    end
+  end
+end
+}
+
+%define module_name %{lua: print(module_name)}
+%define base_name pupmod-%{module_name}
+
+%{lua:
+-- Determine which Variant we are going to build
+
+local variant = rpm.expand("%{_variant}")
+local variant_version = nil
+
+local foo = ""
+
+local i = 0
+for str in string.gmatch(variant,'[^-]+') do
+  if i == 0 then
+    variant = str
+  elseif i == 1 then
+    variant_version = str
+  else
+    break
+  end
+
+  i = i+1
+end
+
+rpm.define("variant " .. variant)
+
+if variant == "pe" then
+  rpm.define("puppet_user pe-puppet")
+else
+  rpm.define("puppet_user puppet")
+end
+
+if variant == "pe" then
+  if variant_version and ( rpm.vercmp(variant_version,'4') >= 0 ) then
+    rpm.define("_sysconfdir /etc/puppetlabs/code")
+  else
+    rpm.define("_sysconfdir /etc/puppetlabs/puppet")
+  end
+elseif variant == "p4" then
+  rpm.define("_sysconfdir /etc/puppetlabs/code")
+else
+  rpm.define("_sysconfdir /etc/puppet")
+end
+}
+
+Summary:   %{module_name} Puppet Module
+%if 0%{?_variant:1}
+Name:      %{base_name}-%{_variant}
+%else
+Name:      %{base_name}
+%endif
+
+Version:   %{lua: print(module_version)}
+Release:   %{lua: print(module_release)}
+License:   %{lua: print(module_license)}
+Group:     Applications/System
+Source:    %{base_name}-%{version}-%{release}.tar.gz
+URL:       %{lua: print(module_source)}
+BuildRoot: %{_tmppath}/%{base_name}-%{version}-%{release}-buildroot
+BuildArch: noarch
+
+%if "%{variant}" == "pe"
+Requires: pe-puppet
+%else
+Requires: puppet
+%endif
+
+%{lua: print(module_requires)}
+
+Prefix: %{_sysconfdir}/environments/simp/modules
 
 %description
-This Puppet module provides the capability to configure stunnel channels on your
-system.
+%{lua: print(module_summary)}
 
 %prep
-%setup -q
+%setup -q -n %{base_name}-%{version}
 
 %build
 
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
-mkdir -p %{buildroot}/%{prefix}/stunnel
+mkdir -p %{buildroot}/%{prefix}
 
-dirs='files lib manifests templates'
-for dir in $dirs; do
-  test -d $dir && cp -r $dir %{buildroot}/%{prefix}/stunnel
-done
+rm -rf .git
+rm -f *.lock
+rm -rf spec/fixtures/modules
+rm -rf dist
+rm -rf junit
+rm -rf log
+
+curdir=`pwd`
+dirname=`basename $curdir`
+cp -r ../$dirname %{buildroot}/%{prefix}/%{module_name}
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
-mkdir -p %{buildroot}/%{prefix}/stunnel
+mkdir -p %{buildroot}/%{prefix}
 
 %files
-%defattr(0640,root,puppet,0750)
-%{prefix}/stunnel
-
-%post
-#!/bin/sh
-
-%postun
-# Post uninstall stuff
+%defattr(0640,root,%{puppet_user},0750)
+%{prefix}/%{module_name}
 
 %changelog
-* Wed May 18 2016 Chris Tessmer <chris.tessmer@onypoint.com> - 4.2.2-0
-- Sanitize code for `STRICT_VARIABLES=yes`
+%{lua:
+-- Finally, the CHANGELOG
 
-* Sat Mar 19 2016 Trevor Vaughan <tvaughan@onyxpoint.comm> - 4.2.1-0
-- Migrated use_simp_pki to a global catalyst.
-- Fixed several ordering issues.
-- Increase safety by moving the public and private keys out of the chroot jail.
+-- A default CHANGELOG in case we cannot find a real one
 
-* Tue Mar 01 2016 Ralph Wright <ralph.wright@onyxpoint.com> - 4.2.0-11
-- Added compliance function support
+default_changelog = [===[
+* $date Auto Changelog <auto@no.body> - $version-$release
+- Latest release of $name
+]===]
 
-* Mon Nov 09 2015 Chris Tessmer <chris.tessmer@onypoint.com> - 4.2.0-10
-- migration to simplib and simpcat (lib/ only)
+default_lookup_table = {
+  date = os.date("%a %b %d %Y"),
+  version = module_version,
+  release = module_release,
+  name = module_name
+}
 
-* Tue Jul 21 2015 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-9
-- Moved stunnel's default pid location back to /var/run/stunnel/stunnel.pid.
-- Stunnel's init script now only creates and chowns the pid file directory
-  if it does not exist.
+changelog = io.open(src_dir .. "/CHANGELOG","r")
+if changelog then
+  first_line = changelog:read()
+  if string.match(first_line, "^*%s+%a%a%a%s+%a%a%a%s+%d%d?%s+%d%d%d%d%s+.+") then
+    changelog:seek("set",0)
+    print(changelog:read("*all"))
+  else
+    print((default_changelog:gsub('$(%w+)', default_lookup_table)))
+  end
+else
+  print((default_changelog:gsub('$(%w+)', default_lookup_table)))
+end
+}
 
-* Wed Jul 01 2015 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-8
-- Stunnel's default pid file location moved from /var/run/stunnel/stunnel.pid
-  to /var/run/stunnel.pid
-
-* Thu Apr 02 2015 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-7
-- Fixed a scoping error in the template
-
-* Fri Feb 27 2015 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-6
-- Fixed a non-scoped call to @options in the stunnel ERB file.
-
-* Thu Feb 19 2015 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-5
-- Migrated to the new 'simp' environment.
-
-* Fri Jan 16 2015 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-4
-- Changed puppet-server requirement to puppet
-
-* Thu Nov 06 2014 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-3
-- Fix chroot detection in SELinux mode.
-
-* Tue Nov 04 2014 Trevor Vaughan <tvaughan@onxypoint.com> - 4.2.0-2
-- Ensure that renegotiation and reset only apply on RHEL>6 systems.
-
-* Sun Nov 02 2014 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-1
-- Updated to add the FIPS global option to the stunnel configuration.
-
-* Tue Oct 21 2014 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.0-0
-- CVE-2014-3566: Updated protocols to mitigate POODLE.
-- Updated all of the stunnel module to properly handle both RHEL6 and
-  RHEL7.
-- Now support multiple connect options.
-- The connect/accept hosts and ports are no longer separate.
-
-* Fri Aug 08 2014 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.1.0-4
-- Change 'delay' to 'no' by default to ensure that DNS lookups happen
-  before entering the chroot jail. This currently does not work in
-  RHEL7.
-- Add nsswitch.conf to the chroot jail.
-
-* Fri Aug 08 2014 Kendall Moore <kmoore@keywcorp.com> - 4.1.0-4
-- Move stunnel outside of a chroot jail when SELinux is set to enforcing.
-
-* Fri Apr 04 2014 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.1.0-3
-- Now simply include 'stunnel' in 'stunnel::add' instead of raising an
-  exception.
-
-* Wed Mar 26 2014 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.1.0-2
-- Moved stunnel::stunnel_add to stunnel::add
-- Replaced all of the PKI copy code with a call to the new pki::copy define.
-- Fixed a bug with the CA path and CRL path in the stunnel configuration file.
-
-* Wed Mar 12 2014 Nick Markowski <nmarkowski@keywcorp.com> - 4.1.0-1
-- Updated module for hiera/puppet3, and lint tests.
-- Copied pki keys and certs to <chroot_path>/etc/stunnel/pki
-- Added rspec tests.
-
-* Tue Jan 28 2014 Kendall Moore <kmoore@keywcorp.com> 4.1.0-0
-- Update to remove warnings about IPTables not being detected. This is a
-  nuisance when allowing other applications to manage iptables legitimately.
-
-* Mon Oct 07 2013 Kendall Moore <kmoore@keywcorp.com> - 4.0.0-12
-- Updated all erb templates to properly scope variables.
-
-* Fri Jun 07 2013 Kendall Moore <kmoore@keywcorp.com>
-4.0.0-11
-- Updated the stunnel start script to allow for the occurence of both *pid*
-  and *chroot* to appear in a hostname
-
-* Mon Jan 07 2013 Maintenance
-4.0.0-10
-- Created a test to install and configure stunnel and to make sure that the
-  stunnel service is running.
-- Created a test to add an stunnel on the first open port start at number 1024
-  and ensure that the chosen port is in state LISTEN and owned by stunnel.
-
-* Tue Nov 27 2012 Maintenance
-4.0.0-9
-- Fixed the stunnel init script to have proper startup output.
-- Updated to set the umask for stunnel open files to 1048576 for heavily loaded
-  systems.
-- Updated the stunnel init script to allow unlimited processes since there is
-  one per connection.
-
-* Mon Nov 05 2012 Maintenance
-4.0.0-8
-- Removed the useless CRL copy exec.
-- Removed the PKI Cert copy exec and replaced it with a recursive copy/purge
-  file resource.
-
-* Fri Sep 28 2012 Maintenance
-4.0.0-7
-- Moved the chroot run directory for stunnel from /var/run/stunnel to
-  /var/stunnel since /var/run gets cleaned out upon reboot.
-
-* Fri Aug 10 2012 Maintenance
-4.0.0-6
-- Update to set max open files ulimit to unlimited in the init script.
-
-* Wed Apr 11 2012 Maintenance
-4.0.0-5
-- Moved mit-tests to /usr/share/simp...
-- Updated pp files to better meet Puppet's recommended style guide.
-
-* Fri Mar 02 2012 Maintenance
-4.0.0-4
-- Improved test stubs.
-
-* Mon Dec 26 2011 Maintenance
-4.0-3
-- Updated the spec file to not require a separate file list.
-- Scoped all of the top level variables.
-
-* Tue Oct 25 2011 Maintenance
-4.0-2
-- Added a note about the transparent mode of stunnel not working
-  properly in RHEL6.
-
-* Mon Oct 10 2011 Maintenance
-4.0-1
-- Updated to put quotes around everything that need it in a comparison
-  statement so that puppet > 2.5 doesn't explode with an undef error.
-
-* Tue Jul 12 2011 Maintenance
-4.0-0
-- Stunnel doesn't care if we're using LDAP or not, so don't check for the
-  value when setting up key permissions.
-
-* Mon Apr 18 2011 Maintenance - 2.0.0-1
-- Changed puppet://$puppet_server/ to puppet:///
-- Ensure that stunnel does not restart when 'resolv.conf' or 'hosts' is updated.
-- Ensure that the stunnel service watches for changes in the entire certificate
-  space.
-- Changed all instances of defined(Class['foo']) to defined('foo') per the
-  directions from the Puppet mailing list.
-- Updated to use concat_build and concat_fragment types.
-
-* Tue Jan 11 2011 Maintenance
-2.0.0-0
-- Refactored for SIMP-2.0.0-alpha release
-
-* Tue Oct 26 2010 Maintenance - 1-2
-- Converting all spec files to check for directories prior to copy.
-
-* Wed Jul 14 2010 Maintenance
-1.0-1
-- Updated stunnel to start at runlevel 15 and ensured that it updated its
-  chkconfig entires approprately
-
-* Tue May 25 2010 Maintenance
-1.0-0
-- Code refactoring.
-
-* Thu Feb 18 2010 Maintenance
-0.1-11
-- Added a paramater $client_nets to the stunnel_add define to allow users to
-  lock down access to the encrypted port via IPTables.
-
-* Thu Oct 08 2009 Maintenance
-0.1-10
-- Finally fixed the problem with cert verification.  All uses of stunnel can now
-  set verify to 1 or 2.

@@ -164,7 +164,7 @@ class stunnel (
   $egd = false,
   $engine = 'auto',
   $engine_ctrl = false,
-  $fips = hiera('use_fips',false),
+  $fips = defined('$::use_fips') ? { true => $::use_fips, default => hiera('use_fips', false) },
   $output = false,
   $rnd_bytes = false,
   $rnd_file = false,
