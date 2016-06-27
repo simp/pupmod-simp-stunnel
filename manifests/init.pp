@@ -137,6 +137,12 @@
 #
 #   If populated, provides an array of socket options of the form '^(a|l|r):.+=.+(:.+)?$'.
 #
+# [*use_haveged*]
+#   Type: Boolean
+#   Default: true
+#
+#   If true, include haveged to assist with entropy generation.
+#
 # [*use_simp_pki*]
 #   Type: Boolean
 #   Default: true
@@ -170,6 +176,7 @@ class stunnel (
   $rnd_file = false,
   $rnd_overwrite = false,
   $socket_options = [],
+  $use_haveged = true,
   $use_simp_pki = defined('$::use_simp_pki') ? { true => $::use_simp_pki, default => hiera('use_simp_pki', true) }
 ) {
   if ( str2bool($::selinux_enforced) ) or !($chroot or str2bool($::selinux_enforced)) {
@@ -198,11 +205,16 @@ class stunnel (
   if $rnd_file { validate_absolute_path($rnd_file) }
   if $rnd_overwrite { validate_bool($rnd_overwrite) }
   validate_array($socket_options)
+  validate_bool($use_haveged)
 
   compliance_map()
 
   if $use_simp_pki {
     include '::pki'
+  }
+
+  if $use_haveged {
+    include '::haveged'
   }
 
   concat_build { 'stunnel':
