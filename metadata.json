@@ -1,6 +1,6 @@
 {
   "name": "simp-stunnel",
-  "version": "4.2.4",
+  "version": "4.2.5",
   "author": "simp",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",
@@ -15,7 +15,7 @@
     "ssl"
   ],
   "dependencies": [
-    { "name": "simp/haveged",
+    { "name": "simp/puppet-haveged",
       "version_requirement": ">= 0.3.0 < 1.0.0"
     },
     {
