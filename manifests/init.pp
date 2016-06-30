@@ -176,7 +176,7 @@ class stunnel (
   $rnd_file = false,
   $rnd_overwrite = false,
   $socket_options = [],
-  $use_haveged = true,
+  $use_haveged = defined('$::use_haveged') ? { true => getvar('::use_haveged'), default => hiera('use_haveged', true) },
   $use_simp_pki = defined('$::use_simp_pki') ? { true => $::use_simp_pki, default => hiera('use_simp_pki', true) }
 ) {
   if ( str2bool($::selinux_enforced) ) or !($chroot or str2bool($::selinux_enforced)) {
