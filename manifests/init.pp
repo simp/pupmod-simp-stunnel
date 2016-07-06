@@ -353,8 +353,13 @@ class stunnel (
     file { "${_chroot}/etc/pki/cacerts":
       source  => "file://${ca_source}",
       group   => $setgid,
+      mode    => '0640',
       recurse => true,
       notify  => Service['stunnel']
+    }
+
+    if $::use_simp_pki {
+      Class['pki'] ~> File["${_chroot}/etc/pki/cacerts"]
     }
 
     File["${_chroot}/etc/resolv.conf"] -> Service['stunnel']

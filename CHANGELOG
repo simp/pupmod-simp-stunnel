@@ -1,3 +1,7 @@
+* Wed Jul 06 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.6-0
+- Ensure that the PKI copy is performed prior to copying the system cacerts
+  into the stunnel chroot.
+
 * Thu Jun 30 2016 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.5-0
 - Use_haveged is now a global catalyst.
 
