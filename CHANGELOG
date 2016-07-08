@@ -1,3 +1,6 @@
+* Fri Jul 08 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.7-0
+- Incorrectly referenced the global $::use_simp_pki in ::stunnel
+
 * Wed Jul 06 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.6-0
 - Ensure that the PKI copy is performed prior to copying the system cacerts
   into the stunnel chroot.
