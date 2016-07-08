@@ -211,6 +211,7 @@ class stunnel (
 
   if $use_simp_pki {
     include '::pki'
+    Class['pki'] -> Class['stunnel']
   }
 
   if $use_haveged {
@@ -356,10 +357,6 @@ class stunnel (
       mode    => '0640',
       recurse => true,
       notify  => Service['stunnel']
-    }
-
-    if $use_simp_pki {
-      Class['pki'] ~> File["${_chroot}/etc/pki/cacerts"]
     }
 
     File["${_chroot}/etc/resolv.conf"] -> Service['stunnel']
