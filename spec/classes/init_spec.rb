@@ -9,7 +9,7 @@ describe 'stunnel' do
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_user('stunnel') }
         it { is_expected.to contain_package('stunnel').that_comes_before('Service[stunnel]') }
-        it { is_expected.to contain_concat_fragment('stunnel+0global.conf') }
+        it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf') }
         it { is_expected.to contain_class('haveged') }
 
         context "alternate gid" do

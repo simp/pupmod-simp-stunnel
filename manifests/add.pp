@@ -432,7 +432,7 @@ define stunnel::add(
 
   compliance_map()
 
-  concat_fragment { "stunnel+stunnel_${name}.conf":
+  simpcat_fragment { "stunnel+stunnel_${name}.conf":
     content => template('stunnel/stunnel.erb')
   }
 
