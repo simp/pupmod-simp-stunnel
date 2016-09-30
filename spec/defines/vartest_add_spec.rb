@@ -15,13 +15,13 @@ def variable_test(title,key,val,opts={})
 
     if opts[:err] then
       it do
-        expect { should contain_concat_fragment("stunnel+stunnel_#{title}.conf") }.to
+        expect { should contain_simpcat_fragment("stunnel+stunnel_#{title}.conf") }.to
           raise_error(opts[:err],opts[:errmsg])
       end
     else
 
       it do
-        should contain_concat_fragment("stunnel+stunnel_#{title}.conf").with({
+        should contain_simpcat_fragment("stunnel+stunnel_#{title}.conf").with({
           'content' => opts[:content]
         })
       end
