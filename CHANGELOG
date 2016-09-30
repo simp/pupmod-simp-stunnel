@@ -1,3 +1,7 @@
+* Fri Sep 30 2016 Trevor Vaughan <tvaughan@onyxpoint.com>,Ryan Russell-Yates <ryan.russellyates@gmail.com> - 4.2.7-0
+- Validate compliance_markup mapping
+- Create Functional README.md for Forge
+
 * Fri Jul 08 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.7-0
 - Incorrectly referenced the global $::use_simp_pki in ::stunnel
 
