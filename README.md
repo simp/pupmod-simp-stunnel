@@ -52,7 +52,7 @@ You can set up stunnel on a node by:
 include stunnel
 ```
 
-or 
+or
 
 ```yaml
 ---
@@ -92,7 +92,7 @@ classes:
 * `chroot`: The location of the chroot jail. Do NOT make this anything under
 /var/run.  Type: Absolute Path.  Default: '/var/stunnel'.
 
-* `key`: Path and name of the private SSL key file.  Type: Absolute Path. 
+* `key`: Path and name of the private SSL key file.  Type: Absolute Path.
 Default: /etc/pki/private/${::fqdn}.pem.
 
 * `cert`: Path and name of the public SSL certificate.  Type: Absolute Path.
