@@ -17,7 +17,7 @@ def variable_test(key,val,opts={})
     else
 
       it do
-        is_expected.to contain_concat_fragment('stunnel+0global.conf').with({
+        is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with({
           'content' => /^\s*#{opts[:key_str]} = #{opts[:val_str]}\n/
         })
       end
@@ -34,7 +34,7 @@ describe 'stunnel' do
         it { is_expected.to compile.with_all_deps }
 
         it do
-          is_expected.to contain_concat_fragment('stunnel+0global.conf').with({
+          is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with({
             'content' => /.*chroot = \/var\/stunnel\nsetgid = stunnel\nsetuid = stunnel\ndebug = err\n.*/
           })
         end

@@ -1,6 +1,6 @@
 {
   "name": "simp-stunnel",
-  "version": "4.2.7",
+  "version": "5.0.0",
   "author": "simp",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",
@@ -32,7 +32,7 @@
     },
     {
       "name": "simp/simpcat",
-      "version_requirement": ">= 4.0.0"
+      "version_requirement": ">= 6.0.0"
     },
     {
       "name": "simp/simplib",

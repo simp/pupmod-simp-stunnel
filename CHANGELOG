@@ -1,3 +1,7 @@
+* Fri Sep 30 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 5.0.0-0
+- Updated to use the version of 'simpcat' that does not conflict with
+  'puppetlabs/concat'.
+
 * Fri Jul 08 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 4.2.7-0
 - Incorrectly referenced the global $::use_simp_pki in ::stunnel
 

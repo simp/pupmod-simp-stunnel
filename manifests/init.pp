@@ -218,13 +218,13 @@ class stunnel (
     include '::haveged'
   }
 
-  concat_build { 'stunnel':
+  simpcat_build { 'stunnel':
     order   => ['*.conf'],
     target  => '/etc/stunnel/stunnel.conf',
     require => Package['stunnel']
   }
 
-  concat_fragment { 'stunnel+0global.conf':
+  simpcat_fragment { 'stunnel+0global.conf':
     content => template('stunnel/stunnel.erb')
   }
 
@@ -266,7 +266,7 @@ class stunnel (
     mode      => '0640',
     notify    => Service['stunnel'],
     require   => Package['stunnel'],
-    subscribe => Concat_build['stunnel'],
+    subscribe => Simpcat_build['stunnel'],
     tag       => 'firstrun',
     audit     => content
   }

@@ -3,5 +3,5 @@ Requires: pupmod-simp-haveged >= 0.3.0
 Requires: pupmod-simp-iptables >= 2.0.0-0
 Requires: pupmod-simp-openldap >= 2.0.0-0
 Requires: pupmod-simp-pki >= 3.0.0-0
-Requires: pupmod-simp-simpcat >= 4.0.0-0
+Requires: pupmod-simp-simpcat >= 6.0.0-0
 Obsoletes: pupmod-stunnel-test >= 0.0.1
