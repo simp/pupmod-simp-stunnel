@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_c9c114e6",
+        "filename": "CHANGELOG",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1005143
+      },
+      "writtenOn": "2016-10-01T00:16:55Z",
+      "side": 1,
+      "message": "щ(ಠ益ಠщ)",
+      "range": {
+        "startLine": 1,
+        "startChar": 113,
+        "endLine": 1,
+        "endChar": 114
+      },
+      "revId": "ce095aeeeabb85f1655e93e465960f1f56665493",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
