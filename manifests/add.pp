@@ -430,7 +430,6 @@ define stunnel::add(
     validate_absolute_path($crl_path)
   }
 
-  compliance_map()
 
   simpcat_fragment { "stunnel+stunnel_${name}.conf":
     content => template('stunnel/stunnel.erb')
