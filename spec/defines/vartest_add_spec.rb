@@ -356,7 +356,7 @@ describe 'stunnel::add' do
     context "specific client nets" do
       let(:title){ 'nfs' }
       let(:params){{
-        :client_nets => ['1.2.3.4.5','5.4.3.2.1/20'],
+        :client_nets => ['1.2.3.4','5.4.3.2/20'],
         :connect => ['2049'],
         :client => false,
         :accept => '20490'
