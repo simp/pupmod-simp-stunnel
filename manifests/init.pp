@@ -207,7 +207,6 @@ class stunnel (
   validate_array($socket_options)
   validate_bool($use_haveged)
 
-  compliance_map()
 
   if $use_simp_pki {
     include '::pki'
