@@ -35,9 +35,8 @@ services.
 
 `simp/stunnel` will install the latest version of stunnel, ensure the service is
 running, generate the stunnel user, manage /etc/stunnel/stunnel.conf,
-/etc/rc.d/init.d/stunnel, a chroot directory, and if `simp/iptables` is
-installed and  $use_iptables is set to true, will manage the iptables required
-for stunnel.
+/etc/rc.d/init.d/stunnel, a chroot directory, and if  $firewall is set to true,
+will manage the iptables required for stunnel.
 
 ### Setup Requirements
 
@@ -133,7 +132,7 @@ parameters.  Type: String.  Default: false.
 * `fips`:  If true, set the fips global option.  We don't enable FIPS mode by
 default since we want to be able to use TLS1.2.  This has no effect on
 RHEL/CentOS 6 or earlier due to stunnel not accepting the fips option in that
-version of stunnel.  Type: Boolean.  Default: hiera('use_fips',false).
+version of stunnel.  Type: Boolean.  Default: false
 
 * `output`: If set, provides the path to a log output file to use.  Type:
 Absolute Path.  Default: false.
@@ -150,12 +149,11 @@ new random data. Type: Boolean.  Default: false.
 * `socket_options`: If populated, provides an array of socket options of the
 form '^(a|l|r):.+=.+(:.+)?$'.  Type: Array of Strings.  Default: [].
 
-* `use_haveged`: If true, include haveged to assist with entropy generation.
-Type: Boolean. Default: true.
+* `haveged`: If true, include haveged to assist with entropy generation.
+Type: Boolean. Default: false.
 
-* `use_simp_pki`: If true, use the SIMP PKI module for key management.  Note:
-This module needsthe pki::copy method from the SIMP pki module but does not need
-to have SIMP actuallly manage the keys.  Type: Boolean.  Default: true.
+* `pki`: If true, use the SIMP PKI module for key management. Type: Boolean.
+Default: false.
 
 ### `stunnel::add`
 
@@ -194,7 +192,7 @@ Path Default: $::stunnel::cert.
 relative to the chroot path if set and is expected to be a directory.  Valid
 Options: Absolute Path Default: /etc/pki/cacerts.
 
-* `client_nets`: Set this if you don't want to allow all IP addresses to access
+* `trusted_nets`: Set this if you don't want to allow all IP addresses to access
 this encrypted channel. This only makes sense for servers.
 
   Example:

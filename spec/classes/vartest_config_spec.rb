@@ -25,7 +25,7 @@ def variable_test(key,val,opts={})
   end
 end
 
-describe 'stunnel' do
+describe 'stunnel::config' do
   context 'supported operating systems' do
     on_supported_os({:selinux_mode => :disabled}).each do |os, facts|
       context "on #{os}" do
@@ -53,7 +53,7 @@ describe 'stunnel' do
         variable_test(:rnd_bytes,'20',{:key_str => 'RNDbytes'})
         variable_test(:rnd_overwrite,true,{:key_str => 'RNDoverwrite',:val_str => 'yes'})
         variable_test(:socket_options,['a:foo=bar'],{:key_str => 'socket', :val_str => 'a:foo=bar'})
-        variable_test(:socket_options,'a:foo=bar',{:err => Puppet::Error, :errmsg => /not an Array/})
+        variable_test(:socket_options,'a:foo=bar',{:err => Puppet::Error, :errmsg => /expects an Array value, got String/})
       end
     end
   end

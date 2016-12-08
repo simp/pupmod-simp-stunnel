@@ -1,6 +1,6 @@
 {
   "name": "simp-stunnel",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "author": "SIMP Team",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",
@@ -37,7 +37,11 @@
     },
     {
       "name": "simp/simplib",
-      "version_requirement": ">= 2.0.0 < 3.0.0"
+      "version_requirement": ">= 2.1.0 < 3.0.0"
+    },
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.9.0 < 5.0.0"
     }
   ],
   "operatingsystem_support": [

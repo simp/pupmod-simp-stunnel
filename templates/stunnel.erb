@@ -10,11 +10,7 @@ bool_translate = {
 # service options
 if has_variable?('setgid') then
   stunnel_conf << ["# This file managed by Puppet. Manual changes will be erased!\n"]
-
-  if @_chroot then
-    stunnel_conf << "chroot = #{@_chroot}"
-  end
-
+  stunnel_conf << "chroot = #{@_chroot}"
   stunnel_conf << "setgid = #{@setgid}"
   stunnel_conf << "setuid = #{@setuid}"
   stunnel_conf << "debug = #{@stunnel_debug}"
@@ -80,11 +76,11 @@ else
     stunnel_conf << "sni = #{@sni}"
   end
 
-  stunnel_conf << "key = #{@_key}"
-  stunnel_conf << "cert = #{@_cert}"
-  stunnel_conf << "CApath = #{@_ca_path}"
-  stunnel_conf << "CRLpath = #{@_crl_path}"
-  stunnel_conf << "ciphers = #{@ciphers.join(':')}"
+  stunnel_conf << "key = #{@_app_pki_key}"
+  stunnel_conf << "cert = #{@_app_pki_cert}"
+  stunnel_conf << "CApath = #{@_app_pki_ca_dir}"
+  stunnel_conf << "CRLpath = #{@_app_pki_crl}"
+  stunnel_conf << "ciphers = #{@openssl_cipher_suite.join(':')}"
 
   if @curve then
     stunnel_conf << "curve = #{@curve}"
