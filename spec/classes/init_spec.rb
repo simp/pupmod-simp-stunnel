@@ -26,18 +26,6 @@ shared_examples_for "a chrooted and non-chrooted configuration" do
   it { is_expected.to contain_exec('stunnel_chkconfig_update') }
 end
 
-# This is used in a regex, put common items to be matched here.
-$stunnel_conf = <<-EOM
-# This file managed by Puppet. Manual changes will be erased!
-
-setgid = stunnel
-setuid = stunnel
-debug = err
-syslog = no
-pid = /var/run/stunnel/stunnel.pid
-engine = auto
-EOM
-
 describe 'stunnel' do
   context 'supported operating systems' do
     on_supported_os.each do |os, facts|
@@ -48,14 +36,35 @@ describe 'stunnel' do
           it_should_behave_like "a chrooted and non-chrooted configuration"
 
           # Specific to chrooting
-          it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(/#{$stunnel_conf_chrooted}/) }
-          it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(/chroot = \/var\/stunnel/) }
-          # Fips should be disabled with default params
           if facts[:osfamily] == 'RedHat' && facts[:operatingsystemmajrelease] >= '7'
-            it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(/fips = no/) }
-          # Fips should not exist on an el 6 system
+            # Fips should be disabled with default params for el 7 systems
+            it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(<<EOM
+# This file managed by Puppet. Manual changes will be erased!
+
+chroot = /var/stunnel
+setgid = stunnel
+setuid = stunnel
+debug = err
+syslog = no
+pid = /var/run/stunnel/stunnel.pid
+engine = auto
+fips = no
+EOM
+            )}
           else
-            it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').without_content(/fips/) }
+            # Fips should not exist on an el 6 system
+            it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(<<EOM
+# This file managed by Puppet. Manual changes will be erased!
+
+chroot = /var/stunnel
+setgid = stunnel
+setuid = stunnel
+debug = err
+syslog = no
+pid = /var/run/stunnel/stunnel.pid
+engine = auto
+EOM
+            )}
           end
 
           it { is_expected.to contain_file('/var/stunnel') }
@@ -74,15 +83,33 @@ describe 'stunnel' do
           let(:params) {{:selinux => true}}
           it_should_behave_like "a chrooted and non-chrooted configuration"
 
-          # Specific to chrooting
-          it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(/#{$stunnel_conf_chrooted}/) }
-          it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(/chroot = false/) }
-          # Fips should be disabled with default params
           if facts[:osfamily] == 'RedHat' && facts[:operatingsystemmajrelease] >= '7'
-            it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(/fips = no/) }
-          # Fips should not exist on an el 6 system
+            # Fips should be disabled 
+            it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(<<EOM
+# This file managed by Puppet. Manual changes will be erased!
+
+setgid = stunnel
+setuid = stunnel
+debug = err
+syslog = no
+pid = /var/run/stunnel/stunnel.pid
+engine = auto
+fips = no
+EOM
+            )}
           else
-            it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').without_content(/fips/) }
+            # Fips should not exist on an el 6 system
+            it { is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with_content(<<EOM
+# This file managed by Puppet. Manual changes will be erased!
+
+setgid = stunnel
+setuid = stunnel
+debug = err
+syslog = no
+pid = /var/run/stunnel/stunnel.pid
+engine = auto
+EOM
+            )}
           end
           it { is_expected.to_not contain_file('/var/stunnel') }
           it { is_expected.to_not contain_file('/var/stunnel/etc') }

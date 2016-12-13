@@ -8,14 +8,14 @@
 class stunnel::install inherits stunnel {
   assert_private()
 
-  group { $stunnel::setgid:
+  group { $::stunnel::setgid:
     ensure    => 'present',
     allowdupe => false,
     gid       => '600',
     tag       => 'firstrun'
   }
 
-  user { $stunnel::setuid:
+  user { $::stunnel::setuid:
     ensure     => 'present',
     allowdupe  => false,
     gid        => '600',
@@ -30,6 +30,6 @@ class stunnel::install inherits stunnel {
   package { 'stunnel':
     ensure  => 'latest',
     tag     => 'firstrun',
-    require => ["User[${stunnel::setuid}]","Group[${stunnel::setgid}]"]
+    require => ["User[${::stunnel::setuid}]","Group[${::stunnel::setgid}]"]
   }
 }

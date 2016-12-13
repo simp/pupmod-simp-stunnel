@@ -10,7 +10,10 @@ bool_translate = {
 # service options
 if has_variable?('setgid') then
   stunnel_conf << ["# This file managed by Puppet. Manual changes will be erased!\n"]
-  stunnel_conf << "chroot = #{@_chroot}"
+  if @_chroot
+    stunnel_conf << "chroot = #{@_chroot}"
+  end
+
   stunnel_conf << "setgid = #{@setgid}"
   stunnel_conf << "setuid = #{@setuid}"
   stunnel_conf << "debug = #{@stunnel_debug}"

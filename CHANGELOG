@@ -1,6 +1,8 @@
 * Thu Dec 08 2016 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
 - Updated global catalysts.
 - Refactored the module.
+- Fixed bug whereby 'chroot = false' is written to stunnel.conf when
+  selinux is enabled.
 
 * Wed Nov 23 2016 Jeanne Greulich <jgreulich@onyxpoint.com> - 5.0.0-0
 - Fix dependancies for simp 6 bump
