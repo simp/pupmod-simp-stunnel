@@ -163,15 +163,15 @@
 # * Nick Markowski <nmarkowski@keywcorp.com>
 #
 class stunnel::config (
-  Stdlib::Absolutepath              $app_pki_dir    = $stunnel::app_pki_dir,
+  Stdlib::Absolutepath              $app_pki_dir    = $::stunnel::app_pki_dir,
   Stdlib::Absolutepath              $app_pki_key    = $::stunnel::app_pki_key,
   Stdlib::Absolutepath              $app_pki_cert   = $::stunnel::app_pki_cert,
   Stdlib::Absolutepath              $app_pki_ca_dir = $::stunnel::app_pki_ca_dir,
   Stdlib::Absolutepath              $app_pki_crl    = $::stunnel::app_pki_crl,
   Stdlib::Absolutepath              $chroot         = '/var/stunnel',
   Stdlib::Absolutepath              $pid            = '/var/run/stunnel/stunnel.pid',
-  String                            $setuid         = $stunnel::setuid,
-  String                            $setgid         = $stunnel::setgid,
+  String                            $setuid         = $::stunnel::setuid,
+  String                            $setgid         = $::stunnel::setgid,
   Pattern['^(.+\.)?.+$']            $stunnel_debug  = 'err',
   Optional[Enum['zlib','rle']]      $compression    = undef,
   Optional[String]                  $egd            = undef,
