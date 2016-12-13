@@ -56,29 +56,31 @@ describe 'stunnel::add' do
 
     variable_test(
       'nfs',
-      :key,
+      :app_pki_key,
       '/foo/bar/baz',
       { :params => {
           :connect => ['2049'],
           :client => false,
           :accept => '20490'
-        }
+        },
+        :key_str => 'key'
       })
 
     variable_test(
       'nfs',
-      :cert,
+      :app_pki_cert,
       '/foo/bar/baz',
       { :params => {
           :connect => ['2049'],
           :client => false,
           :accept => '20490'
-        }
+        },
+        :key_str => 'cert'
       })
 
     variable_test(
       'nfs',
-      :ca_path,
+      :app_pki_ca_dir,
       '/foo/bar/baz',
       { :params => {
           :connect => ['2049'],
@@ -90,7 +92,7 @@ describe 'stunnel::add' do
 
     variable_test(
       'nfs',
-      :crl_path,
+      :app_pki_crl,
       '/foo/bar/baz',
       { :params => {
           :connect => ['2049'],
@@ -102,13 +104,14 @@ describe 'stunnel::add' do
 
     variable_test(
       'nfs',
-      :ciphers,
+      :openssl_cipher_suite,
       ['HIGH','FOO'],
       { :params => {
           :connect => ['2049'],
           :client => false,
           :accept => '20490'
         },
+        :key_str => 'ciphers',
         :val_str => 'HIGH:FOO'
       })
 
@@ -260,13 +263,14 @@ describe 'stunnel::add' do
 
     variable_test(
       'nfs',
-      :key,
+      :app_pki_key,
       '/foo/bar/baz',
       { :params => {
           :connect => ['2049'],
           :client => false,
           :accept => '20490'
-        }
+        },
+        :key_str => 'key'
       })
 
     variable_test(
@@ -356,7 +360,7 @@ describe 'stunnel::add' do
     context "specific client nets" do
       let(:title){ 'nfs' }
       let(:params){{
-        :client_nets => ['1.2.3.4','5.4.3.2/20'],
+        :trusted_nets => ['1.2.3.4','5.4.3.2/20'],
         :connect => ['2049'],
         :client => false,
         :accept => '20490'

@@ -57,32 +57,32 @@
 #
 #   This option is only valid on RHEL/CentOS 7+.
 #
-# [*key*]
+# [*app_pki_key*]
 #   Type: Absolute Path
-#   Default: $::stunnel::key
+#   Default: ''
 #
 #   Path and name of the private SSL key file.
 #
-# [*cert*]
+# [*app_pki_cert*]
 #   Type: Absolute Path
-#   Default: $::stunnel::cert
+#   Default: ''
 #
 #   Path and name of the public SSL certificate.
 #
-# [*ca_path*]
+# [*app_pki_ca_dir*]
 #   Type: Absolute Path
-#   Default: /etc/pki/cacerts
+#   Default: /var/stunnel_pki/pki/cacerts
 #
 #   Path to the OpenSSL compatible CA certificates. Note, this path is relative
 #   to the chroot path if set and is expected to be a directory.
 #
-# [*crl_path*]
+# [*app_pki_crl*]
 #   Type: Absolute Path
-#   Default: /etc/pki/crl
+#   Default: /var/stunnel_pki/pki/crl
 #
 #   Path to the OpenSSL compatible CRL directory.
 #
-# [*ciphers*]
+# [*openssl_cipher_suite*]
 #   Type: Array
 #   Default: ['HIGH','-SSLv2']
 #
@@ -278,9 +278,21 @@
 #
 #   Time to keep an idle connection in seconds.
 #
-# [*client_nets*]
+# [*trusted_nets*]
 #   Set this if you don't want to allow all IP addresses to access this
 #   encrypted channel. This only makes sense for servers.
+#
+# [*firewall*]
+#   Type: Boolean
+#   Default: false
+#
+#   If set to true, include the SIMP IPtables module to manage the firewall.
+#
+# [*tcpwrappers*]
+#   Type: Boolean
+#   Default: false
+#
+#   If set to true, include the SIMP tcpwrappers module to manage tcpwrappers.
 #
 # == Example
 #
@@ -294,81 +306,51 @@
 # * Trevor Vaughan <tvaughan@onyxpoint.com>
 #
 define stunnel::add(
-  $connect,
-  $accept,
-  $client                  = true,
-  $failover                = 'rr',
-  $sni                     = false,
-  $key                     = '',
-  $cert                    = '',
-  $ca_path                 = '/etc/pki/cacerts',
-  $crl_path                = '/etc/pki/crl',
-  $ciphers                 = ['HIGH','-SSLv2'],
-  $curve                   = false,
-  $ssl_version             = false,
-  $options                 = [],
-  $verify                  = '2',
-  $ocsp                    = false,
-  $ocsp_flags              = [],
-  $local                   = false,
-  $protocol                = false,
-  $protocol_authentication = false,
-  $protocol_host           = false,
-  $protocol_password       = false,
-  $protocol_username       = false,
-  $delay                   = false,
-  $engine_num              = false,
-  $libwrap                 = false,
-  $exec                    = false,
-  $execargs                = [],
-  $pty                     = false,
-  $renegotiation           = true,
-  $reset                   = true,
-  $retry                   = false,
-  $session_cache_size      = false,
-  $session_cache_timeout   = false,
-  $stack                   = false,
-  $timeout_busy            = false,
-  $timeout_close           = false,
-  $timeout_connect         = false,
-  $timeout_idle            = false,
-  $client_nets             = 'any',
-  $use_iptables            = defined('$::use_iptables') ? { true => getvar('::use_iptables'), default => hiera('use_iptables',true) }
+  Array[Pattern[/^(.+:)?\d+$/]]      $connect,
+  Pattern[/^(.+:)?\d+$/]             $accept,
+  Boolean                            $client                  = true,
+  Enum['rr','prio']                  $failover                = 'rr',
+  Optional[Pattern[/^.+(:.+)?$/]]    $sni                     = undef,
+  Optional[Stdlib::Absolutepath]     $app_pki_key             = undef,
+  Optional[Stdlib::Absolutepath]     $app_pki_cert            = undef,
+  Stdlib::Absolutepath               $app_pki_ca_dir          = '/var/stunnel_pki/pki/cacerts',
+  Stdlib::Absolutepath               $app_pki_crl             = '/var/stunnel_pki/pki/crl',
+  Array[String]                      $openssl_cipher_suite    = ['HIGH','-SSLv2'],
+  Optional[String]                   $curve                   = undef,
+  Optional[String]                   $ssl_version             = undef,
+  Array[String]                      $options                 = [],
+  Stdlib::Compat::Integer            $verify                  = '2',
+  Optional[Pattern['^https?://.+$']] $ocsp                    = undef,
+  Stunnel::OcspFlags                 $ocsp_flags              = [],
+  Optional[String]                   $local                   = undef,
+  Optional[String]                   $protocol                = undef,
+  Optional[Enum['basic','NTLM']]     $protocol_authentication = undef,
+  Optional[String]                   $protocol_host           = undef,
+  Optional[String]                   $protocol_username       = undef,
+  Optional[String]                   $protocol_password       = undef,
+  Boolean                            $delay                   = false,
+  Optional[Stdlib::Compat::Integer]  $engine_num              = undef,
+  Boolean                            $libwrap                 = false,
+  Optional[String]                   $exec                    = undef,
+  Array[String]                      $execargs                = [],
+  Boolean                            $pty                     = false,
+  Boolean                            $renegotiation           = true,
+  Boolean                            $reset                   = true,
+  Boolean                            $retry                   = false,
+  Optional[Stdlib::Compat::Integer]  $session_cache_size      = undef,
+  Optional[Stdlib::Compat::Integer]  $session_cache_timeout   = undef,
+  Optional[Stdlib::Compat::Integer]  $stack                   = undef,
+  Optional[Stdlib::Compat::Integer]  $timeout_busy            = undef,
+  Optional[Stdlib::Compat::Integer]  $timeout_close           = undef,
+  Optional[Stdlib::Compat::Integer]  $timeout_connect         = undef,
+  Optional[Stdlib::Compat::Integer]  $timeout_idle            = undef,
+  Array[String]                      $trusted_nets            = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1', '::1'] }),
+  Boolean                            $firewall                = simplib::lookup('simp_options::firewall', { 'default_value'     => false }),
+  Boolean                            $tcpwrappers             = simplib::lookup('simp_options::tcpwrappers', { 'default_value'  => false } )
 ) {
   include '::stunnel'
 
-  validate_array($connect)
-  validate_re_array($connect,'^(.+:)?\d+$')
-  validate_re($accept,'^(.+:)?\d+$')
-  validate_bool($client)
-  validate_array_member($failover,['rr','prio'])
-  validate_array($ciphers)
-  validate_array($options)
-  validate_between($verify, 0, 4)
-  if $ocsp { validate_re($ocsp,'^https?://.+$') }
-  if !empty($ocsp_flags) {
-    validate_re_array($ocsp_flags,[
-      'NOCERTS', 'NOINTERN', 'NOSIGS', 'NOCHAIN', 'NOVERIFY', 'NOEXPLICIT',
-      'NOCASIGN', 'NODELEGATED', 'NOCHECKS', 'TRUSTOTHER',
-      'RESPID_KEY', 'NOTIME'])
-  }
-  if $local { validate_net_list($local) }
-  if $protocol_authentication { validate_array_member($protocol_authentication,['basic','NTLM']) }
-  if $protocol_password { validate_string($protocol_password) }
-  if $protocol_username { validate_string($protocol_username) }
-  if $delay { validate_bool($delay) }
-  if $pty { validate_bool($pty) }
-  validate_bool($renegotiation)
-  validate_bool($reset)
-  validate_bool($retry)
-  if $session_cache_timeout { validate_integer($session_cache_timeout) }
-  if $stack { validate_integer($stack) }
-  if $timeout_busy { validate_integer($timeout_busy) }
-  if $timeout_close { validate_integer($timeout_close) }
-  if $timeout_connect { validate_integer($timeout_connect) }
-  if $timeout_idle { validate_integer($timeout_idle) }
-  validate_net_list($client_nets,'^any$')
-  validate_bool($use_iptables)
+  validate_net_list($trusted_nets,'^any$')
 
   # Validation for RHEL6/7 Options. Defaulting to 7.
   if ($::operatingsystem in ['Red Hat','CentOS']) and ($::operatingsystemmajrelease < '7') {
@@ -383,8 +365,6 @@ define stunnel::add(
     }
   }
   else {
-    if $sni { validate_re($sni,'^.+(:.+)?$') }
-    if $curve { validate_string($curve) }
     if $::stunnel::fips {
       if $ssl_version { validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
     }
@@ -396,38 +376,35 @@ define stunnel::add(
     if $protocol {
       validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
     }
-    if $engine_num { validate_integer($engine_num) }
-    validate_bool($libwrap)
-    if $session_cache_size { validate_integer($session_cache_size) }
   }
 
-  if empty($key) {
-    $_key = $::stunnel::key
+  if empty($app_pki_key) {
+    $_app_pki_key = $::stunnel::app_pki_key
   }
   else {
-    $_key = $key
-    validate_absolute_path($key)
+    $_app_pki_key = $app_pki_key
+    validate_absolute_path($app_pki_key)
   }
-  if empty($cert) {
-    $_cert = $::stunnel::cert
-  }
-  else {
-    $_cert = $cert
-    validate_absolute_path($cert)
-  }
-  if empty($ca_path) {
-    $_ca_path = $::stunnel::ca_path
+  if empty($app_pki_cert) {
+    $_app_pki_cert = $::stunnel::app_pki_cert
   }
   else {
-    $_ca_path = $ca_path
-    validate_absolute_path($ca_path)
+    $_app_pki_cert = $app_pki_cert
+    validate_absolute_path($app_pki_cert)
   }
-  if empty($crl_path) {
-    $_crl_path = $::stunnel::crl_path
+  if empty($app_pki_ca_dir) {
+    $_app_pki_ca_dir = $::stunnel::app_pki_ca_dir
   }
   else {
-    $_crl_path = $crl_path
-    validate_absolute_path($crl_path)
+    $_app_pki_ca_dir = $app_pki_ca_dir
+    validate_absolute_path($app_pki_ca_dir)
+  }
+  if empty($app_pki_crl) {
+    $_app_pki_crl = $::stunnel::app_pki_crl
+  }
+  else {
+    $_app_pki_crl = $app_pki_crl
+    validate_absolute_path($app_pki_crl)
   }
 
 
@@ -439,22 +416,22 @@ define stunnel::add(
   # variables.
   #
   # This is only enabled if the system is a server.
-  if $use_iptables and !$client {
+  if $firewall and !$client {
     include '::iptables'
 
     $dport = split($accept,':')
 
     iptables::add_tcp_stateful_listen { "allow_stunnel_${name}":
-      client_nets => $client_nets,
-      dports      => $dport[-1]
+      trusted_nets => $trusted_nets,
+      dports       => $dport[-1]
     }
   }
 
-  if $libwrap and !$client {
+  if $libwrap and !$client and $tcpwrappers {
     include '::tcpwrappers'
 
     tcpwrappers::allow { "allow_stunnel_${name}":
-      pattern => nets2ddq($client_nets)
+      pattern => nets2ddq($trusted_nets)
     }
   }
 }
