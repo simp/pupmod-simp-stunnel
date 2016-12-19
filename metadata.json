@@ -16,7 +16,7 @@
   ],
   "dependencies": [
     {
-      "name": "simp/puppet-haveged",
+      "name": "simp/haveged",
       "version_requirement": ">= 0.3.0 < 1.0.0"
     },
     {
