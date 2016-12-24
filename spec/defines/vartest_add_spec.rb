@@ -13,23 +13,21 @@ def variable_test(title,key,val,opts={})
     let(:title) { title }
     let(:params) { {key => val}.merge(opts[:params]) }
 
-    if opts[:err] then
+    if opts[:err]
       it do
-        expect { should contain_simpcat_fragment("stunnel+stunnel_#{title}.conf") }.to
+        expect { should contain_concat__fragment("stunnel_connection_#{title}") }.to
           raise_error(opts[:err],opts[:errmsg])
       end
     else
 
       it do
-        should contain_simpcat_fragment("stunnel+stunnel_#{title}.conf").with({
-          'content' => opts[:content]
-        })
+        should contain_concat__fragment("stunnel_connection_#{title}").with_content(opts[:content])
       end
     end
   end
 end
 
-describe 'stunnel::add' do
+describe 'stunnel::connection' do
 
   shared_examples_for "a fact set vartest add" do
     variable_test(
@@ -38,7 +36,7 @@ describe 'stunnel::add' do
       ['127.0.0.1:2049'],
       { :params => {
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :val_str => '127.0.0.1:2049'
       })
@@ -48,9 +46,9 @@ describe 'stunnel::add' do
       :failover,
       'prio',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         }
       })
 
@@ -59,9 +57,9 @@ describe 'stunnel::add' do
       :app_pki_key,
       '/foo/bar/baz',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'key'
       })
@@ -71,9 +69,9 @@ describe 'stunnel::add' do
       :app_pki_cert,
       '/foo/bar/baz',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'cert'
       })
@@ -83,9 +81,9 @@ describe 'stunnel::add' do
       :app_pki_ca_dir,
       '/foo/bar/baz',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'CApath'
       })
@@ -95,9 +93,9 @@ describe 'stunnel::add' do
       :app_pki_crl,
       '/foo/bar/baz',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'CRLpath'
       })
@@ -107,9 +105,9 @@ describe 'stunnel::add' do
       :openssl_cipher_suite,
       ['HIGH','FOO'],
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'ciphers',
         :val_str => 'HIGH:FOO'
@@ -120,9 +118,9 @@ describe 'stunnel::add' do
       :ssl_version,
       'TLSv1',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'sslVersion'
       })
@@ -132,9 +130,9 @@ describe 'stunnel::add' do
       :options,
       ['opt_one','opt_two'],
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :content => /\s*options = opt_one\n\s*options = opt_two/
       })
@@ -142,11 +140,11 @@ describe 'stunnel::add' do
     variable_test(
       'nfs',
       :verify,
-      '2',
+      2,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         }
       })
 
@@ -155,9 +153,9 @@ describe 'stunnel::add' do
       :ocsp,
       'http://ocsp.bar.baz',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'OCSP'
       })
@@ -167,9 +165,9 @@ describe 'stunnel::add' do
       :ocsp_flags,
       ['NOCERTS','NOINTERN'],
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490',
+          :accept => 20490,
           :ocsp => 'http://ocsp.bar.baz'
         },
         :content => /\s*OCSPFlag = NOCERTS\nOCSPFlag = NOINTERN/
@@ -180,9 +178,9 @@ describe 'stunnel::add' do
       :local,
       '1.2.3.4',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         }
       })
 
@@ -191,9 +189,9 @@ describe 'stunnel::add' do
       :protocol,
       'connect',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         }
       })
 
@@ -202,9 +200,9 @@ describe 'stunnel::add' do
       :protocol_authentication,
       'NTLM',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490',
+          :accept => 20490,
           :protocol => 'connect'
         },
         :key_str => 'protocolAuthentication'
@@ -215,9 +213,9 @@ describe 'stunnel::add' do
       :protocol_host,
       'host.bar.baz',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490',
+          :accept => 20490,
           :protocol => 'connect'
         },
         :key_str => 'protocolHost'
@@ -228,9 +226,9 @@ describe 'stunnel::add' do
       :protocol_password,
       'password',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490',
+          :accept => 20490,
           :protocol => 'connect'
         },
         :key_str => 'protocolPassword'
@@ -241,9 +239,9 @@ describe 'stunnel::add' do
       :protocol_username,
       'username',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490',
+          :accept => 20490,
           :protocol => 'connect'
         },
         :key_str => 'protocolUsername'
@@ -254,9 +252,9 @@ describe 'stunnel::add' do
       :delay,
       true,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :val_str => 'yes'
       })
@@ -266,9 +264,9 @@ describe 'stunnel::add' do
       :app_pki_key,
       '/foo/bar/baz',
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'key'
       })
@@ -278,9 +276,9 @@ describe 'stunnel::add' do
       :pty,
       true,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490',
+          :accept => 20490,
           :exec => '/bin/foo',
         },
         :val_str => 'yes'
@@ -291,9 +289,9 @@ describe 'stunnel::add' do
       :retry,
       true,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
       },
       :val_str => 'yes'
     })
@@ -301,22 +299,22 @@ describe 'stunnel::add' do
     variable_test(
       'nfs',
       :stack,
-      '12345',
+      12345,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         }
       })
 
     variable_test(
       'nfs',
       :timeout_busy,
-      '12345',
+      12345,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'TIMEOUTbusy'
       })
@@ -324,11 +322,11 @@ describe 'stunnel::add' do
     variable_test(
       'nfs',
       :timeout_close,
-      '12345',
+      12345,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'TIMEOUTclose'
       })
@@ -336,11 +334,11 @@ describe 'stunnel::add' do
     variable_test(
       'nfs',
       :timeout_connect,
-      '12345',
+      12345,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'TIMEOUTconnect'
       })
@@ -348,11 +346,11 @@ describe 'stunnel::add' do
     variable_test(
       'nfs',
       :timeout_idle,
-      '12345',
+      12345,
       { :params => {
-          :connect => ['2049'],
+          :connect => [2049],
           :client => false,
-          :accept => '20490'
+          :accept => 20490
         },
         :key_str => 'TIMEOUTidle'
       })
@@ -361,9 +359,9 @@ describe 'stunnel::add' do
       let(:title){ 'nfs' }
       let(:params){{
         :trusted_nets => ['1.2.3.4','5.4.3.2/20'],
-        :connect => ['2049'],
+        :connect => [2049],
         :client => false,
-        :accept => '20490'
+        :accept => 20490
       }}
 
         it { should compile.with_all_deps }
@@ -380,11 +378,11 @@ describe 'stunnel::add' do
           variable_test(
             'nfs',
             :session_cache_timeout,
-            '12345',
+            12345,
             { :params => {
-                :connect => ['2049'],
+                :connect => [2049],
                 :client => false,
-                :accept => '20490'
+                :accept => 20490
             },
             :key_str => 'session'
           })
@@ -395,9 +393,9 @@ describe 'stunnel::add' do
               :sni,
               'foo:bar',
               { :params => {
-                  :connect => ['2049'],
+                  :connect => [2049],
                   :client => false,
-                  :accept => '20490'
+                  :accept => 20490
               }
             })
           end
@@ -407,20 +405,20 @@ describe 'stunnel::add' do
             :curve,
             'jello_puddin_pops',
             { :params => {
-                :connect => ['2049'],
+                :connect => [2049],
                 :client => false,
-                :accept => '20490'
+                :accept => 20490
             }
           })
 
           variable_test(
             'nfs',
             :engine_num,
-            '5',
+            5,
             { :params => {
-                :connect => ['2049'],
+                :connect => [2049],
                 :client => false,
-                :accept => '20490'
+                :accept => 20490
             },
             :key_str => 'engineNum'
           })
@@ -428,11 +426,11 @@ describe 'stunnel::add' do
           variable_test(
             'nfs',
             :session_cache_size,
-            '12345',
+            12345,
             { :params => {
-                :connect => ['2049'],
+                :connect => [2049],
                 :client => false,
-                :accept => '20490'
+                :accept => 20490
             },
             :key_str => 'sessionCacheSize'
           })
@@ -440,11 +438,11 @@ describe 'stunnel::add' do
           variable_test(
             'nfs',
             :session_cache_timeout,
-            '12345',
+            12345,
             { :params => {
-                :connect => ['2049'],
+                :connect => [2049],
                 :client => false,
-                :accept => '20490'
+                :accept => 20490
             },
             :key_str => 'sessionCacheTimeout'
           })
@@ -454,9 +452,9 @@ describe 'stunnel::add' do
             :reset,
             true,
             { :params => {
-                :connect => ['2049'],
+                :connect => [2049],
                 :client => false,
-                :accept => '20490'
+                :accept => 20490
             },
             :val_str => 'yes'
           })
@@ -466,9 +464,9 @@ describe 'stunnel::add' do
             :renegotiation,
             true,
             { :params => {
-                :connect => ['2049'],
+                :connect => [2049],
                 :client => false,
-                :accept => '20490'
+                :accept => 20490
             },
             :val_str => 'yes'
           })

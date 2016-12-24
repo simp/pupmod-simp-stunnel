@@ -17,7 +17,7 @@ def variable_test(key,val,opts={})
     else
 
       it do
-        is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with({
+        is_expected.to contain_concat__fragment('0_stunnel_global').with({
           'content' => /^\s*#{opts[:key_str]} = #{opts[:val_str]}\n/
         })
       end
@@ -34,7 +34,7 @@ describe 'stunnel::config' do
         it { is_expected.to compile.with_all_deps }
 
         it do
-          is_expected.to contain_simpcat_fragment('stunnel+0global.conf').with({
+          is_expected.to contain_concat__fragment('0_stunnel_global').with({
             'content' => /.*chroot = \/var\/stunnel\nsetgid = stunnel\nsetuid = stunnel\ndebug = err\n.*/
           })
         end
@@ -50,7 +50,7 @@ describe 'stunnel::config' do
         variable_test(:engine,'TEST')
         variable_test(:engine_ctrl,'TEST_CTRL',{:key_str => 'engineCtrl'})
         variable_test(:output,'/foo.bar.out')
-        variable_test(:rnd_bytes,'20',{:key_str => 'RNDbytes'})
+        variable_test(:rnd_bytes,20,{:key_str => 'RNDbytes'})
         variable_test(:rnd_overwrite,true,{:key_str => 'RNDoverwrite',:val_str => 'yes'})
         variable_test(:socket_options,['a:foo=bar'],{:key_str => 'socket', :val_str => 'a:foo=bar'})
         variable_test(:socket_options,'a:foo=bar',{:err => Puppet::Error, :errmsg => /expects an Array value, got String/})

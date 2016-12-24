@@ -1,11 +1,11 @@
-# == Class stunnel::install
+# **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**
 #
-# == Authors
+# Install the Stunnel components
 #
-# * Trevor Vaughan <tvaughan@onyxpoint.com>
-# * Nick Markowski <nmarkowswki@keywcorp.com>
+# @author Trevor Vaughan <tvaughan@onyxpoint.com>
+# @author Nick Markowski <nmarkowswki@keywcorp.com>
 #
-class stunnel::install inherits stunnel {
+class stunnel::install inherits ::stunnel {
   assert_private()
 
   group { $::stunnel::setgid:
@@ -30,6 +30,9 @@ class stunnel::install inherits stunnel {
   package { 'stunnel':
     ensure  => 'latest',
     tag     => 'firstrun',
-    require => ["User[${::stunnel::setuid}]","Group[${::stunnel::setgid}]"]
+    require => [
+      "User[${::stunnel::setuid}]",
+      "Group[${::stunnel::setgid}]"
+    ]
   }
 }
