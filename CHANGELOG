@@ -1,3 +1,7 @@
+* Sun Dec 25 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.0.0-0
+- Moved `stunnel::add` to `stunnel::connection` for syntactic correctness
+- Updated to work with the new IPTables module
+
 * Thu Dec 08 2016 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
 - Updated global catalysts.
 - Refactored the module.

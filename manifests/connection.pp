@@ -296,11 +296,13 @@ define stunnel::connection (
   if $firewall and !$client {
     include '::iptables'
 
-    $_dport = split(to_string($accept),':')
+    $_dport = [to_integer(split(to_string($accept),':')[-1])]
 
-    iptables::add_tcp_stateful_listen { "allow_stunnel_${name}":
+    inspect($_dport)
+
+    iptables::listen::tcp_stateful { "allow_stunnel_${name}":
       trusted_nets => $trusted_nets,
-      dports       => $_dport[-1]
+      dports       => $_dport
     }
   }
 

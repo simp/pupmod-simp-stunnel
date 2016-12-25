@@ -16,9 +16,9 @@ describe 'stunnel::connection' do
             :firewall     => true
           }}
           it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_iptables__add_tcp_stateful_listen("allow_stunnel_#{title}").with({
+          it { is_expected.to create_iptables__listen__tcp_stateful("allow_stunnel_#{title}").with({
             :trusted_nets => ['any'],
-            :dports       => params[:accept].to_s.split(':')[-1]
+            :dports       => [params[:accept].to_s.split(':')[-1]]
             })
           }
         end
