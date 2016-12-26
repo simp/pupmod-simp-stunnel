@@ -8,7 +8,7 @@ bool_translate = {
 
 # This is just a stupid way to differentate between global options and
 # service options
-if has_variable?('setgid') then
+if has_variable?('setgid')
   stunnel_conf << ["# This file managed by Puppet. Manual changes will be erased!\n"]
   if @_chroot
     stunnel_conf << "chroot = #{@_chroot}"
@@ -19,47 +19,47 @@ if has_variable?('setgid') then
   stunnel_conf << "debug = #{@stunnel_debug}"
   stunnel_conf << "syslog = #{bool_translate[@syslog]}"
 
-  if @pid then
+  if @pid
     stunnel_conf << "pid = #{@pid}"
   end
 
-  if @compression then
+  if @compression
     stunnel_conf << "compression = #{@compression}"
   end
 
-  if @egd then
+  if @egd
     stunnel_conf << "EGD = #{@egd}"
   end
 
-  if @engine then
+  if @engine
     stunnel_conf << "engine = #{@engine}"
 
-    if @engine_ctrl then
+    if @engine_ctrl
       stunnel_conf << "engineCtrl = #{@engine_ctrl}"
     end
   end
 
-  if ['RedHat','CentOS'].include?(@operatingsystem) and (@operatingsystemmajrelease.to_s >= "7") then
-    stunnel_conf << "fips = #{bool_translate[@fips]}"
+  if ['RedHat','CentOS'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'].to_s >= "7")
+    stunnel_conf << "fips = #{bool_translate[(@facts['fips_enabled'] || @fips)]}"
   end
 
-  if @output then
+  if @output
     stunnel_conf << "output = #{@output}"
   end
 
-  if @rnd_bytes then
+  if @rnd_bytes
     stunnel_conf << "RNDbytes = #{@rnd_bytes}"
   end
 
-  if @rnd_file then
+  if @rnd_file
     stunnel_conf << "RNDfile = #{@rnd_file}"
   end
 
-  if @rnd_overwrite then
+  if @rnd_overwrite
     stunnel_conf << "RNDoverwrite = #{bool_translate[@rnd_overwrite]}"
   end
 
-  if @socket_options then
+  if @socket_options
     @socket_options.each do |sock_opt|
       stunnel_conf << "socket = #{sock_opt}"
     end
@@ -75,7 +75,7 @@ else
   stunnel_conf << "client = #{bool_translate[@client]}"
   stunnel_conf << "failover = #{@failover}"
 
-  if @sni then
+  if @sni
     stunnel_conf << "sni = #{@sni}"
   end
 
@@ -85,11 +85,11 @@ else
   stunnel_conf << "CRLpath = #{@_app_pki_crl}"
   stunnel_conf << "ciphers = #{@openssl_cipher_suite.join(':')}"
 
-  if @curve then
+  if @curve
     stunnel_conf << "curve = #{@curve}"
   end
 
-  if @ssl_version then
+  if @ssl_version
     stunnel_conf << "sslVersion = #{@ssl_version}"
   end
 
@@ -99,7 +99,7 @@ else
 
   stunnel_conf << "verify = #{@verify}"
 
-  if @ocsp then
+  if @ocsp
     stunnel_conf << "OCSP = #{@ocsp}"
 
     @ocsp_flags.each do |flag|
@@ -107,36 +107,36 @@ else
     end
   end
 
-  if @local then
+  if @local
     stunnel_conf << "local = #{@local}"
   end
 
-  if @protocol then
+  if @protocol
     stunnel_conf << "protocol = #{@protocol}"
 
-    if @protocol_authentication then
+    if @protocol_authentication
       stunnel_conf << "protocolAuthentication = #{@protocol_authentication}"
     end
-    if @protocol_host then
+    if @protocol_host
       stunnel_conf << "protocolHost = #{@protocol_host}"
     end
-    if @protocol_password then
+    if @protocol_password
       stunnel_conf << "protocolPassword = #{@protocol_password}"
     end
-    if @protocol_username then
+    if @protocol_username
       stunnel_conf << "protocolUsername = #{@protocol_username}"
     end
   end
 
   stunnel_conf << "delay = #{bool_translate[@delay]}"
 
-  if @engine_num then
+  if @engine_num
     stunnel_conf << "engineNum = #{@engine_num}"
   end
 
-  if @exec then
+  if @exec
     stunnel_conf << "exec = #{@exec}"
-    if @execargs then
+    if @execargs
       stunnel_conf << "execargs = #{@execargs.join(' ')}"
     end
     stunnel_conf << "pty = #{bool_translate[@pty]}"
@@ -145,37 +145,37 @@ else
 
   stunnel_conf << "retry = #{bool_translate[@retry]}"
 
-  if @session_cache_timeout then
+  if @session_cache_timeout
     stunnel_conf << "session = #{@session_cache_timeout}"
   end
 
-  if ['RedHat','CentOS'].include?(@operatingsystem) and (@operatingsystemmajrelease > '6') then
+  if ['RedHat','CentOS'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'] > '6')
     stunnel_conf << "renegotiation = #{bool_translate[@renegotiation]}"
     stunnel_conf << "reset = #{bool_translate[@reset]}"
 
-    if @session_cache_size then
+    if @session_cache_size
       stunnel_conf << "sessionCacheSize = #{@session_cache_size}"
     end
 
-    if @session_cache_timeout then
+    if @session_cache_timeout
       stunnel_conf << "sessionCacheTimeout = #{@session_cache_timeout}"
     end
   end
 
-  if @stack then
+  if @stack
     stunnel_conf << "stack = #{@stack}"
   end
 
-  if @timeout_busy then
+  if @timeout_busy
     stunnel_conf << "TIMEOUTbusy = #{@timeout_busy}"
   end
-  if @timeout_close then
+  if @timeout_close
     stunnel_conf << "TIMEOUTclose = #{@timeout_close}"
   end
-  if @timeout_connect then
+  if @timeout_connect
     stunnel_conf << "TIMEOUTconnect = #{@timeout_connect}"
   end
-  if @timeout_idle then
+  if @timeout_idle
     stunnel_conf << "TIMEOUTidle = #{@timeout_idle}"
   end
 end
