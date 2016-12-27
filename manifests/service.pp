@@ -15,16 +15,17 @@ class stunnel::service {
     notify  => Exec['stunnel_chkconfig_update'],
   }
 
+  exec { 'stunnel_chkconfig_update':
+    command     => '/sbin/chkconfig --del stunnel; /sbin/chkconfig --add stunnel',
+    refreshonly => true,
+    before      => Service['stunnel']
+  }
+
   service { 'stunnel':
     ensure     => 'running',
     hasrestart => true,
     hasstatus  => true,
     require    =>  File['/etc/rc.d/init.d/stunnel'],
     tag        => 'firstrun'
-  }
-
-  exec { 'stunnel_chkconfig_update':
-    command     => '/sbin/chkconfig --del stunnel; /sbin/chkconfig --add stunnel',
-    refreshonly => true
   }
 }

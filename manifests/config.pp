@@ -130,7 +130,9 @@ class stunnel::config (
       group  => 'root',
       mode   => '0755'
     }
+
     ::pki::copy { $app_pki_dir:
+      group   => $setgid,
       require => File[$app_pki_dir]
     }
   }
