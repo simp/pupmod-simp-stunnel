@@ -298,8 +298,6 @@ define stunnel::connection (
 
     $_dport = [to_integer(split(to_string($accept),':')[-1])]
 
-    inspect($_dport)
-
     iptables::listen::tcp_stateful { "allow_stunnel_${name}":
       trusted_nets => $trusted_nets,
       dports       => $_dport
