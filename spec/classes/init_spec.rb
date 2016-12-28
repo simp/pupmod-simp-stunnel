@@ -129,16 +129,15 @@ engine = auto
           it { is_expected.to_not contain_file('/var/stunnel/etc/pki') }
           it { is_expected.to_not contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///var/stunnel_pki/pki/cacerts') }
         end
-        context 'with pki = true, haveged = true, syslog = true, and fips = true' do
+        context 'with pki = simp, haveged = true, syslog = true, and fips = true' do
           let(:params) {{
-            :pki => true,
+            :pki => 'simp',
             :haveged => true,
             :syslog => true,
             :fips => true
           }}
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('pki') }
-          it { is_expected.to create_file('/var/stunnel_pki') }
           it { is_expected.to create_pki__copy('/var/stunnel_pki') }
           # Make sure syslog = yes in stunnel.conf
           it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(/syslog = yes/) }

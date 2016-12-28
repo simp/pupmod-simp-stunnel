@@ -5,6 +5,8 @@
 #
 #   * Do **NOT** make this anything under ``/var/run``
 #
+# @param app_pki_external_source
+#
 # @param app_pki_dir
 #   If ``$pki`` is true, certs will be copied to this location for stunnel
 #   to use
@@ -90,28 +92,29 @@
 # @author Nick Markowski <nmarkowski@keywcorp.com>
 #
 class stunnel::config (
-  Stdlib::Absolutepath           $app_pki_dir    = $::stunnel::app_pki_dir,
-  Stdlib::Absolutepath           $app_pki_key    = $::stunnel::app_pki_key,
-  Stdlib::Absolutepath           $app_pki_cert   = $::stunnel::app_pki_cert,
-  Stdlib::Absolutepath           $app_pki_ca_dir = $::stunnel::app_pki_ca_dir,
-  Stdlib::Absolutepath           $app_pki_crl    = $::stunnel::app_pki_crl,
-  Stdlib::Absolutepath           $chroot         = '/var/stunnel',
-  Stdlib::Absolutepath           $pid            = '/var/run/stunnel/stunnel.pid',
-  String                         $setuid         = $::stunnel::setuid,
-  String                         $setgid         = $::stunnel::setgid,
-  String                         $stunnel_debug  = 'err',
-  Optional[Enum['zlib','rle']]   $compression    = undef,
-  Optional[String]               $egd            = undef,
-  String                         $engine         = 'auto',
-  Optional[String]               $engine_ctrl    = undef,
-  Optional[Stdlib::Absolutepath] $output         = undef,
-  Optional[Integer]              $rnd_bytes      = undef,
-  Optional[Stdlib::Absolutepath] $rnd_file       = undef,
-  Boolean                        $rnd_overwrite  = false,
-  Array[String]                  $socket_options = [],
-  Boolean                        $syslog         = $::stunnel::syslog,
-  Boolean                        $fips           = $::stunnel::fips,
-  Boolean                        $pki            = $::stunnel::pki
+  Stdlib::Absolutepath           $app_pki_dir             = $::stunnel::app_pki_dir,
+  Stdlib::Absolutepath           $app_pki_external_source = $::stunnel::app_pki_external_source,
+  Stdlib::Absolutepath           $app_pki_key             = $::stunnel::app_pki_key,
+  Stdlib::Absolutepath           $app_pki_cert            = $::stunnel::app_pki_cert,
+  Stdlib::Absolutepath           $app_pki_ca_dir          = $::stunnel::app_pki_ca_dir,
+  Stdlib::Absolutepath           $app_pki_crl             = $::stunnel::app_pki_crl,
+  Stdlib::Absolutepath           $chroot                  = '/var/stunnel',
+  Stdlib::Absolutepath           $pid                     = '/var/run/stunnel/stunnel.pid',
+  String                         $setuid                  = $::stunnel::setuid,
+  String                         $setgid                  = $::stunnel::setgid,
+  String                         $stunnel_debug           = 'err',
+  Optional[Enum['zlib','rle']]   $compression             = undef,
+  Optional[String]               $egd                     = undef,
+  String                         $engine                  = 'auto',
+  Optional[String]               $engine_ctrl             = undef,
+  Optional[Stdlib::Absolutepath] $output                  = undef,
+  Optional[Integer]              $rnd_bytes               = undef,
+  Optional[Stdlib::Absolutepath] $rnd_file                = undef,
+  Boolean                        $rnd_overwrite           = false,
+  Array[String]                  $socket_options          = [],
+  Boolean                        $syslog                  = $::stunnel::syslog,
+  Boolean                        $fips                    = $::stunnel::fips,
+  Variant[Enum['simp'],Boolean]  $pki                     = $::stunnel::pki
 ) inherits stunnel {
 
   if $facts['selinux_current_mode'] and $facts['selinux_current_mode'] != 'disabled' {
@@ -122,18 +125,18 @@ class stunnel::config (
   }
 
   if $pki {
-    include '::pki'
+    if $pki == 'simp' { include '::pki' }
 
-    file { $app_pki_dir:
+    pki::copy { $app_pki_dir:
+      source => $app_pki_external_source
+    }
+  }
+  else {
+    file { "${app_pki_dir}/pki":
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0755'
-    }
-
-    ::pki::copy { $app_pki_dir:
-      group   => $setgid,
-      require => File[$app_pki_dir]
+      mode   => '0640'
     }
   }
 
