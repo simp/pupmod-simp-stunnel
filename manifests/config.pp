@@ -1,221 +1,143 @@
-# == Class: stunnel
+# Global stunnel options
 #
-# Configure stunnel.
+# @param chroot
+#   The location of the chroot jail
 #
-# == Parameters
+#   * Do **NOT** make this anything under ``/var/run``
 #
-# [*chroot*]
-#   Type: Absolute Path
-#   Default: '/var/stunnel'
+# @param app_pki_external_source
 #
-#   The location of the chroot jail. Do NOT make this anything under
-#   /var/run.
+# @param app_pki_dir
+#   If ``$pki`` is true, certs will be copied to this location for stunnel
+#   to use
 #
-# [*app_pki_dir*]
-#   Type: Absolute Path
-#   Default: /var/stunnel_pki
+#   * **NOTE:** Even when using a chroot, stunnel needs the certs to reside
+#     **outside** of the chroot path
 #
-#   If $pki is true, certs will be copied to this location for stunnel
-#   to use.  NOTE: Even when using a chroot, stunnel needs the certs
-#   to reside outside of the chroot path.
+# @param app_pki_key
+#   Path and name of the private SSL key file
 #
-# [*app_pki_key*]
-#   Type: Absolute Path
-#   Default: /etc/pki/private/${::fqdn}.pem
+# @param app_pki_cert
+#   Path and name of the public SSL certificate
 #
-#   Path and name of the private SSL key file.
+# @param app_pki_ca_dir
+#   Since stunnel runs in a chroot, you need to copy the appropriate CA
+#   certificates in from an external source
 #
-# [*app_pki_cert*]
-#   Type: Absolute Path
-#   Default: /etc/pki/public/${::fqdn}.pub
+#   * This should be the full path to a directory containing **hashed**
+#   versions of the CA certificates
 #
-#   Path and name of the public SSL certificate.
+# @param app_pki_crl
+#   Since stunnel runs in a chroot, you need to copy the appropriate CRL in
+#   from an external source
 #
-# [*app_pki_ca_dir*]
-#   Type: Absolute Path
-#   Default: '/etc/pki/cacerts'
-#     Since stunnel runs in a chroot, you need to copy the appropriate
-#     CA certificates in from an external source.
+# @param pid
+#   The PID file
 #
-#     This should be the full path to a directory containing hashed versions of
-#     the CA certificates.
+#   * Relative to the chroot jail!
+#   * Let the startup script handle it by default
 #
-# [*app_pki_crl*]
-#   Type: Absolute Path
-#   Default: '/etc/pki/crl'
-#     Since stunnel runs in a chroot, you need to copy the appropriate
-#     CRL in from an external source.
+# @param setuid
+#   The user stunnel should run as
 #
-# [*pid*]
-#   Type: Absolute Path
-#   Default: '/var/run/stunnel/stunnel.pid'
+# @param setgid
+#   The group stunnel should run as
 #
-#   The PID file. Relative to the chroot jail! Let the startup script
-#   handle it by default.
+# @param stunnel_debug
+#   The debug level for logging
 #
-# [*setuid*]
-#   Type: String
-#   Default: 'stunnel'
+# @param syslog
+#   Enable logging to syslog
 #
-#   The user stunnel should run as.
+# @param compression
+#   The compression type to use for this service
 #
-# [*setgid*]
-#   Type: String
-#   Default: 'stunnel'
+# @param egd
+#   The path to the Entropy Gathering Daemon socket used to feed the OpenSSL
+#   Random Number Generator
 #
-#   The group stunnel should run as.
+# @param engine
+#   If ``$egd`` is set, sets the Hardware Engine to be used
 #
-# [*stunnel_debug*]
-#   Type: String
-#   Default: 'err'
+# @param engine_ctrl
+#   If ``$egd`` is set, sets the Hardware Engine Control parameters
 #
-#   The debug level for logging.
+# @param fips
+#   Set the ``fips`` global option
 #
-# [*syslog*]
-#   Type: Boolean
-#   Default: true
+#   * We don't enable FIPS mode by default since we want to be able to use
+#     TLS1.2
 #
-#   Whether or not to log to syslog.
+#   * **NOTE:** This has no effect on EL < 7 due to stunnel not accepting the
+#     fips option in that version of stunnel
 #
-# [*compression*]
-#   Type: ['zlib'|'rle']
-#   Default: None
+# @param output
+#   The path to a log output file to use
 #
-#   The compression type to use for this service. Anything other than
-#   'zlib' and 'rle' is ignored.
+# @param rnd_bytes
+#   The number of bytes to read from the random seed file
 #
-# [*egd*]
-#   Type: Absolute Path
-#   Default: false
+# @param rnd_file
+#   The path to the random seed data file
 #
-#   If set, is the path to the Entropy Gathering Daemon socket used to
-#   feed the OpenSSL RNG.
+# @param rnd_overwrite
+#   Overwrite the random seed file with new random data
 #
-# [*engine*]
-#   Type: String
-#   Default: auto
+# @param socket_options
 #
-#   If $egd is set, sets the Hardware Engine to be used.
+# @param pki
+#   Use the SIMP ``pki`` module for key management
 #
-# [*engine_ctrl*]
-#   Type: String
-#   Default: false
-#
-#   If set, $egd is set, sets the Hardware Engine Control parameters.
-#
-# [*fips*]
-#   Type: Boolean
-#   Default: false
-#
-#   If true, set the fips global option.
-#   We don't enable FIPS mode by default since we want to be able to use
-#   TLS1.2.
-#
-#   Note: This has no effect on RHEL/CentOS < 7 due to stunnel not accepting
-#   the fips option in that version of stunnel.
-#
-# [*output*]
-#   Type: Absolute Path
-#   Default: false
-#
-#   If set, provides the path to a log output file to use.
-#
-# [*rnd_bytes*]
-#   Type: Integer
-#   Default: false
-#
-#   The number of bytes to read from the random seed file.
-#
-# [*rnd_file*]
-#   Type: Absolute Path
-#   Default: false
-#
-#   If set, provides the path to the random seed data file.
-#
-# [*rnd_overwrite*]
-#   Type: Boolean
-#   Default: false
-#
-#   If set, Stunnel should overwrite the random seed file with new
-#   random data.
-#
-# [*socket_options*]
-#   Type: Array of Strings
-#   Default: []
-#
-#   If populated, provides an array of socket options of the form '^(a|l|r):.+=.+(:.+)?$'.
-#
-# [*selinux*]
-#   Type: Boolean
-#   Default: false
-#
-#   If true, use the SIMP Selinux module for context enforcement.
-#
-# [*pki*]
-#   Type: Boolean
-#   Default: false
-#
-#   If true, use the SIMP PKI module for key management.
-#
-# == Authors
-#
-# * Trevor Vaughan <tvaughan@onyxpoint.com>
-# * Nick Markowski <nmarkowski@keywcorp.com>
+# @author Trevor Vaughan <tvaughan@onyxpoint.com>
+# @author Nick Markowski <nmarkowski@keywcorp.com>
 #
 class stunnel::config (
-  Stdlib::Absolutepath              $app_pki_dir    = $::stunnel::app_pki_dir,
-  Stdlib::Absolutepath              $app_pki_key    = $::stunnel::app_pki_key,
-  Stdlib::Absolutepath              $app_pki_cert   = $::stunnel::app_pki_cert,
-  Stdlib::Absolutepath              $app_pki_ca_dir = $::stunnel::app_pki_ca_dir,
-  Stdlib::Absolutepath              $app_pki_crl    = $::stunnel::app_pki_crl,
-  Stdlib::Absolutepath              $chroot         = '/var/stunnel',
-  Stdlib::Absolutepath              $pid            = '/var/run/stunnel/stunnel.pid',
-  String                            $setuid         = $::stunnel::setuid,
-  String                            $setgid         = $::stunnel::setgid,
-  Pattern['^(.+\.)?.+$']            $stunnel_debug  = 'err',
-  Optional[Enum['zlib','rle']]      $compression    = undef,
-  Optional[String]                  $egd            = undef,
-  String                            $engine         = 'auto',
-  Optional[String]                  $engine_ctrl    = undef,
-  Optional[Stdlib::Absolutepath]    $output         = undef,
-  Optional[Stdlib::Compat::Integer] $rnd_bytes      = undef,
-  Optional[Stdlib::Absolutepath]    $rnd_file       = undef,
-  Boolean                           $rnd_overwrite  = false,
-  Array[String]                     $socket_options = [],
-  Boolean                           $selinux        = $::stunnel::selinux,
-  Boolean                           $syslog         = $::stunnel::syslog,
-  Boolean                           $fips           = $::stunnel::fips,
-  Boolean                           $pki            = $::stunnel::pki
+  Stdlib::Absolutepath           $app_pki_dir             = $::stunnel::app_pki_dir,
+  Stdlib::Absolutepath           $app_pki_external_source = $::stunnel::app_pki_external_source,
+  Stdlib::Absolutepath           $app_pki_key             = $::stunnel::app_pki_key,
+  Stdlib::Absolutepath           $app_pki_cert            = $::stunnel::app_pki_cert,
+  Stdlib::Absolutepath           $app_pki_ca_dir          = $::stunnel::app_pki_ca_dir,
+  Stdlib::Absolutepath           $app_pki_crl             = $::stunnel::app_pki_crl,
+  Stdlib::Absolutepath           $chroot                  = '/var/stunnel',
+  Stdlib::Absolutepath           $pid                     = '/var/run/stunnel/stunnel.pid',
+  String                         $setuid                  = $::stunnel::setuid,
+  String                         $setgid                  = $::stunnel::setgid,
+  String                         $stunnel_debug           = 'err',
+  Optional[Enum['zlib','rle']]   $compression             = undef,
+  Optional[String]               $egd                     = undef,
+  String                         $engine                  = 'auto',
+  Optional[String]               $engine_ctrl             = undef,
+  Optional[Stdlib::Absolutepath] $output                  = undef,
+  Optional[Integer]              $rnd_bytes               = undef,
+  Optional[Stdlib::Absolutepath] $rnd_file                = undef,
+  Boolean                        $rnd_overwrite           = false,
+  Array[String]                  $socket_options          = [],
+  Boolean                        $syslog                  = $::stunnel::syslog,
+  Boolean                        $fips                    = $::stunnel::fips,
+  Variant[Enum['simp'],Boolean]  $pki                     = $::stunnel::pki
 ) inherits stunnel {
 
-  if ($selinux)  or !($chroot or $selinux) {
-    $_chroot = false
+  if $facts['selinux_current_mode'] and $facts['selinux_current_mode'] != 'disabled' {
+    $_chroot = undef
   }
   else {
     $_chroot = $chroot
   }
 
   if $pki {
-    include '::pki'
+    if $pki == 'simp' { include '::pki' }
 
-    file { $app_pki_dir:
+    pki::copy { $app_pki_dir:
+      source => $app_pki_external_source
+    }
+  }
+  else {
+    file { "${app_pki_dir}/pki":
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0755'
+      mode   => '0640'
     }
-    ::pki::copy { $app_pki_dir:
-      require => File[$app_pki_dir]
-    }
-  }
-
-  simpcat_build { 'stunnel':
-    order  => ['*.conf'],
-    target => '/etc/stunnel/stunnel.conf',
-  }
-
-  simpcat_fragment { 'stunnel+0global.conf':
-    content => template('stunnel/stunnel.erb')
   }
 
   file { '/etc/stunnel':
@@ -227,14 +149,18 @@ class stunnel::config (
     tag     => 'firstrun',
   }
 
-  file { '/etc/stunnel/stunnel.conf':
-    ensure    => 'present',
-    owner     => 'root',
-    group     => 'root',
-    mode      => '0640',
-    subscribe => Simpcat_build['stunnel'],
-    tag       => 'firstrun',
-    audit     => content
+  concat { '/etc/stunnel/stunnel.conf':
+    owner          => 'root',
+    group          => 'root',
+    mode           => '0600',
+    ensure_newline => true,
+    warn           => true
+  }
+
+  concat::fragment { '0_stunnel_global':
+    order   => 1,
+    target  => '/etc/stunnel/stunnel.conf',
+    content => template('stunnel/stunnel.erb')
   }
 
   if $_chroot {

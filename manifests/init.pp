@@ -1,121 +1,78 @@
-# == Class: stunnel
+# Set up stunnel
 #
-# Set up stunnel.
+# @param app_pki_dir
+#   If ``$pki`` is ``true``, certs will be copied to this location for stunnel
+#   to use
 #
-# == Parameters
+#   * **NOTE:** Even when using a chroot, stunnel needs the certs to reside
+#     **outside** of the chroot path
 #
-# [*app_pki_dir*]
-#   Type: Absolute Path
-#   Default: /var/stunnel_pki
+# @param app_pki_external_source
 #
-#   If $pki is true, certs will be copied to this location for stunnel
-#   to use.  NOTE: Even when using a chroot, stunnel needs the certs
-#   to reside outside of the chroot path.
+# @param app_pki_key
+#   Path and name of the private SSL key file
 #
-# [*app_pki_key*]
-#   Type: Absolute Path
-#   Default: /etc/pki/private/${::fqdn}.pem
+# @param app_pki_cert
+#   Path and name of the public SSL certificate
 #
-#   Path and name of the private SSL key file.
+# @param app_pki_ca_dir
+#   Since stunnel runs in a chroot, you need to copy the appropriate CA
+#   certificates in from an external source
 #
-# [*app_pki_cert*]
-#   Type: Absolute Path
-#   Default: /etc/pki/public/${::fqdn}.pub
+#   * This should be the full path to a directory containing **hashed
+#     versions** of the CA certificates
 #
-#   Path and name of the public SSL certificate.
+# @param app_pki_crl
+#     Since stunnel runs in a chroot, you need to copy the appropriate CRL in
+#     from an external source
 #
-# [*app_pki_ca_dir*]
-#   Type: Absolute Path
-#   Default: '/etc/pki/cacerts'
-#     Since stunnel runs in a chroot, you need to copy the appropriate
-#     CA certificates in from an external source.
+# @param setuid
+#   The user stunnel should run as
 #
-#     This should be the full path to a directory containing hashed versions of
-#     the CA certificates.
+# @param setgid
+#   The group stunnel should run as
 #
-# [*app_pki_crl*]
-#   Type: Absolute Path
-#   Default: '/etc/pki/crl'
-#     Since stunnel runs in a chroot, you need to copy the appropriate
-#     CRL in from an external source.
+# @param syslog
+#   Whether or not to log to syslog
 #
-# [*setuid*]
-#   Type: String
-#   Default: 'stunnel'
+# @param fips
+#   Set the fips global option
 #
-#   The user stunnel should run as.
+#   * We don't enable FIPS mode by default since we want to be able to use
+#     TLS1.2
 #
-# [*setgid*]
-#   Type: String
-#   Default: 'stunnel'
+#   * **NOTE:** This has no effect on EL < 7 due to stunnel not accepting the
+#     fips option in that version of stunnel.
 #
-#   The group stunnel should run as.
+# @param haveged
+#  Include the SIMP ``haveged`` module to assist with entropy generation
 #
-# [*syslog*]
-#   Type: Boolean
-#   Default: true
+# @param pki
+#   Use the SIMP ``pki`` module for key management
 #
-#   Whether or not to log to syslog.
-#
-# [*fips*]
-#   Type: Boolean
-#   Default: false
-#
-#   If true, set the fips global option.
-#   We don't enable FIPS mode by default since we want to be able to use
-#   TLS1.2.
-#
-#   Note: This has no effect on RHEL/CentOS < 7 due to stunnel not accepting
-#   the fips option in that version of stunnel.
-#
-# [*haveged*]
-#   Type: Boolean
-#   Default: false
-#
-#   If true, include SIMP haveged module to assist with entropy generation.
-#
-# [*pki*]
-#   Type: Boolean
-#   Default: false
-#
-#   If true, use the SIMP PKI module for key management.
-#
-# [*selinux*]
-#   Type: Boolean
-#   Default: false
-#
-#   If true, use the SIMP Selinux module for context enforcement.
-#
-# == Authors
-#
-# * Trevor Vaughan <tvaughan@onyxpoint.com>
-# * Nick Markowski <nmarkowski@keywcorp.com>
+# @author Trevor Vaughan <tvaughan@onyxpoint.com>
+# @author Nick Markowski <nmarkowski@keywcorp.com>
 #
 class stunnel (
-  Stdlib::Absolutepath  $app_pki_dir    = '/var/stunnel_pki',
-  Stdlib::Absolutepath  $app_pki_key    = "/var/stunnel_pki/pki/private/${::fqdn}.pem",
-  Stdlib::Absolutepath  $app_pki_cert   = "/var/stunnel_pki/pki/public/${::fqdn}.pub",
-  Stdlib::Absolutepath  $app_pki_ca_dir = '/var/stunnel_pki/pki/cacerts',
-  Stdlib::Absolutepath  $app_pki_crl    = '/var/stunnel_pki/pki/crl',
-  String                $setuid         = 'stunnel',
-  String                $setgid         = 'stunnel',
-  Boolean               $selinux        = simplib::lookup('simp_options::selinux', { 'default_value' => false }),
-  Boolean               $syslog         = simplib::lookup('simp_options::syslog', { 'default_value'  => false }),
-  Boolean               $fips           = simplib::lookup('simp_options::fips', { 'default_value'    => false }),
-  Boolean               $haveged        = simplib::lookup('simp_options::haveged', { 'default_value' => false }),
-  Boolean               $pki            = simplib::lookup('simp_options::pki', { 'default_value'     => false })
+  Stdlib::Absolutepath            $app_pki_dir             = '/var/stunnel_pki',
+  Stdlib::Absolutepath            $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/simp/pki' }),
+  Stdlib::Absolutepath            $app_pki_key             = "/var/stunnel_pki/pki/private/${facts['fqdn']}.pem",
+  Stdlib::Absolutepath            $app_pki_cert            = "/var/stunnel_pki/pki/public/${facts['fqdn']}.pub",
+  Stdlib::Absolutepath            $app_pki_ca_dir          = '/var/stunnel_pki/pki/cacerts',
+  Stdlib::Absolutepath            $app_pki_crl             = '/var/stunnel_pki/pki/crl',
+  String                          $setuid                  = 'stunnel',
+  String                          $setgid                  = 'stunnel',
+  Boolean                         $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'      => false }),
+  Boolean                         $fips                    = simplib::lookup('simp_options::fips', { 'default_value'        => false }),
+  Boolean                         $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value'     => false }),
+  Variant[Enum['simp'],Boolean]   $pki                     = simplib::lookup('simp_options::pki', { 'default_value'         => false })
 ) {
+  if $haveged { include '::haveged' }
 
-  if $haveged {
-    include '::haveged'
-  }
+  contain '::stunnel::install'
+  contain '::stunnel::config'
+  contain '::stunnel::service'
 
-  include '::stunnel::install'
-  include '::stunnel::config'
-  include '::stunnel::service'
-
-  Class['stunnel::install'] ->
-  Class['stunnel::config'] ~>
-  Class['stunnel::service'] ->
-  Class['stunnel']
+  Class['stunnel::install'] -> Class['stunnel::config']
+  Class['stunnel::config'] ~> Class['stunnel::service']
 }
