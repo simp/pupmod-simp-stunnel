@@ -1,3 +1,7 @@
+* Thu Dec 29 2016 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
+- Updated the stunnel::connection connect parameter to take an array
+  of simplib::netlist::port
+
 * Sun Dec 25 2016 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.0.0-0
 - Moved `stunnel::add` to `stunnel::connection` for syntactic correctness
 - Updated to work with the new IPTables module
