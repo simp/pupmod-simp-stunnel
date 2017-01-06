@@ -1,13 +1,31 @@
 # Set up stunnel
 #
+# @param pki
+#   * If 'simp', include SIMP's pki module and use pki::copy to manage
+#     application certs in /etc/pki/simp_apps/stunnel/pki
+#   * If true, do *not* include SIMP's pki module, but still use pki::copy
+#     to manage certs in /etc/pki/simp_apps/stunnel/pki
+#   * If false, do not include SIMP's pki module and do not use pki::copy
+#     to manage certs.  You will need to appropriately assign a subset of:
+#     * app_pki_dir
+#     * app_pki_key
+#     * app_pki_cert
+#     * app_pki_ca
+#     * app_pki_ca_dir
+#
+# @param app_pki_external_source
+#   * If pki = 'simp' or true, this is the directory from which certs will be
+#     copied, via pki::copy.  Defaults to /etc/pki/simp.
+#
+#   * If pki = false, this variable has no effect.
+#
 # @param app_pki_dir
-#   If ``$pki`` is ``true``, certs will be copied to this location for stunnel
-#   to use
+#   This variable controls the source of certs in the chroot, and the basepath
+#   of $app_pki_key, $app_pki_cert, $app_pki_ca, $app_pki_ca_dir, and
+#   $app_pki_crl. It defaults to /etc/pki/simp_apps/stunnel/pki.
 #
 #   * **NOTE:** Even when using a chroot, stunnel needs the certs to reside
 #     **outside** of the chroot path
-#
-# @param app_pki_external_source
 #
 # @param app_pki_key
 #   Path and name of the private SSL key file
@@ -19,12 +37,12 @@
 #   Since stunnel runs in a chroot, you need to copy the appropriate CA
 #   certificates in from an external source
 #
-#   * This should be the full path to a directory containing **hashed
-#     versions** of the CA certificates
+#   * This should be the full path to a directory containing **hashed**
+#   versions of the CA certificates
 #
 # @param app_pki_crl
-#     Since stunnel runs in a chroot, you need to copy the appropriate CRL in
-#     from an external source
+#   Since stunnel runs in a chroot, you need to copy the appropriate CRL in
+#   from an external source.
 #
 # @param setuid
 #   The user stunnel should run as
@@ -47,19 +65,16 @@
 # @param haveged
 #  Include the SIMP ``haveged`` module to assist with entropy generation
 #
-# @param pki
-#   Use the SIMP ``pki`` module for key management
-#
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Nick Markowski <nmarkowski@keywcorp.com>
 #
 class stunnel (
-  Stdlib::Absolutepath            $app_pki_dir             = '/var/stunnel_pki',
+  Stdlib::Absolutepath            $app_pki_dir             = '/etc/pki/simp_apps/stunnel/pki',
   Stdlib::Absolutepath            $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/simp/pki' }),
-  Stdlib::Absolutepath            $app_pki_key             = "/var/stunnel_pki/pki/private/${facts['fqdn']}.pem",
-  Stdlib::Absolutepath            $app_pki_cert            = "/var/stunnel_pki/pki/public/${facts['fqdn']}.pub",
-  Stdlib::Absolutepath            $app_pki_ca_dir          = '/var/stunnel_pki/pki/cacerts',
-  Stdlib::Absolutepath            $app_pki_crl             = '/var/stunnel_pki/pki/crl',
+  Stdlib::Absolutepath            $app_pki_key             = "${app_pki_dir}/private/${facts['fqdn']}.pem",
+  Stdlib::Absolutepath            $app_pki_cert            = "${app_pki_dir}/public/${facts['fqdn']}.pub",
+  Stdlib::Absolutepath            $app_pki_ca_dir          = "${app_pki_dir}/cacerts",
+  Stdlib::Absolutepath            $app_pki_crl             = "${app_pki_dir}/crl",
   String                          $setuid                  = 'stunnel',
   String                          $setgid                  = 'stunnel',
   Boolean                         $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'      => false }),

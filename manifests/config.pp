@@ -5,11 +5,28 @@
 #
 #   * Do **NOT** make this anything under ``/var/run``
 #
+# @param pki
+#   * If 'simp', include SIMP's pki module and use pki::copy to manage
+#     application certs in /etc/pki/simp_apps/stunnel/pki
+#   * If true, do *not* include SIMP's pki module, but still use pki::copy
+#     to manage certs in /etc/pki/simp_apps/stunnel/pki
+#   * If false, do not include SIMP's pki module and do not use pki::copy
+#     to manage certs.  You will need to appropriately assign a subset of:
+#     * app_pki_dir
+#     * app_pki_key
+#     * app_pki_cert
+#     * app_pki_ca_dir
+#
 # @param app_pki_external_source
+#   * If pki = 'simp' or true, this is the directory from which certs will be
+#     copied, via pki::copy.  Defaults to /etc/pki/simp.
+#
+#   * If pki = false, this variable has no effect.
 #
 # @param app_pki_dir
-#   If ``$pki`` is true, certs will be copied to this location for stunnel
-#   to use
+#   This variable controls the source of certs in the chroot, and the basepath
+#   of $app_pki_key, $app_pki_cert, $app_pki_ca, $app_pki_ca_dir, and
+#   $app_pki_crl. It defaults to /etc/pki/simp_apps/stunnel/pki.
 #
 #   * **NOTE:** Even when using a chroot, stunnel needs the certs to reside
 #     **outside** of the chroot path
@@ -85,13 +102,11 @@
 #
 # @param socket_options
 #
-# @param pki
-#   Use the SIMP ``pki`` module for key management
-#
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 # @author Nick Markowski <nmarkowski@keywcorp.com>
 #
 class stunnel::config (
+  Variant[Enum['simp'],Boolean]  $pki                     = $::stunnel::pki,
   Stdlib::Absolutepath           $app_pki_dir             = $::stunnel::app_pki_dir,
   Stdlib::Absolutepath           $app_pki_external_source = $::stunnel::app_pki_external_source,
   Stdlib::Absolutepath           $app_pki_key             = $::stunnel::app_pki_key,
@@ -113,8 +128,7 @@ class stunnel::config (
   Boolean                        $rnd_overwrite           = false,
   Array[String]                  $socket_options          = [],
   Boolean                        $syslog                  = $::stunnel::syslog,
-  Boolean                        $fips                    = $::stunnel::fips,
-  Variant[Enum['simp'],Boolean]  $pki                     = $::stunnel::pki
+  Boolean                        $fips                    = $::stunnel::fips
 ) inherits stunnel {
 
   if $facts['selinux_current_mode'] and $facts['selinux_current_mode'] != 'disabled' {
@@ -125,18 +139,9 @@ class stunnel::config (
   }
 
   if $pki {
-    if $pki == 'simp' { include '::pki' }
-
-    pki::copy { $app_pki_dir:
-      source => $app_pki_external_source
-    }
-  }
-  else {
-    file { "${app_pki_dir}/pki":
-      ensure => 'directory',
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0640'
+    pki::copy { 'stunnel':
+      source => $app_pki_external_source,
+      pki    => $pki
     }
   }
 
@@ -239,7 +244,7 @@ class stunnel::config (
     }
 
     file { "${_chroot}/etc/pki/cacerts":
-      source  => "file://${app_pki_dir}/pki/cacerts",
+      source  => "file://${app_pki_dir}/cacerts",
       group   => $setgid,
       mode    => '0640',
       recurse => true,
