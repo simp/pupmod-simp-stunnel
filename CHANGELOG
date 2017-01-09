@@ -1,3 +1,7 @@
+* Fri Jan 06 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
+- Updated pki::copy to use the new scheme.
+- Removed parameters from README because we are puppet-strings-ified.
+
 * Thu Dec 29 2016 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
 - Updated the stunnel::connection connect parameter to take an array
   of simplib::netlist::port
