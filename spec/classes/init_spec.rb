@@ -81,7 +81,7 @@ engine = auto
           it { is_expected.to contain_file('/var/stunnel/var/run') }
           it { is_expected.to contain_file('/var/stunnel/var/run/stunnel') }
           it { is_expected.to contain_file('/var/stunnel/etc/pki') }
-          it { is_expected.to contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/pki/cacerts') }
+          it { is_expected.to contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
 
         end
 
@@ -127,7 +127,7 @@ engine = auto
           it { is_expected.to_not contain_file('/var/stunnel/var/run') }
           it { is_expected.to_not contain_file('/var/stunnel/var/run/stunnel') }
           it { is_expected.to_not contain_file('/var/stunnel/etc/pki') }
-          it { is_expected.to_not contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/pki/cacerts') }
+          it { is_expected.to_not contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
         end
         context 'with pki = simp, haveged = true, syslog = true, and fips = true' do
           let(:params) {{
