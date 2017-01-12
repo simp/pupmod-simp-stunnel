@@ -7,9 +7,9 @@
 #
 # @param pki
 #   * If ``simp``, include SIMP's ``pki`` module and use ``pki::copy`` to
-#     manage application certs in ``/etc/pki/simp_apps/stunnel/pki``
+#     manage application certs in ``/etc/pki/simp_apps/stunnel/x509``
 #   * If ``true``, do *not* include SIMP's pki module, but still use
-#     ``pki::copy`` to manage certs in ``/etc/pki/simp_apps/stunnel/pki``
+#     ``pki::copy`` to manage certs in ``/etc/pki/simp_apps/stunnel/x509``
 #   * If ``false``, do not include SIMP's pki module and do not use
 #     ``pki::copy`` to manage certs.  You will need to appropriately assign a
 #     subset of:
