@@ -1,8 +1,6 @@
 * Wed Jan 11 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
-- Application certs now managed in /etc/pki/simp_apps/stunnel/x509
-
-* Fri Jan 06 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
 - Updated pki::copy to use the new scheme.
+- Application certs now managed in /etc/pki/simp_apps/stunnel/x509
 - Removed parameters from README because we are puppet-strings-ified.
 
 * Thu Dec 29 2016 Nick Markowski <nmarkowski@keywcorp.com> - 6.0.0-0
