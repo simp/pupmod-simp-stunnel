@@ -213,7 +213,6 @@ define stunnel::connection (
   Optional[String]                             $protocol_password       = undef,
   Boolean                                      $delay                   = false,
   Optional[Integer]                            $engine_num              = undef,
-  Boolean                                      $libwrap                 = false,
   Optional[String]                             $exec                    = undef,
   Array[String]                                $execargs                = [],
   Boolean                                      $pty                     = false,
@@ -304,7 +303,7 @@ define stunnel::connection (
     }
   }
 
-  if $libwrap and !$client and $tcpwrappers {
+  if !$client and $tcpwrappers {
     include '::tcpwrappers'
 
     tcpwrappers::allow { "allow_stunnel_${name}":
