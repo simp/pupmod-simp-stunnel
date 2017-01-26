@@ -27,7 +27,6 @@ describe 'stunnel::connection' do
           let(:title){ 'nfs' }
           let(:params){{
             :tcpwrappers  => true,
-            :libwrap      => true,
             :client       => false,
             :connect      => [2049],
             :accept       => 20490,
