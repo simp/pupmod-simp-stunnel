@@ -53,7 +53,7 @@
 # @param app_pki_cert
 #   Path and name of the public SSL certificate
 #
-# @param app_pki_ca_dir
+# @param app_pki_cacert
 #   Path to the OpenSSL compatible CA certificates
 #
 #   * **NOTE:** this path is relative to the chroot path if set and is expected
@@ -196,7 +196,7 @@ define stunnel::connection (
   Optional[String]                            $sni                     = undef,
   Optional[Stdlib::Absolutepath]              $app_pki_key             = undef,
   Optional[Stdlib::Absolutepath]              $app_pki_cert            = undef,
-  Stdlib::Absolutepath                        $app_pki_ca_dir          = '/etc/pki/simp_apps/stunnel/x509/cacerts',
+  Stdlib::Absolutepath                        $app_pki_cacert          = '/etc/pki/simp_apps/stunnel/x509/cacerts/cacerts.pem',
   Stdlib::Absolutepath                        $app_pki_crl             = '/etc/pki/simp_apps/stunnel/x509/crl',
   Array[String]                               $openssl_cipher_suite    = ['HIGH','-SSLv2'],
   Optional[String]                            $curve                   = undef,
@@ -270,11 +270,11 @@ define stunnel::connection (
   else {
     $_app_pki_cert = $::stunnel::app_pki_cert
   }
-  if $app_pki_ca_dir {
-    $_app_pki_ca_dir = $app_pki_ca_dir
+  if $app_pki_cacert {
+    $_app_pki_cacert = $app_pki_cacert
   }
   else {
-    $_app_pki_ca_dir = $::stunnel::app_pki_ca_dir
+    $_app_pki_cacert = $::stunnel::app_pki_cacert
   }
   if $app_pki_crl {
     $_app_pki_crl = $app_pki_crl

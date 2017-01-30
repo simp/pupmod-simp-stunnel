@@ -12,7 +12,8 @@
     "stunnel",
     "pki",
     "tls",
-    "ssl"
+    "ssl",
+    "tunnel"
   ],
   "dependencies": [
     {
@@ -59,5 +60,16 @@
         "7"
       ]
     }
-  ]
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.7.0"
+    },
+    {
+      "name": "pe",
+      "version_requirement": ">= 2016.4.0"
+    }
+  ],
+  "data_provider": "hiera"
 }
