@@ -69,18 +69,18 @@
 # @author Nick Markowski <nmarkowski@keywcorp.com>
 #
 class stunnel (
-  Stdlib::Absolutepath            $app_pki_dir             = '/etc/pki/simp_apps/stunnel/x509',
-  Stdlib::Absolutepath            $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }),
-  Stdlib::Absolutepath            $app_pki_key             = "${app_pki_dir}/private/${facts['fqdn']}.pem",
-  Stdlib::Absolutepath            $app_pki_cert            = "${app_pki_dir}/public/${facts['fqdn']}.pub",
-  Stdlib::Absolutepath            $app_pki_ca_dir          = "${app_pki_dir}/cacerts",
-  Stdlib::Absolutepath            $app_pki_crl             = "${app_pki_dir}/crl",
-  String                          $setuid                  = 'stunnel',
-  String                          $setgid                  = 'stunnel',
-  Boolean                         $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'      => false }),
-  Boolean                         $fips                    = simplib::lookup('simp_options::fips', { 'default_value'        => false }),
-  Boolean                         $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value'     => false }),
-  Variant[Enum['simp'],Boolean]   $pki                     = simplib::lookup('simp_options::pki', { 'default_value'         => false })
+  Stdlib::Absolutepath          $app_pki_dir             = '/etc/pki/simp_apps/stunnel/x509',
+  Stdlib::Absolutepath          $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }),
+  Stdlib::Absolutepath          $app_pki_key             = "${app_pki_dir}/private/${facts['fqdn']}.pem",
+  Stdlib::Absolutepath          $app_pki_cert            = "${app_pki_dir}/public/${facts['fqdn']}.pub",
+  Stdlib::Absolutepath          $app_pki_ca_dir          = "${app_pki_dir}/cacerts",
+  Stdlib::Absolutepath          $app_pki_crl             = "${app_pki_dir}/crl",
+  String                        $setuid                  = 'stunnel',
+  String                        $setgid                  = 'stunnel',
+  Boolean                       $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'      => false }),
+  Boolean                       $fips                    = simplib::lookup('simp_options::fips', { 'default_value'        => false }),
+  Boolean                       $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value'     => false }),
+  Variant[Enum['simp'],Boolean] $pki                     = simplib::lookup('simp_options::pki', { 'default_value'         => false })
 ) {
   if $haveged { include '::haveged' }
 
