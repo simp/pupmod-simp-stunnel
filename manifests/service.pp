@@ -25,7 +25,7 @@ class stunnel::service {
     ensure     => 'running',
     hasrestart => true,
     hasstatus  => true,
-    require    =>  File['/etc/rc.d/init.d/stunnel'],
+    require    => File['/etc/rc.d/init.d/stunnel'],
     tag        => 'firstrun'
   }
 }

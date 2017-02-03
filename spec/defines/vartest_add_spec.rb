@@ -78,14 +78,14 @@ describe 'stunnel::connection' do
 
     variable_test(
       'nfs',
-      :app_pki_ca_dir,
+      :app_pki_cacert,
       '/foo/bar/baz',
       { :params => {
           :connect => [2049],
           :client => false,
           :accept => 20490
         },
-        :key_str => 'CApath'
+        :key_str => 'CAfile'
       })
 
     variable_test(
