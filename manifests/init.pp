@@ -34,15 +34,14 @@
 #   Path and name of the public SSL certificate
 #
 # @param app_pki_ca_dir
-#   Since stunnel runs in a chroot, you need to copy the appropriate CA
-#   certificates in from an external source
+#   Directory external from the stunnel chroot to copy the CA certificates from.
 #
 #   * This should be the full path to a directory containing **hashed**
 #   versions of the CA certificates
 #
 # @param app_pki_crl
-#   Since stunnel runs in a chroot, you need to copy the appropriate CRL in
-#   from an external source.
+#   Directory external from the stunnel chroot to copy the Certificate
+#   Revocation List from.
 #
 # @param setuid
 #   The user stunnel should run as
