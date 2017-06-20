@@ -1,3 +1,11 @@
+* Tue Jun 20 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.1.0
+- Added a define, stunnel::individual_connection, to break out stunnel
+  connections into their own configurations and services.  The define
+  is backward compatible with existing stunnel configurations.
+- stunnel::connection is unofficially deprecated until the SIMP-7
+  release, at which point stunnel::individual_connection will
+  replace stunnel::connection.
+
 * Fri Mar 17 2017 Ryan Russell-Yates, Liz Nemsick - 6.0.1-0
 - Flesh out README
 - Remove OBE 'pe' requirement from metadata.json

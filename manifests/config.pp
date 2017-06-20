@@ -146,13 +146,16 @@ class stunnel::config (
     }
   }
 
-  file { '/etc/stunnel':
-    ensure  => 'directory',
-    owner   => 'root',
-    group   => $setgid,
-    mode    => '0750',
-    recurse => true,
-    tag     => 'firstrun',
+  # Potentially included by stunnel::individual_connection.
+  if !defined(File['/etc/stunnel']) {
+    file { '/etc/stunnel':
+      ensure  => 'directory',
+      owner   => 'root',
+      group   => $setgid,
+      mode    => '0750',
+      recurse => true,
+      tag     => 'firstrun',
+    }
   }
 
   concat { '/etc/stunnel/stunnel.conf':
