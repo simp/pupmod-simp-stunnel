@@ -1,121 +1,14 @@
-#!/bin/bash
-#
-# Init script for stunnel_<%=@name%>
-#
-# chkconfig: 345 20 99
-# description: Stunnel TCP Encryption Utility
-# processname: stunnel_<%=@name%>
-# config: /etc/stunnel/stunnel_<%=@name%>.conf
+<%
+  $piddir = "#{@_chroot}#{File.dirname(@pid)}"
+-%>
+[Unit]
+Description=Start a stunnel_nfs listener
 
-# Set up ulimits for heavily connected processes
-ulimit -n 1048576
-ulimit -u unlimited
-
-# Paths, variables, and system checks.
-
-# Source function library
-. /etc/rc.d/init.d/functions
-
-# Account for the various locations in different OSs
-[ -f /usr/sbin/stunnel ] && exec=/usr/sbin/stunnel || exec=/usr/bin/stunnel
-
-conf=/etc/stunnel/stunnel_<%=@name%>.conf
-
-# See if we're chroot'ed.
-chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel_<%=@name%>.conf | sed -e 's/chroot[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
-
-# Find the pid file, normal by default
-pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel_<%=@name%>.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
-piddir=`dirname "${pidfile}"`
-
-# Find the UID/GID of stunnel
-user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel_<%=@name%>.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel_<%=@name%>.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-
-# Set the SELinux Contexts Properly
-if [ -z "${pidfile}" ]; then
-    if [ ! -d "${piddir}" ]; then
-      mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "${piddir}"
-      chown ${user}:${group} "${piddir}"
-    fi
-fi
-if [ -n $chroot ]; then
-    mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "${chroot}${piddir}"
-    chown ${user}:${group} "${chroot}${piddir}"
-    pidfile="${chroot}${pidfile}";
-fi
-
-# If the command doesn't exist, that's probably not going to work
-[ -x ${exec} ] || exit 1
-# If the config file doesn't exist, we can't run stunnel
-[ -f ${conf} ] || exit 1
-
-RETVAL=0
-prog='stunnel'
-lock_file="/var/lock/subsys/${prog}"
-
-# Destroy any stunnel processes that this script doesn't know about.
-# It's a bit dangerous, but they'll end up interfering otherwise.
-kill_floaters() {
-  retval=1
-  if [ ! -f "${pidfile}" ]; then
-    pkill -u $user $exec
-    retval=$?
-  fi
-
-  return $retval
-}
-
-start() {
-  echo -n $"Starting ${prog}: "
-  kill_floaters
-  daemon --pidfile="${pidfile}" $exec $conf
-  RETVAL=$?
-  if [ -d `dirname $lock_file` ]; then
-    touch $lock_file
-  fi
-  echo
-  return $RETVAL
-}
-
-stop() {
-  echo -n $"Shutting down stunnel: "
-  kill_floaters ||  killproc -p "${pidfile}" $prog
-  RETVAL=$?
-  if [ -f $lock_file ]; then
-    rm $lock_file
-  fi
-  echo
-  return $RETVAL
-}
-
-restart() {
-  stop
-  # Sometimes the stunnel application hangs for a while shutting down.
-  sleep 3
-  start
-}
-
-case "$1" in
-  start)
-    $1
-    ;;
-  stop)
-    $1
-    ;;
-  restart)
-    $1
-    ;;
-  condrestart)
-    status -p "${pidfile}" $prog >/dev/null 2>&1 || exit 0
-    restart
-    ;;
-  status)
-    status -p "${pidfile}" stunnel
-  ;;
-    *)
-  echo $"Usage: $0 {start|stop|restart|condrestart|status}"
-  exit 2
-esac
-
-exit $?
+[Service]
+Type=forking
+ExecPreStart=/usr/bin/mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 <%=$piddir%>
+# add in chown/chmod of files
+ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_<%=@name%>.conf
+PIDFile=<%="#{@_chroot}#{@pid}"%>
+LimitNOFILE=1048576
+LimitNPROC=infinity

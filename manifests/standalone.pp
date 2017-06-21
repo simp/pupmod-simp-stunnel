@@ -144,7 +144,7 @@ define stunnel::standalone(
   Stdlib::Absolutepath                        $app_pki_cacert          = "${app_pki_dir}/cacerts/cacerts.pem",
   Stdlib::Absolutepath                        $app_pki_crl             = "${app_pki_dir}/crl",
   Variant[Simplib::Port, Simplib::Host::Port] $accept,
-  Stdlib::Absolutepath                        $chroot                  = "/var/stunnel_${name}",
+  Optional[Stdlib::Absolutepath]              $chroot                  = undef,
   Boolean                                     $client                  = true,
   Optional[Enum['zlib','rle']]                $compression             = undef,
   Stunnel::Connect                            $connect,
@@ -222,11 +222,11 @@ define stunnel::standalone(
     }
   }
 
-  if $facts['selinux_current_mode'] and $facts['selinux_current_mode'] != 'disabled' {
-    $_chroot = undef
-  }
-  else {
+  if $chroot {
     $_chroot = $chroot
+  }
+  elsif $facts['selinux_current_mode'] and $facts['selinux_current_mode'] == 'disabled' {
+    $_chroot = "/var/stunnel_${name}"
   }
 
   file { "/etc/stunnel/stunnel_${name}.conf":
@@ -295,20 +295,6 @@ define stunnel::standalone(
       mode   => '0644'
     }
 
-    file { "${_chroot}/var/run":
-      ensure => 'directory',
-      owner  => $setuid,
-      group  => $setgid,
-      mode   => '0644'
-    }
-
-    file { "${_chroot}/var/run/stunnel":
-      ensure => 'directory',
-      owner  => $setuid,
-      group  => $setgid,
-      mode   => '0644'
-    }
-
     file { "${_chroot}/etc/pki":
       ensure => 'directory',
       owner  => 'root',
@@ -347,22 +333,21 @@ define stunnel::standalone(
     }
   }
 
-  file { "/etc/rc.d/init.d/stunnel_${name}":
+  file { "/etc/systemd/system/stunnel_${name}.service":
     ensure  => 'present',
     owner   => 'root',
     group   => 'root',
     mode    => '0750',
     content => template('stunnel/standalone_init.erb'),
-    notify  => Exec["stunnel_${name}_chkconfig_update"],
   }
 
   service { "stunnel_${name}":
     ensure     => 'running',
-    enable     =>  true,
+    enable     => true,
     hasrestart => true,
     hasstatus  => true,
     require    => [
-      File["/etc/rc.d/init.d/stunnel_${name}"],
+      File["/etc/systemd/system/stunnel_${name}.service"],
       File["/etc/stunnel/stunnel_${name}.conf"]
     ],
   }
