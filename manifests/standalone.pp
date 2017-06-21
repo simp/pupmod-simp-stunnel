@@ -1,7 +1,7 @@
 # Set up a stunnel connection with a unique configuration and service
 #
 # @example Add an Rsync listener
-#  stunnel::individual_connection ('rsync':
+#  stunnel::standalone ('rsync':
 #    accept  => '873',
 #    connect =>  ['1.2.3.4:8730']
 #  }
@@ -129,7 +129,7 @@
 #
 # @author Nick Markowski <nmarkowski@keywcorp.com>
 #
-define stunnel::individual_connection(
+define stunnel::standalone(
   Simplib::Netlist                            $trusted_nets            = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
   Boolean                                     $firewall                = simplib::lookup('simp_options::firewall', { 'default_value'     => false }),
   Boolean                                     $tcpwrappers             = simplib::lookup('simp_options::tcpwrappers', { 'default_value'  => false }),
@@ -229,23 +229,12 @@ define stunnel::individual_connection(
     $_chroot = $chroot
   }
 
-  if !defined(File['/etc/stunnel']) {
-    file { '/etc/stunnel':
-      ensure  => 'directory',
-      owner   => 'root',
-      group   => $setgid,
-      mode    => '0750',
-      recurse => true,
-      tag     =>  'firstrun',
-    }
-  }
-
   file { "/etc/stunnel/stunnel_${name}.conf":
     ensure  => 'present',
     owner   => 'root',
     group   => 'root',
     mode    => '0600',
-    content => template('stunnel/individual_conf.erb'),
+    content => template('stunnel/standalone_conf.erb'),
     require => File['/etc/stunnel']
   }
 
@@ -264,7 +253,6 @@ define stunnel::individual_connection(
       owner  => 'root',
       group  => $setgid,
       mode   => '0770',
-      tag    => 'firstrun',
     }
 
     # The following two entries are required to be able to properly resolve
@@ -274,7 +262,6 @@ define stunnel::individual_connection(
       owner  => 'root',
       group  => 'root',
       mode   => '0755',
-      tag    => 'firstrun',
     }
 
     file { "${_chroot}/etc/resolv.conf":
@@ -283,7 +270,6 @@ define stunnel::individual_connection(
       group  => 'root',
       mode   => '0644',
       source => 'file:///etc/resolv.conf',
-      tag    => 'firstrun',
     }
 
     file { "${_chroot}/etc/nsswitch.conf":
@@ -292,7 +278,6 @@ define stunnel::individual_connection(
       group  => 'root',
       mode   => '0644',
       source => 'file:///etc/nsswitch.conf',
-      tag    => 'firstrun',
     }
 
     file { "${_chroot}/etc/hosts":
@@ -301,7 +286,6 @@ define stunnel::individual_connection(
       group  => 'root',
       mode   => '0644',
       source => 'file:///etc/hosts',
-      tag    => 'firstrun',
     }
 
     file { "${_chroot}/var":
@@ -368,25 +352,18 @@ define stunnel::individual_connection(
     owner   => 'root',
     group   => 'root',
     mode    => '0750',
-    content => template('stunnel/individual_init.erb'),
-    tag     => 'firstrun',
+    content => template('stunnel/standalone_init.erb'),
     notify  => Exec["stunnel_${name}_chkconfig_update"],
-  }
-
-  exec { "stunnel_${name}_chkconfig_update":
-    command     => "/sbin/chkconfig --del stunnel_${name}; /sbin/chkconfig --add stunnel_${name}",
-    refreshonly => true,
-    before      => Service["stunnel_${name}"]
   }
 
   service { "stunnel_${name}":
     ensure     => 'running',
+    enable     =>  true,
     hasrestart => true,
     hasstatus  => true,
     require    => [
       File["/etc/rc.d/init.d/stunnel_${name}"],
       File["/etc/stunnel/stunnel_${name}.conf"]
     ],
-    tag        => 'firstrun'
   }
 }

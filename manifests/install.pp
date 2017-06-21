@@ -35,4 +35,15 @@ class stunnel::install inherits ::stunnel {
       "Group[${::stunnel::setgid}]"
     ]
   }
+
+  file { '/etc/stunnel':
+    ensure  => 'directory',
+    owner   => 'root',
+    group   => $::stunnel::setgid,
+    mode    => '0750',
+    recurse => true,
+    tag     => 'firstrun',
+    require =>  Package['stunnel']
+  }
+
 }

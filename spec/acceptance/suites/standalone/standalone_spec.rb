@@ -10,7 +10,7 @@ describe 'individual_connection' do
     # does not test stunnel itself.
     context 'set up two connections' do
       let(:manifest) { <<EOF
-stunnel::individual_connection{ 'nfs':
+stunnel::standalone{ 'nfs':
   client       => false,
   connect      => [2049],
   accept       => 20490,
@@ -48,6 +48,8 @@ EOF
         result = on(host, "netstat -plant | grep #{pid} | awk ' { print $4 }'").stdout.strip
         expect(result).to match(/0.0.0.0:20490/)
       end
+
+      # TODO: Add test to ensure stunnel was chkconfig'd
 
     end
   end

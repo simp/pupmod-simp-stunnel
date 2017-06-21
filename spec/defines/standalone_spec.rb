@@ -51,7 +51,7 @@ delay = no
 retry = no
 EOF
 
-describe 'stunnel::individual_connection' do
+describe 'stunnel::standalone' do
   context 'supported operating systems' do
     on_supported_os.each do |os, facts|
       context "on #{os}" do
@@ -94,7 +94,7 @@ describe 'stunnel::individual_connection' do
               it { is_expected.to contain_file("/etc/stunnel/stunnel_#{title}.conf").with_content($el6_non_chroot) }
             end
           end
-          it { is_expected.to create_file("/etc/rc.d/init.d/stunnel_#{title}").with_content(/.*conf= \/etc\/stunnel\/stunnel_#{title}.conf.*/)}
+          it { is_expected.to create_file("/etc/rc.d/init.d/stunnel_#{title}").with_content(/.*conf=\/etc\/stunnel\/stunnel_#{title}.conf.*/)}
           it { is_expected.to create_iptables__listen__tcp_stateful("allow_stunnel_#{title}").with({
             :trusted_nets => ['any'],
             :dports       => [params[:accept].to_s.split(':')[-1]]
