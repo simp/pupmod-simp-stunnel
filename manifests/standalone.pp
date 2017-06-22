@@ -249,8 +249,8 @@ define stunnel::standalone(
     }
   }
 
+  # NOTE: The pidfile directory is ensured by the service file(s)
   if $_chroot {
-    # The _chroot directory
     file { $_chroot:
       ensure => 'directory',
       owner  => 'root',
@@ -339,7 +339,7 @@ define stunnel::standalone(
   if ($facts['os']['name'] in ['RedHat','CentOS']) {
     if ($facts['os']['release']['major'] < '7') {
       $_service_file = "/etc/rc.d/init.d/stunnel_${name}"
-      file { "/etc/rc.d/init.d/stunnel_${name}":
+      file { $_service_file:
         ensure  => 'present',
         owner   => 'root',
         group   => 'root',
@@ -350,7 +350,7 @@ define stunnel::standalone(
     }
     else {
       $_service_file = "/etc/systemd/system/stunnel_${name}.service"
-      file { "/etc/systemd/system/stunnel_${name}.service":
+      file { $_service_file:
         ensure  => 'present',
         owner   => 'root',
         group   => 'root',
