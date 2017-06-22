@@ -15,6 +15,12 @@ stunnel::standalone{ 'nfs':
   connect      => [2049],
   accept       => 20490,
 }
+stunnel::standalone{ 'chroot':
+  client       => false,
+  connect      => [4049],
+  accept       => 40490,
+  chroot       => '/var/stunnel_chroot'
+}
 stunnel::connection{ 'rsync':
   client       => false,
   connect      => [3049],
@@ -33,13 +39,15 @@ EOF
         apply_manifest_on(host,manifest,:catch_failures => true)
       end
 
-      it 'should be running stunnel and stunnel_nfs' do
+      it 'should be running stunnel, stunnel_nfs, and stunnel chroot' do
         if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
           on(host, 'systemctl status stunnel', :acceptable_exit_codes => 0)
           on(host, 'systemctl status stunnel_nfs', :acceptable_exit_codes => 0)
+          on(host, 'systemctl status stunnel_chroot', :acceptable_exit_codes => 0)
         else
           on(host, 'service stunnel status', :acceptable_exit_codes => 0)
           on(host, 'service stunnel_nfs status', :acceptable_exit_codes => 0)
+          on(host, 'service stunnel_chroot status', :acceptable_exit_codes => 0)
         end
       end
 
@@ -47,6 +55,12 @@ EOF
         pid = on(host, 'cat /var/run/stunnel/stunnel_nfs.pid').stdout.strip
         result = on(host, "netstat -plant | grep #{pid} | awk ' { print $4 }'").stdout.strip
         expect(result).to match(/0.0.0.0:20490/)
+      end
+
+      it 'stunnel_chroot should be listening on 40490' do
+        pid = on(host, 'cat /var/stunnel_chroot/var/run/stunnel/stunnel_nfs.pid').stdout.strip
+        result = on(host, "netstat -plant | grep #{pid} | awk ' { print $4 }'").stdout.strip
+        expect(result).to match(/0.0.0.0:40490/)
       end
 
     end

@@ -2,8 +2,8 @@
 #
 # @example Add an Rsync listener
 #  stunnel::standalone ('rsync':
-#    accept  => '873',
-#    connect =>  ['1.2.3.4:8730']
+#    accept                                                              => '873',
+#    connect                                                             => ['1.2.3.4:8730']
 #  }
 #
 # - Creates /etc/stunnel/stunnel_rsync.conf
@@ -310,6 +310,7 @@ define stunnel::standalone(
       group   => $setgid,
       mode    => '0640',
       recurse => true,
+      require =>  $pki ? { true =>  Pki::Copy["stunnel_${name}"], default =>  undef }
     }
   }
 
@@ -354,7 +355,7 @@ define stunnel::standalone(
         ensure  => 'present',
         owner   => 'root',
         group   => 'root',
-        mode    => '0750',
+        mode    => '0644',
         content => template('stunnel/standalone_systemd.erb'),
       }
     }

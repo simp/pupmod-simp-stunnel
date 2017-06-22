@@ -106,16 +106,18 @@ describe 'stunnel::standalone' do
           it { is_expected.to contain_class('stunnel::install') }
         end
 
-        context 'when chrooted' do
+        context 'when chrooted and pki true' do
           let(:title){ 'nfs' }
           let(:params){{
             :connect      => [2049],
             :accept       => 20490,
+            :pki          => true
           }}
           let(:facts) {facts.merge(:selinux_current_mode => 'disabled')}
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('stunnel::install') }
           it { is_expected.to create_file("/var/stunnel_#{title}") }
+          it { is_expected.to create_file("/var/stunnel_#{title}/etc/pki/cacerts").that_requires("Pki::Copy[stunnel_#{title}]") }
           if facts[:osfamily] == 'RedHat'
             if facts[:os][:release][:major].to_i >= 7
               it { is_expected.to contain_file("/etc/stunnel/stunnel_#{title}.conf").with_content(/.*chroot = \/var\/stunnel_#{title}.*/)}

@@ -6,7 +6,7 @@ Description=Start a stunnel_nfs listener
 
 [Service]
 Type=forking
-ExecPreStart=/usr/bin/mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 <%=$piddir%> ; /usr/bin/chown <%=@setuid%>:<%=@setgid%> <%=$piddir%>
+ExecStartPre=/usr/bin/mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 <%=$piddir%> ; /usr/bin/chown <%=@setuid%>:<%=@setgid%> <%=$piddir%>
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_<%=@name%>.conf
 PIDFile=<%="#{@_chroot}#{@pid}"%>
 LimitNOFILE=1048576
