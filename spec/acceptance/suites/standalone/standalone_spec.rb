@@ -8,7 +8,7 @@ describe 'standalone' do
     # This test verifys the validity of basic stunnel configurations
     # and ensures multiple connections can co-exist as advertised. It
     # does not test stunnel itself.
-    context 'set up two connections' do
+    context 'set up legacy, chrooted, and non-chrooted connections' do
       let(:manifest) { <<EOF
 stunnel::standalone{ 'nfs':
   client       => false,
@@ -58,7 +58,7 @@ EOF
       end
 
       it 'stunnel_chroot should be listening on 40490' do
-        pid = on(host, 'cat /var/stunnel_chroot/var/run/stunnel/stunnel_nfs.pid').stdout.strip
+        pid = on(host, 'cat /var/stunnel_chroot/var/run/stunnel/stunnel_chroot.pid').stdout.strip
         result = on(host, "netstat -plant | grep #{pid} | awk ' { print $4 }'").stdout.strip
         expect(result).to match(/0.0.0.0:40490/)
       end

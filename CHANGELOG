@@ -1,11 +1,13 @@
 * Tue Jun 20 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.1.0
-- Added a define, stunnel::standalone, to break out stunnel
-  connections into their own configurations and services.  The define
-  is backward compatible with existing stunnel configurations.
-- Added systemd support to stunnel::standalone
+- Added a define, stunnel::standalone
+  - Creates standalone connections with their own configurations
+    and services
+  - Adds systemd support
+  - Possible to chroot when selinux is permissive/enforcing
+  - Backwards compatible with existing stunnel configurations
 - stunnel::connection is unofficially deprecated until the SIMP-7
   release, at which point stunnel::standalone will replace
-  stunnel::connection.
+  stunnel::connection
 
 * Fri Mar 17 2017 Ryan Russell-Yates, Liz Nemsick - 6.0.1-0
 - Flesh out README

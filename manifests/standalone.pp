@@ -2,16 +2,16 @@
 #
 # @example Add an Rsync listener
 #  stunnel::standalone ('rsync':
-#    accept                                                              => '873',
-#    connect                                                             => ['1.2.3.4:8730']
+#    accept  => '873',
+#    connect => ['1.2.3.4:8730']
 #  }
 #
 # - Creates /etc/stunnel/stunnel_rsync.conf
 # - Spawns service 'stunnel_rsync' from stunnel_rsync.conf
 #
 # @param name [String]
-#   The name used to separate stunnel processes. For example, a name
-#   of 'nfs' would result in a service stunnel_nfs
+#   The name of the stunnel process. For example, a name of 'nfs'
+#   would result in a service stunnel_nfs
 #
 # @param chroot
 #   The location of the chroot jail
