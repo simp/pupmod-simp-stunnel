@@ -6,7 +6,7 @@
 #    connect =>  ['1.2.3.4:8730']
 #  }
 #
-# - Creates /etc/stunnel/stunnel_rsync.conf 
+# - Creates /etc/stunnel/stunnel_rsync.conf
 # - Spawns service 'stunnel_rsync' from stunnel_rsync.conf
 #
 # @param name [String]
@@ -228,6 +228,9 @@ define stunnel::standalone(
   elsif $facts['selinux_current_mode'] and $facts['selinux_current_mode'] == 'disabled' {
     $_chroot = "/var/stunnel_${name}"
   }
+  else {
+    $_chroot = undef
+  }
 
   file { "/etc/stunnel/stunnel_${name}.conf":
     ensure  => 'present',
@@ -245,7 +248,7 @@ define stunnel::standalone(
       notify =>  Service["stunnel_${name}"]
     }
   }
-    
+
   if $_chroot {
     # The _chroot directory
     file { $_chroot:
@@ -333,12 +336,28 @@ define stunnel::standalone(
     }
   }
 
-  file { "/etc/systemd/system/stunnel_${name}.service":
-    ensure  => 'present',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0750',
-    content => template('stunnel/standalone_init.erb'),
+  if ($facts['os']['name'] in ['RedHat','CentOS']) {
+    if ($facts['os']['release']['major'] < '7') {
+      $_service_file = "/etc/rc.d/init.d/stunnel_${name}"
+      file { "/etc/rc.d/init.d/stunnel_${name}":
+        ensure  => 'present',
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0750',
+        content => template('stunnel/standalone_init.erb'),
+        tag     => 'firstrun',
+      }
+    }
+    else {
+      $_service_file = "/etc/systemd/system/stunnel_${name}.service"
+      file { "/etc/systemd/system/stunnel_${name}.service":
+        ensure  => 'present',
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0750',
+        content => template('stunnel/standalone_systemd.erb'),
+      }
+    }
   }
 
   service { "stunnel_${name}":
@@ -347,7 +366,7 @@ define stunnel::standalone(
     hasrestart => true,
     hasstatus  => true,
     require    => [
-      File["/etc/systemd/system/stunnel_${name}.service"],
+      File[$_service_file],
       File["/etc/stunnel/stunnel_${name}.conf"]
     ],
   }

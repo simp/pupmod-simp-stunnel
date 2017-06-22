@@ -1,8 +1,8 @@
 require 'spec_helper_acceptance'
 
-test_name 'individual_connection'
+test_name 'standalone'
 
-describe 'individual_connection' do
+describe 'standalone' do
   hosts.each do |host|
 
     # This test verifys the validity of basic stunnel configurations
@@ -48,8 +48,6 @@ EOF
         result = on(host, "netstat -plant | grep #{pid} | awk ' { print $4 }'").stdout.strip
         expect(result).to match(/0.0.0.0:20490/)
       end
-
-      # TODO: Add test to ensure stunnel was chkconfig'd
 
     end
   end

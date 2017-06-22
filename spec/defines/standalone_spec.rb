@@ -89,12 +89,13 @@ describe 'stunnel::standalone' do
           # Some differences in el6 vs el7+ content
           if facts[:osfamily] == 'RedHat'
             if facts[:os][:release][:major].to_i >= 7
-              it { is_expected.to contain_file("/etc/stunnel/stunnel_#{title}.conf").with_content($el7_non_chroot) } 
+              it { is_expected.to contain_file("/etc/stunnel/stunnel_#{title}.conf").with_content($el7_non_chroot) }
+              it { is_expected.to create_file("/etc/systemd/system/stunnel_#{title}.service").with_content(/.*ExecStart=\/usr\/bin\/stunnel \/etc\/stunnel\/stunnel_#{title}.conf\nPIDFile=\/var\/run\/stunnel\/stunnel_#{title}.pid.*/)}
             else
               it { is_expected.to contain_file("/etc/stunnel/stunnel_#{title}.conf").with_content($el6_non_chroot) }
+              it { is_expected.to create_file("/etc/rc.d/init.d/stunnel_#{title}").with_content(/.*conf=\/etc\/stunnel\/stunnel_#{title}.conf.*/)}
             end
           end
-          it { is_expected.to create_file("/etc/rc.d/init.d/stunnel_#{title}").with_content(/.*conf=\/etc\/stunnel\/stunnel_#{title}.conf.*/)}
           it { is_expected.to create_iptables__listen__tcp_stateful("allow_stunnel_#{title}").with({
             :trusted_nets => ['any'],
             :dports       => [params[:accept].to_s.split(':')[-1]]
@@ -115,7 +116,15 @@ describe 'stunnel::standalone' do
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('stunnel::install') }
           it { is_expected.to create_file("/var/stunnel_#{title}") }
-          it { is_expected.to contain_file("/etc/stunnel/stunnel_#{title}.conf").with_content(/.*chroot = \/var\/stunnel_#{title}.*/)}
+          if facts[:osfamily] == 'RedHat'
+            if facts[:os][:release][:major].to_i >= 7
+              it { is_expected.to contain_file("/etc/stunnel/stunnel_#{title}.conf").with_content(/.*chroot = \/var\/stunnel_#{title}.*/)}
+              it { is_expected.to create_file("/etc/systemd/system/stunnel_#{title}.service").with_content(/.*ExecStart=\/usr\/bin\/stunnel \/etc\/stunnel\/stunnel_#{title}.conf\nPIDFile=\/var\/stunnel_#{title}\/var\/run\/stunnel\/stunnel_#{title}.pid.*/)}
+            else
+              it { is_expected.to contain_file("/etc/stunnel/stunnel_#{title}.conf").with_content(/.*chroot = \/var\/stunnel_#{title}.*/)}
+              it { is_expected.to create_file("/etc/rc.d/init.d/stunnel_#{title}").with_content(/.*conf=\/etc\/stunnel\/stunnel_#{title}.conf.*/)}
+            end
+          end
         end
 
         # Make sure there are no resource issues when including legacy stunnel

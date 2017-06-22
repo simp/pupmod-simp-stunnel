@@ -2,6 +2,7 @@
 - Added a define, stunnel::standalone, to break out stunnel
   connections into their own configurations and services.  The define
   is backward compatible with existing stunnel configurations.
+- Added systemd support to stunnel::standalone
 - stunnel::connection is unofficially deprecated until the SIMP-7
   release, at which point stunnel::standalone will replace
   stunnel::connection.
