@@ -1,8 +1,8 @@
 require 'spec_helper_acceptance'
 
-test_name 'standalone'
+test_name 'instance'
 
-describe 'standalone' do
+describe 'instance' do
   hosts.each do |host|
 
     # This test verifies the validity of basic stunnel configurations
@@ -10,12 +10,12 @@ describe 'standalone' do
     # does not test stunnel itself.
     context 'set up legacy, chrooted, and non-chrooted connections' do
       let(:manifest) { <<EOF
-stunnel::standalone{ 'nfs':
+stunnel::instance{ 'nfs':
   client       => false,
   connect      => [2049],
   accept       => 20490,
 }
-stunnel::standalone{ 'chroot':
+stunnel::instance{ 'chroot':
   client       => false,
   connect      => [4049],
   accept       => 40490,

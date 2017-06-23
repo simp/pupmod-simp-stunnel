@@ -1,7 +1,7 @@
 # Set up a stunnel connection with a unique configuration and service
 #
 # @example Add an Rsync listener
-#  stunnel::standalone {'rsync':
+#  stunnel::instance {'rsync':
 #    accept  => 873,
 #    connect => ['1.2.3.4:8730']
 #  }
@@ -183,7 +183,7 @@
 #
 # @author Nick Markowski <nmarkowski@keywcorp.com>
 #
-define stunnel::standalone(
+define stunnel::instance(
   Simplib::Netlist                            $trusted_nets            = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
   Boolean                                     $firewall                = simplib::lookup('simp_options::firewall', { 'default_value' => false }),
   Boolean                                     $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value' => true }),
@@ -300,7 +300,7 @@ define stunnel::standalone(
     owner   => 'root',
     group   => 'root',
     mode    => '0600',
-    content => template('stunnel/standalone_conf.erb'),
+    content => template('stunnel/instance_conf.erb'),
     require => File['/etc/stunnel']
   }
 
@@ -402,27 +402,28 @@ define stunnel::standalone(
     }
   }
 
-  if ($facts['os']['name'] in ['RedHat','CentOS']) {
-    if ($facts['os']['release']['major'] < '7') {
-      $_service_file = "/etc/rc.d/init.d/stunnel_${_safe_name}"
-      file { $_service_file:
-        ensure  => 'present',
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0750',
-        content => template('stunnel/standalone_init.erb')
-      }
+  if 'upstart' in $facts['init_systems'] {
+    $_service_file = "/etc/rc.d/init.d/stunnel_${_safe_name}"
+    file { $_service_file:
+      ensure  => 'present',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0750',
+      content => template('stunnel/instance_init.erb')
     }
-    else {
-      $_service_file = "/etc/systemd/system/stunnel_${_safe_name}.service"
-      file { $_service_file:
-        ensure  => 'present',
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-        content => template('stunnel/standalone_systemd.erb'),
-      }
+  }
+  elsif 'systemd' in $facts['init_systems'] {
+    $_service_file = "/etc/systemd/system/stunnel_${_safe_name}.service"
+    file { $_service_file:
+      ensure  => 'present',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => template('stunnel/instance_systemd.erb'),
     }
+  }
+  else {
+    fail("Init systems ${$facts['init_systems']} not supported. Only systemd, upstart supported.")
   }
 
   service { "stunnel_${_safe_name}":

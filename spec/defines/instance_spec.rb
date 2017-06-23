@@ -51,7 +51,7 @@ delay = no
 retry = no
 EOF
 
-describe 'stunnel::standalone' do
+describe 'stunnel::instance' do
   context 'supported operating systems' do
     on_supported_os.each do |os, facts|
       context "on #{os}" do
@@ -142,6 +142,16 @@ describe 'stunnel::standalone' do
           it { is_expected.to contain_class('stunnel::config') }
           it { is_expected.to contain_class('stunnel::service') }
           it { is_expected.to contain_class('stunnel::install') }
+        end
+
+        context 'on an unsupported OS' do
+          let(:title){ 'nfs' }
+          let(:params){{
+            :connect      => [2049],
+            :accept       => 20490,
+          }}
+          let(:facts) {facts.merge(:init_systems => ['rc'])}
+          it { is_expected.to compile.and_raise_error(/Init systems.*not supported/) }
         end
 
       end

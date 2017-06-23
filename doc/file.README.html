@@ -163,7 +163,7 @@ firewall  settings required for stunnel.</p>
 
 <p>You can set up stunnel for a particular service using the following code:</p>
 
-<pre class="code ruby"><code class="ruby">stunnel::standalone { &#39;service_name&#39;:
+<pre class="code ruby"><code class="ruby">stunnel::instance { &#39;service_name&#39;:
   accept =&gt; 873,
   connect =&gt; [&#39;1.2.3.4:8730&#39;]
 }
@@ -176,7 +176,7 @@ spawn a system service <code>stunnel_service_name</code>.</p>
 
 <h3 id="label-I+want+to+add+a+connection+to+the+stunnel+server">I want to add a connection <strong>to</strong> the stunnel server</h3>
 
-<pre class="code ruby"><code class="ruby">stunnel::standalone { &#39;my_service&#39;:
+<pre class="code ruby"><code class="ruby">stunnel::instance { &#39;my_service&#39;:
   connect =&gt; [&#39;stunnel.server.int:8730&#39;],
   accept  =&gt; &#39;127.0.0.1:873&#39;
 }

@@ -76,7 +76,7 @@ There are no special requirements for using this module.
 You can set up stunnel for a particular service using the following code:
 
 ```ruby
-stunnel::standalone { 'service_name':
+stunnel::instance { 'service_name':
   accept => 873,
   connect => ['1.2.3.4:8730']
 }
@@ -91,7 +91,7 @@ service ``stunnel_service_name``.
 ### I want to add a connection **to** the stunnel server
 
 ```ruby
-stunnel::standalone { 'my_service':
+stunnel::instance { 'my_service':
   connect => ['stunnel.server.int:8730'],
   accept  => '127.0.0.1:873'
 }
