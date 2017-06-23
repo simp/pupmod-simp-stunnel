@@ -5,7 +5,7 @@ test_name 'standalone'
 describe 'standalone' do
   hosts.each do |host|
 
-    # This test verifys the validity of basic stunnel configurations
+    # This test verifies the validity of basic stunnel configurations
     # and ensures multiple connections can co-exist as advertised. It
     # does not test stunnel itself.
     context 'set up legacy, chrooted, and non-chrooted connections' do

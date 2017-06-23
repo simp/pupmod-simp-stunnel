@@ -166,8 +166,7 @@ class stunnel::config (
       ensure => 'directory',
       owner  => 'root',
       group  => $setgid,
-      mode   => '0770',
-      tag    => 'firstrun',
+      mode   => '0770'
     }
 
     # The following two entries are required to be able to properly resolve
@@ -176,8 +175,7 @@ class stunnel::config (
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0755',
-      tag    => 'firstrun',
+      mode   => '0755'
     }
 
     file { "${_chroot}/etc/resolv.conf":
@@ -185,8 +183,7 @@ class stunnel::config (
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/resolv.conf',
-      tag    => 'firstrun',
+      source => 'file:///etc/resolv.conf'
     }
 
     file { "${_chroot}/etc/nsswitch.conf":
@@ -194,8 +191,7 @@ class stunnel::config (
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/nsswitch.conf',
-      tag    => 'firstrun',
+      source => 'file:///etc/nsswitch.conf'
     }
 
     file { "${_chroot}/etc/hosts":
@@ -203,8 +199,7 @@ class stunnel::config (
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/hosts',
-      tag    => 'firstrun',
+      source => 'file:///etc/hosts'
     }
 
     file { "${_chroot}/var":

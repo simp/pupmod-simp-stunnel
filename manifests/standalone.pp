@@ -1,8 +1,8 @@
 # Set up a stunnel connection with a unique configuration and service
 #
 # @example Add an Rsync listener
-#  stunnel::standalone ('rsync':
-#    accept  => '873',
+#  stunnel::standalone {'rsync':
+#    accept  => 873,
 #    connect => ['1.2.3.4:8730']
 #  }
 #
@@ -13,10 +13,20 @@
 #   The name of the stunnel process. For example, a name of 'nfs'
 #   would result in a service stunnel_nfs
 #
-# @param chroot
-#   The location of the chroot jail
+# @param trusted_nets
+#   Set this if you don't want to allow all IP addresses to access this
+#   connection
 #
-#   * Do **NOT** make this anything under ``/var/run``
+#   * This only makes sense for servers
+#
+# @param haveged
+#   Include ``haveged`` support when setting up stunnel (highly recommended)
+#
+# @param firewall
+#   Include the SIMP ``iptables`` module to manage the firewall
+#
+# @param tcpwrappers
+#   Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
 #
 # @param pki
 #   * If ``simp``, include SIMP's ``pki`` module and use ``pki::copy`` to
@@ -56,11 +66,22 @@
 #   certificates in from an external source
 #
 #   * This should be the full path to a directory containing **hashed**
-#   versions of the CA certificates
+#     versions of the CA certificates
+#
+# @param app_pki_cacert
+#   The path to the full CA certificate for the Stunnel connections
 #
 # @param app_pki_crl
 #   Since stunnel runs in a chroot, you need to copy the appropriate CRL in
 #   from an external source
+#
+# @param chroot
+#   The location of the chroot jail
+#
+#   * Do **NOT** make this anything under ``/var/run``
+#
+# @param client
+#   Indicates that this connection is a client connection
 #
 # @param fips
 #   Set the ``fips`` global option
@@ -95,9 +116,6 @@
 #       * '1.2.3.4:3000'
 #       * '3000'
 #
-# @param client
-#   Indicates that this connection is a client connection
-#
 # @param openssl_cipher_suite
 #   OpenSSL compatible array of ciphers to allow on the system
 #
@@ -110,34 +128,71 @@
 # @param options
 #   The OpenSSL library options
 #
+# @param uid
+#   The user id of the stunnel user
 #
-# @param trusted_nets
-#   Set this if you don't want to allow all IP addresses to access this
-#   connection
-#
-#   * This only makes sense for servers
-#
-# @param firewall
-#   Include the SIMP ``iptables`` module to manage the firewall
-#
-# @param tcpwrappers
-#   Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
+# @param gid
+#   The group id of the stunnel group
 #
 # All other configuration options can be found in the stunnel man pages
 # @see stunnel.conf(5)
 # @see stunnel.conf(8)
 #
+# @param client
+# @param compression
+# @param curve
+# @param delay
+# @param egd
+# @param engine
+# @param engine_ctrl
+# @param engine_num
+# @param exec
+# @param execargs
+# @param failover
+# @param local
+# @param ocsp
+# @param ocsp_flags
+# @param output
+# @param pid
+# @param protocol
+# @param protocol_host
+# @param protocol_username
+# @param protocol_password
+# @param protocol_authentication
+# @param pty
+# @param renegotiation
+# @param reset
+# @param retry
+# @param rnd_bytes
+# @param rnd_file
+# @param rnd_overwrite
+# @param session_cache_size
+# @param session_cache_timeout
+# @param setuid
+# @param setgid
+# @param sni
+# @param socket_options
+# @param stack
+# @param stunnel_debug
+# @param syslog
+# @param timeout_busy
+# @param timeout_close
+# @param timeout_connect
+# @param timeout_idle
+# @param verify
+#
 # @author Nick Markowski <nmarkowski@keywcorp.com>
 #
 define stunnel::standalone(
   Simplib::Netlist                            $trusted_nets            = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
-  Boolean                                     $firewall                = simplib::lookup('simp_options::firewall', { 'default_value'     => false }),
-  Boolean                                     $tcpwrappers             = simplib::lookup('simp_options::tcpwrappers', { 'default_value'  => false }),
+  Boolean                                     $firewall                = simplib::lookup('simp_options::firewall', { 'default_value' => false }),
+  Boolean                                     $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value' => true }),
+  Boolean                                     $tcpwrappers             = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }),
 
 
-  Variant[Enum['simp'],Boolean]               $pki                     = simplib::lookup('simp_options::pki', { 'default_value'          =>  false }),
+  Variant[Enum['simp'],Boolean]               $pki                     = simplib::lookup('simp_options::pki', { 'default_value' => false }),
   Stdlib::Absolutepath                        $app_pki_dir             = "/etc/pki/simp_apps/stunnel_${name}/x509",
-  Stdlib::Absolutepath                        $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value'  => '/etc/pki/simp/x509' }),
+  Stdlib::Absolutepath                        $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }),
   Stdlib::Absolutepath                        $app_pki_key             = "${app_pki_dir}/private/${facts['fqdn']}.pem",
   Stdlib::Absolutepath                        $app_pki_cert            = "${app_pki_dir}/public/${facts['fqdn']}.pub",
   Stdlib::Absolutepath                        $app_pki_ca_dir          = "${app_pki_dir}/cacerts",
@@ -157,7 +212,7 @@ define stunnel::standalone(
   Optional[String]                            $exec                    = undef,
   Array[String]                               $execargs                = [],
   Enum['rr','prio']                           $failover                = 'rr',
-  Boolean                                     $fips                    = simplib::lookup('simp_options::fips', { 'default_value'         => false }),
+  Boolean                                     $fips                    = simplib::lookup('simp_options::fips', { 'default_value' => pick($facts['fips_enabled'], false) }),
   Optional[String]                            $local                   = undef,
   Optional[Simplib::URI]                      $ocsp                    = undef,
   Stunnel::OcspFlags                          $ocsp_flags              = [],
@@ -181,12 +236,14 @@ define stunnel::standalone(
   Optional[Integer]                           $session_cache_timeout   = undef,
   String                                      $setuid                  = 'stunnel',
   String                                      $setgid                  = 'stunnel',
+  Integer                                     $uid                     = 600,
+  Integer                                     $gid                     = $uid,
   Optional[String]                            $sni                     = undef,
   Array[String]                               $socket_options          = [],
   Optional[String]                            $ssl_version             = undef,
   Optional[Integer]                           $stack                   = undef,
   String                                      $stunnel_debug           = 'err',
-  Boolean                                     $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'       => false }),
+  Boolean                                     $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value' => false }),
   Optional[Integer]                           $timeout_busy            = undef,
   Optional[Integer]                           $timeout_close           = undef,
   Optional[Integer]                           $timeout_connect         = undef,
@@ -196,9 +253,11 @@ define stunnel::standalone(
 
   include '::stunnel::install'
 
+  if $haveged { include '::haveged' }
+
   # Validation for RHEL6/7 Options. Defaulting to 7.
   if ($facts['os']['name'] in ['Red Hat','CentOS']) and ($facts['os']['release']['major'] < '7') {
-    if $::stunnel::fips {
+    if $fips {
       if $ssl_version { validate_array_member($ssl_version,['TLSv1']) }
     }
     else {
@@ -209,7 +268,7 @@ define stunnel::standalone(
     }
   }
   else {
-    if $::stunnel::fips {
+    if $fips {
       if $ssl_version { validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
     }
     else {
@@ -222,17 +281,21 @@ define stunnel::standalone(
     }
   }
 
+  ensure_resource('stunnel::account', $setuid, { 'groupname' => $setgid, 'uid' => $uid, 'gid' => $gid })
+
+  $_safe_name = regsubst($name, '(/|\s)', '__')
+
   if $chroot {
     $_chroot = $chroot
   }
   elsif $facts['selinux_current_mode'] and $facts['selinux_current_mode'] == 'disabled' {
-    $_chroot = "/var/stunnel_${name}"
+    $_chroot = "/var/stunnel_${_safe_name}"
   }
   else {
     $_chroot = undef
   }
 
-  file { "/etc/stunnel/stunnel_${name}.conf":
+  file { "/etc/stunnel/stunnel_${_safe_name}.conf":
     ensure  => 'present',
     owner   => 'root',
     group   => 'root',
@@ -242,10 +305,10 @@ define stunnel::standalone(
   }
 
   if $pki {
-    pki::copy { "stunnel_${name}":
+    pki::copy { "stunnel_${_safe_name}":
       source => $app_pki_external_source,
       pki    => $pki,
-      notify =>  Service["stunnel_${name}"]
+      notify =>  Service["stunnel_${_safe_name}"]
     }
   }
 
@@ -305,12 +368,14 @@ define stunnel::standalone(
       mode   => '0640'
     }
 
+    $_require_pki =  $pki ? { true =>  Pki::Copy["stunnel_${_safe_name}"], default =>  undef }
+
     file { "${_chroot}/etc/pki/cacerts":
       source  => "file://${app_pki_dir}/cacerts",
       group   => $setgid,
       mode    => '0640',
       recurse => true,
-      require =>  $pki ? { true =>  Pki::Copy["stunnel_${name}"], default =>  undef }
+      require =>  $_require_pki
     }
   }
 
@@ -323,7 +388,7 @@ define stunnel::standalone(
 
     $_dport = [to_integer(split(to_string($accept),':')[-1])]
 
-    iptables::listen::tcp_stateful { "allow_stunnel_${name}":
+    iptables::listen::tcp_stateful { "allow_stunnel_${_safe_name}":
       trusted_nets => $trusted_nets,
       dports       => $_dport
     }
@@ -332,25 +397,24 @@ define stunnel::standalone(
   if !$client and $tcpwrappers {
     include '::tcpwrappers'
 
-    tcpwrappers::allow { "allow_stunnel_${name}":
+    tcpwrappers::allow { "allow_stunnel_${_safe_name}":
       pattern => nets2ddq($trusted_nets)
     }
   }
 
   if ($facts['os']['name'] in ['RedHat','CentOS']) {
     if ($facts['os']['release']['major'] < '7') {
-      $_service_file = "/etc/rc.d/init.d/stunnel_${name}"
+      $_service_file = "/etc/rc.d/init.d/stunnel_${_safe_name}"
       file { $_service_file:
         ensure  => 'present',
         owner   => 'root',
         group   => 'root',
         mode    => '0750',
-        content => template('stunnel/standalone_init.erb'),
-        tag     => 'firstrun',
+        content => template('stunnel/standalone_init.erb')
       }
     }
     else {
-      $_service_file = "/etc/systemd/system/stunnel_${name}.service"
+      $_service_file = "/etc/systemd/system/stunnel_${_safe_name}.service"
       file { $_service_file:
         ensure  => 'present',
         owner   => 'root',
@@ -361,14 +425,14 @@ define stunnel::standalone(
     }
   }
 
-  service { "stunnel_${name}":
+  service { "stunnel_${_safe_name}":
     ensure     => 'running',
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
     require    => [
       File[$_service_file],
-      File["/etc/stunnel/stunnel_${name}.conf"]
+      File["/etc/stunnel/stunnel_${_safe_name}.conf"]
     ],
   }
 }
