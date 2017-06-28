@@ -11,8 +11,7 @@ class stunnel::service {
     group   => 'root',
     mode    => '0750',
     content => file("${module_name}/stunnel.init"),
-    tag     => 'firstrun',
-    notify  => Exec['stunnel_chkconfig_update'],
+    notify  => Exec['stunnel_chkconfig_update']
   }
 
   exec { 'stunnel_chkconfig_update':
@@ -26,6 +25,5 @@ class stunnel::service {
     hasrestart => true,
     hasstatus  => true,
     require    => File['/etc/rc.d/init.d/stunnel'],
-    tag        => 'firstrun'
   }
 }

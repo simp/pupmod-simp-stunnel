@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.9
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="puppet_class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="puppet_class_list_link"
+        href="puppet_class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'>
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0.html"><img
+src="http://img.shields.io/:license-apache-blue.svg"></a> <a
+href="https://travis-ci.org/simp/pupmod-simp-stunnel"><img
+src="https://travis-ci.org/simp/pupmod-simp-stunnel.svg"></a> <a
+href="https://img.shields.io/badge/SIMP%20compatibility-4.2.*%2F5.1.*-orange.svg"><img
+src="https://img.shields.io/badge/SIMP%20compatibility-4.2.*%2F5.1.*-orange.svg"></a></p>
+
+<h4 id="label-Table+of+Contents">Table of Contents</h4>
+<ol><li>
+<p><a href="#this-is-a-simp-module">Overview</a></p>
+</li><li>
+<p><a href="#module-description">Module Description - A Puppet module for
+managing stunnel</a></p>
+</li><li>
+<p><a href="#setup">Setup - The basics of getting started with
+pupmod-simp-stunnel</a></p>
+<ul><li>
+<p><a href="#what-simp-stunnel-affects">What pupmod-simp-stunnel affects</a></p>
+</li><li>
+<p><a href="#setup-requirements">Setup requirements</a></p>
+</li><li>
+<p><a href="#beginning-with-stunnel">Beginning with stunnel</a></p>
+</li></ul>
+</li><li>
+<p><a href="#usage">Usage - Configuration options and additional
+functionality</a></p>
+</li><li>
+<p><a href="#reference">Reference - An under-the-hood peek at what the module
+is doing and how</a></p>
+</li><li>
+<p><a href="#limitations">Limitations - OS compatibility, etc.</a></p>
+</li><li>
+<p><a href="#development">Development - Guide for contributing to the
+module</a></p>
+</li></ol>
+
+<h2 id="label-This+is+a+SIMP+module">This is a SIMP module</h2>
+
+<p>This module is a component of the <a
+href="https://github.com/NationalSecurityAgency/SIMP">System Integrity
+Management Platform</a>, a compliance-management framework built on Puppet.</p>
+
+<p>If you find any issues, they can be submitted to our <a
+href="https://simp-project.atlassian.net/">JIRA</a>.</p>
+
+<p>Please read our <a
+href="https://simp-project.atlassian.net/wiki/display/SD/Contributing+to+SIMP">Contribution
+Guide</a> and visit our <a
+href="https://simp-project.atlassian.net/wiki/display/SD/SIMP+Development+Home">developer
+wiki</a>.</p>
+
+<p>This module is optimally designed for use within a larger SIMP ecosystem,
+but it can be used independently:</p>
+<ul><li>
+<p>When included within the SIMP ecosystem, security compliance settings will
+be  managed from the Puppet server.</p>
+</li><li>
+<p>All SIMP-managed security subsystems are disabled by default and must be 
+explicitly opted into by administrators. Please review  <a
+href="https://github.com/simp/pupmod-simp-simp_options">simp/simp_options</a>
+for  details.</p>
+</li></ul>
+
+<h2 id="label-Module+Description">Module Description</h2>
+
+<p>This module sets up <a
+href="https://www.stunnel.org/index.html">stunnel</a> and allows the
+creation of stunnel connections for services.</p>
+
+<p><strong>IMPORTANT</strong></p>
+
+<p>| Please use the <code>stunnel::connection</code> define instead of
+including the | <code>stunnel</code> class directly. | | The main
+<code>stunnel</code> class is deprecated and will be removed in a future
+release. | | The main <code>stunnel</code> class manages the
+<strong>global</strong> stunnel configuration and | this was deemed to be
+too risky for use across services that are not related.</p>
+
+<h2 id="label-Setup">Setup</h2>
+
+<h3 id="label-What+simp+stunnel+affects">What simp stunnel affects</h3>
+
+<p><em>simp::stunnel</em> will manage:</p>
+<ul><li>
+<p>The latest version of stunnel</p>
+</li><li>
+<p>Ensure the service is running</p>
+</li><li>
+<p>Stunnel configuration files and daemons for each of your services</p>
+</li><li>
+<p>A stunnel chroot directory for each of your services</p>
+</li><li>
+<p>If <code>$firewall</code> is set to <code>true</code>, will manage the  <a
+href="https://github.com/simp/pupmod-simp-iptables">simp/iptables</a>
+firewall  settings required for stunnel.</p>
+</li></ul>
+
+<h3 id="label-Setup+Requirements">Setup Requirements</h3>
+
+<p>There are no special requirements for using this module.</p>
+
+<h3 id="label-Beginning+with+stunnel">Beginning with stunnel</h3>
+
+<p>You can set up stunnel for a particular service using the following code:</p>
+
+<pre class="code ruby"><code class="ruby">stunnel::instance { &#39;service_name&#39;:
+  accept =&gt; 873,
+  connect =&gt; [&#39;1.2.3.4:8730&#39;]
+}
+</code></pre>
+
+<p>This will create <code>/etc/stunnel/stunnel_service_name.conf</code> and
+spawn a system service <code>stunnel_service_name</code>.</p>
+
+<h2 id="label-Usage">Usage</h2>
+
+<h3 id="label-I+want+to+add+a+connection+to+the+stunnel+server">I want to add a connection <strong>to</strong> the stunnel server</h3>
+
+<pre class="code ruby"><code class="ruby">stunnel::instance { &#39;my_service&#39;:
+  connect =&gt; [&#39;stunnel.server.int:8730&#39;],
+  accept  =&gt; &#39;127.0.0.1:873&#39;
+}
+</code></pre>
+
+<h3 id="label-I+want+to+build+a+connection+on+the+stunnel+server">I want to build a connection <strong>on</strong> the stunnel server</h3>
+
+<pre class="code ruby"><code class="ruby">stunnel::connection { &#39;my_service&#39;:
+  client  =&gt; false,
+  connect =&gt; [873],
+  accept  =&gt; 8730
+}
+</code></pre>
+
+<h2 id="label-Reference">Reference</h2>
+
+<p>Please see the <code>puppet strings</code> <a
+href="https://github.com/simp/pupmod-simp-stunnel/tree/master/doc">generated
+documentation</a> for a full reference.</p>
+
+<h2 id="label-Limitations">Limitations</h2>
+
+<p>This module is only designed to work in RHEL or CentOS 6 and 7. Any other
+operating systems have not been tested and results cannot be guaranteed.</p>
+
+<h1 id="label-Development">Development</h1>
+
+<p>Please see the <a
+href="https://simp-project.atlassian.net/wiki/display/SD/Contributing+to+SIMP">SIMP
+Contribution Guidelines</a>.</p>
+
+<p>General developer documentation can be found on <a
+href="https://simp-project.atlassian.net/wiki/display/SD/SIMP+Development+Home">Confluence</a>.
+Visit the project homepage on <a
+href="https://simp-project.com">GitHub</a>, chat with us on our <a
+href="https://simp-project.hipchat.com/">HipChat</a>, and look at our
+issues on <a href="https://simp-project.atlassian.net/">JIRA</a>.</p>
+</div></div>
+
+      <div id="footer">
+  Generated on Thu Jun 22 21:06:45 2017 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.9 (ruby-2.1.9).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -49,6 +49,12 @@
 # @param setgid
 #   The group stunnel should run as
 #
+# @param uid
+#   The user id of the stunnel user
+#
+# @param gid
+#   The group id of the stunnel group
+#
 # @param syslog
 #   Whether or not to log to syslog
 #
@@ -76,8 +82,10 @@ class stunnel (
   Stdlib::Absolutepath          $app_pki_crl             = "${app_pki_dir}/crl",
   String                        $setuid                  = 'stunnel',
   String                        $setgid                  = 'stunnel',
+  Integer                       $uid                     = 600,
+  Integer                       $gid                     = $uid,
   Boolean                       $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'      => false }),
-  Boolean                       $fips                    = simplib::lookup('simp_options::fips', { 'default_value'        => false }),
+  Boolean                       $fips                    = simplib::lookup('simp_options::fips', { 'default_value'        => pick($facts['fips_enabled'], false) }),
   Boolean                       $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value'     => false }),
   Variant[Enum['simp'],Boolean] $pki                     = simplib::lookup('simp_options::pki', { 'default_value'         => false })
 ) {
@@ -87,6 +95,8 @@ class stunnel (
   contain '::stunnel::config'
   contain '::stunnel::service'
 
-  Class['stunnel::install'] -> Class['stunnel::config']
+  ensure_resource('stunnel::account', $setuid, { 'groupname' => $setgid, 'uid' => $uid, 'gid' => $gid })
+
+  Class['stunnel::install'] -> Stunnel::Account[$setuid] -> Class['stunnel::config']
   Class['stunnel::config'] ~> Class['stunnel::service']
 }

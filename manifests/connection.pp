@@ -186,6 +186,13 @@
 # @param tcpwrappers
 #   Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
 #
+# All other configuration options can be found in the stunnel man pages
+# @see stunnel.conf(5)
+# @see stunnel.conf(8)
+#
+# @param exec
+# @param execargs
+#
 # @author Trevor Vaughan <tvaughan@onyxpoint.com>
 #
 define stunnel::connection (

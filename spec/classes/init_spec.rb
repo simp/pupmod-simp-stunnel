@@ -8,17 +8,22 @@ describe 'stunnel' do
     it { is_expected.to compile.with_all_deps }
     it { is_expected.to_not contain_class('haveged') }
 
+    # User
+    it { is_expected.to create_stunnel__account('stunnel').that_comes_before('Class[stunnel::config]') }
+
     # Install
-    it { is_expected.to create_class('stunnel::install').that_comes_before('Class[stunnel::config]') }
+    it { is_expected.to create_class('stunnel::install').that_comes_before('Stunnel::Account[stunnel]') }
     it { is_expected.to create_group('stunnel') }
     it { is_expected.to create_user('stunnel') }
-    it { is_expected.to create_package('stunnel').with_require(["User[stunnel]","Group[stunnel]"]) }
+    it { is_expected.to create_package('stunnel') }
 
     # Config
     it { is_expected.to create_class('stunnel::config') }
     it { is_expected.to_not contain_class('pki') }
     it { is_expected.to contain_concat('/etc/stunnel/stunnel.conf') }
-    it { is_expected.to contain_file('/etc/stunnel').with_group('stunnel') }
+    it { is_expected.to contain_file('/etc/stunnel').with_owner('root') }
+    it { is_expected.to contain_file('/etc/stunnel').with_group('root') }
+    it { is_expected.to contain_file('/etc/stunnel').with_mode('0644') }
 
     # Service
     it { is_expected.to create_class('stunnel::service') }
