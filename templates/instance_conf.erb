@@ -1,0 +1,178 @@
+<%
+bool_translate = {
+  true => 'yes',
+  false => 'no'
+}
+
+  stunnel_conf = []
+
+  stunnel_conf << ["# This file managed by Puppet. Manual changes will be erased!\n"]
+  if @_chroot
+    stunnel_conf << "chroot = #{@_chroot}"
+  end
+
+  stunnel_conf << "setgid = #{@setgid}"
+  stunnel_conf << "setuid = #{@setuid}"
+  stunnel_conf << "debug = #{@stunnel_debug}"
+  stunnel_conf << "syslog = #{bool_translate[@syslog]}"
+
+  if @pid
+    stunnel_conf << "pid = #{@pid}"
+  end
+
+  if @compression
+    stunnel_conf << "compression = #{@compression}"
+  end
+
+  if @egd
+    stunnel_conf << "EGD = #{@egd}"
+  end
+
+  if @engine
+    stunnel_conf << "engine = #{@engine}"
+
+    if @engine_ctrl
+      stunnel_conf << "engineCtrl = #{@engine_ctrl}"
+    end
+  end
+
+  if ['RedHat','CentOS'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'].to_s >= "7")
+    stunnel_conf << "fips = #{bool_translate[(@facts['fips_enabled'] || @fips)]}"
+  end
+
+  if @output
+    stunnel_conf << "output = #{@output}"
+  end
+
+  if @rnd_bytes
+    stunnel_conf << "RNDbytes = #{@rnd_bytes}"
+  end
+
+  if @rnd_file
+    stunnel_conf << "RNDfile = #{@rnd_file}"
+  end
+
+  if @rnd_overwrite
+    stunnel_conf << "RNDoverwrite = #{bool_translate[@rnd_overwrite]}"
+  end
+
+  if @socket_options
+    @socket_options.each do |sock_opt|
+      stunnel_conf << "socket = #{sock_opt}"
+    end
+  end
+
+  stunnel_conf << "[#{@name}]"
+
+  @connect.each do |addr|
+    stunnel_conf << "connect = #{addr}"
+  end
+  stunnel_conf << "accept = #{@accept}"
+  stunnel_conf << "client = #{bool_translate[@client]}"
+  stunnel_conf << "failover = #{@failover}"
+
+  if @sni
+    stunnel_conf << "sni = #{@sni}"
+  end
+
+  stunnel_conf << "key = #{@app_pki_key}"
+  stunnel_conf << "cert = #{@app_pki_cert}"
+  stunnel_conf << "CAfile = #{@app_pki_cacert}"
+  stunnel_conf << "CRLpath = #{@app_pki_crl}"
+  stunnel_conf << "ciphers = #{@openssl_cipher_suite.join(':')}"
+
+  if @curve
+    stunnel_conf << "curve = #{@curve}"
+  end
+
+  if @ssl_version
+    stunnel_conf << "sslVersion = #{@ssl_version}"
+  end
+
+  @options.each do |opt|
+    stunnel_conf << "options = #{opt}"
+  end
+
+  stunnel_conf << "verify = #{@verify}"
+
+  if @ocsp
+    stunnel_conf << "OCSP = #{@ocsp}"
+
+    @ocsp_flags.each do |flag|
+      stunnel_conf << "OCSPFlag = #{flag}"
+    end
+  end
+
+  if @local
+    stunnel_conf << "local = #{@local}"
+  end
+
+  if @protocol
+    stunnel_conf << "protocol = #{@protocol}"
+
+    if @protocol_authentication
+      stunnel_conf << "protocolAuthentication = #{@protocol_authentication}"
+    end
+    if @protocol_host
+      stunnel_conf << "protocolHost = #{@protocol_host}"
+    end
+    if @protocol_password
+      stunnel_conf << "protocolPassword = #{@protocol_password}"
+    end
+    if @protocol_username
+      stunnel_conf << "protocolUsername = #{@protocol_username}"
+    end
+  end
+
+  stunnel_conf << "delay = #{bool_translate[@delay]}"
+
+  if @engine_num
+    stunnel_conf << "engineNum = #{@engine_num}"
+  end
+
+  if @exec
+    stunnel_conf << "exec = #{@exec}"
+    if @execargs
+      stunnel_conf << "execargs = #{@execargs.join(' ')}"
+    end
+    stunnel_conf << "pty = #{bool_translate[@pty]}"
+    stunnel_conf << "retry = #{@retry}"
+  end
+
+  stunnel_conf << "retry = #{bool_translate[@retry]}"
+
+  if @session_cache_timeout
+    stunnel_conf << "session = #{@session_cache_timeout}"
+  end
+
+  if ['RedHat','CentOS'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'] > '6')
+    stunnel_conf << "renegotiation = #{bool_translate[@renegotiation]}"
+    stunnel_conf << "reset = #{bool_translate[@reset]}"
+
+    if @session_cache_size
+      stunnel_conf << "sessionCacheSize = #{@session_cache_size}"
+    end
+
+    if @session_cache_timeout
+      stunnel_conf << "sessionCacheTimeout = #{@session_cache_timeout}"
+    end
+  end
+
+  if @stack
+    stunnel_conf << "stack = #{@stack}"
+  end
+
+  if @timeout_busy
+    stunnel_conf << "TIMEOUTbusy = #{@timeout_busy}"
+  end
+  if @timeout_close
+    stunnel_conf << "TIMEOUTclose = #{@timeout_close}"
+  end
+  if @timeout_connect
+    stunnel_conf << "TIMEOUTconnect = #{@timeout_connect}"
+  end
+  if @timeout_idle
+    stunnel_conf << "TIMEOUTidle = #{@timeout_idle}"
+  end
+-%>
+<%= stunnel_conf.join("\n") %>

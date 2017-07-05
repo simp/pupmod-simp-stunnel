@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Defined Type: stunnel::connection
+  
+    &mdash; Documentation by YARD 0.9.9
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "puppet_defined_types::stunnel::connection";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../puppet_defined_type_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (s)</a> &raquo;
+    <span class='title'><span class='object_link'>Defined Types</span></span>
+     &raquo; 
+    <span class="title">stunnel::connection</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="puppet_class_list_link"
+        href="../puppet_class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Defined Type: stunnel::connection</h1>
+<div class="box_info">
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>
+      manifests/connection.pp
+    </dd>
+  </dl>
+</div>
+
+<h2>Overview</h2>
+<div class="docstring">
+  <div class="discussion">
+    
+<p>Set up a stunnel connection for the service <code>$name</code></p>
+
+<p>All other configuration options can be found in the stunnel man pages</p>
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'>
+<p>Add an Rsync listener</p>
+</div></p>
+      
+      <pre class="example code"><code>stunnel::connection (&#39;rsync&#39;:
+  accept       =&gt; &#39;873&#39;,
+  connect_addr =&gt; [&#39;1.2.3.4:8730&#39;]
+}</code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The service name</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>connect</span>
+      
+      
+        <span class='type'>(<tt>Stunnel::Connect</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Address and port to which to <strong>forward</strong> connections</p>
+<ul><li>
+<p>For a client, this is the port of the stunnel server</p>
+</li><li>
+<p>For the stunnel server, this is the listening port of the tunneled  service</p>
+</li><li>
+<p>Just a port indicates that you wish to listen on all interfaces</p>
+</li><li>
+<p>Examples:</p>
+<ul><li>
+<p>[&#39;my.server:3000&#39;,&#39;my.server2:3001&#39;]</p>
+</li><li>
+<p>[&#39;my.server:3000&#39;]</p>
+</li><li>
+<p>[&#39;3000&#39;]</p>
+</li></ul>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>accept</span>
+      
+      
+        <span class='type'>(<tt>Variant[Simplib::Port, Simplib::Host::Port]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Address and port upon which to <strong>accept</strong> connections</p>
+<ul><li>
+<p>For a client, this is generally <code>localhost</code></p>
+</li><li>
+<p>For a server, it should be whichever external address is appropriate</p>
+<ul><li>
+<p>If this is omitted, then connections are accepted on all addresses</p>
+</li><li>
+<p>If this is omitted, then connections are accepted on all addresses</p>
+</li></ul>
+</li><li>
+<p>Examples:</p>
+<ul><li>
+<p>&#39;1.2.3.4:3000&#39;</p>
+</li><li>
+<p>&#39;3000&#39;</p>
+</li></ul>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>client</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Indicates that this connection is a client connection</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>failover</span>
+      
+      
+        <span class='type'>(<tt>Enum['rr','prio']</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;rr&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The failover strategy for multiple connect targets</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>sni</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>See the &#39;sni&#39; option documentation in <code>stunnel(8)</code></p>
+
+<p>This option is only valid on EL 7+</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>app_pki_key</span>
+      
+      
+        <span class='type'>(<tt>Optional[Stdlib::Absolutepath]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Path and name of the private SSL key file</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>app_pki_cert</span>
+      
+      
+        <span class='type'>(<tt>Optional[Stdlib::Absolutepath]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Path and name of the public SSL certificate</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>app_pki_cacert</span>
+      
+      
+        <span class='type'>(<tt>Stdlib::Absolutepath</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;/etc/pki/simp_apps/stunnel/x509/cacerts/cacerts.pem&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Path to the OpenSSL compatible CA certificates</p>
+<ul><li>
+<p><strong>NOTE:</strong> this path is relative to the chroot path if set and
+is expected to be a directory</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>app_pki_crl</span>
+      
+      
+        <span class='type'>(<tt>Stdlib::Absolutepath</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;/etc/pki/simp_apps/stunnel/x509/crl&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Path to the OpenSSL compatible CRL directory</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>openssl_cipher_suite</span>
+      
+      
+        <span class='type'>(<tt>Array[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[&#39;HIGH&#39;,&#39;-SSLv2&#39;]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>OpenSSL compatible array of ciphers to allow on the system</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>curve</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The ECDH curve name to use. To get a list of supported curves use:
+<code>openssl ecparam -list_curves</code> on your <em>client</em></p>
+<ul><li>
+<p>This option is only valid on EL 7+</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ssl_version</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Dictate the SSL version that can be used on the system</p>
+<ul><li>
+<p>This default, combined with the default <code>$ciphers</code>, will only
+negotiate  at <code>TLSv1.1</code> or higher</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Array[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The OpenSSL library options</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>verify</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>2</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Level of mutual authentication to perform</p>
+<ul><li>
+<p>RHEL 6 Options:</p>
+<ul><li>
+<p>level 1 - verify peer certificate if present</p>
+</li><li>
+<p>level 2 - verify peer certificate</p>
+</li><li>
+<p>level 3 - verify peer with locally installed certificate</p>
+</li><li>
+<p>default - no verify</p>
+</li><li>
+<p>level 1 - verify peer certificate if present</p>
+</li><li>
+<p>level 2 - verify peer certificate</p>
+</li><li>
+<p>level 3 - verify peer with locally installed certificate</p>
+</li><li>
+<p>default - no verify</p>
+</li></ul>
+</li><li>
+<p>RHEL 7 Options:</p>
+<ul><li>
+<p>level 0 - Request and ignore peer certificate.</p>
+</li><li>
+<p>level 1 - Verify peer certificate if present.</p>
+</li><li>
+<p>level 2 - Verify peer certificate.</p>
+</li><li>
+<p>level 3 - Verify peer with locally installed certificate.</p>
+</li><li>
+<p>level 4 - Ignore CA chain and only verify peer certificate.</p>
+</li><li>
+<p>default - No verify</p>
+</li></ul>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ocsp</span>
+      
+      
+        <span class='type'>(<tt>Optional[Simplib::URI]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The OCSP responder to use for certificate validation</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ocsp_flags</span>
+      
+      
+        <span class='type'>(<tt>Stunnel::OcspFlags</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The OCSP server flags</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>local</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The outgoing IP to which to bind</p>
+
+<p>By default, stunnel binds to all interfaces</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>protocol</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The application protocol to negotiate SSL.</p>
+<ul><li>
+<p>RHEL/CentOS 6: [cifs|connect|imap|nntp|pgsql|pop3|smtp]</p>
+</li><li>
+<p>RHEL/CentOS 7+: [cifs|connect|imap|nntp|pgsql|pop3|proxy|smtp]</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>protocol_authentication</span>
+      
+      
+        <span class='type'>(<tt>Optional[Enum['basic','NTLM']]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Authentication type for protocol negotiations</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>protocol_host</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The destination address for protocol negotiations</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>protocol_password</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The password for protocol negotiations</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>protocol_username</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The username for protocol negotiations</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>delay</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Delay DNS lookup for <code>connect</code> option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>engine_num</span>
+      
+      
+        <span class='type'>(<tt>Optional[Integer]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The engine number from which to read the private key</p>
+<ul><li>
+<p>This option is only supported on RHEL/CentOS 7+</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>pty</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Reserve and assign a pty to a program that is run by stunnel inetd-style
+using the <code>exec</code> option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>renegotiation</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Support SSL renegotiation</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>reset</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Attempt to use TCP <code>RST</code> flag to indicate an error</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>retry</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Reconnect a <code>connect+exec</code> session after it has been
+disconnected</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>session_cache_size</span>
+      
+      
+        <span class='type'>(<tt>Optional[Integer]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The maximum number of internal session cache entries</p>
+<ul><li>
+<p>Set to 0 for <code>unlimited</code> (<strong>not advised</strong>)</p>
+</li><li>
+<p>This option is only valid on EL 7+</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>session_cache_timeout</span>
+      
+      
+        <span class='type'>(<tt>Optional[Integer]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The number of seconds to keep cached SSL sessions</p>
+<ul><li>
+<p>Corresponds to the <code>session_timeout</code> variable in EL 6</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>stack</span>
+      
+      
+        <span class='type'>(<tt>Optional[Integer]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Thread stack size in <strong>bytes</strong></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>timeout_busy</span>
+      
+      
+        <span class='type'>(<tt>Optional[Integer]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Time to wait for expected data in <strong>seconds</strong></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>timeout_close</span>
+      
+      
+        <span class='type'>(<tt>Optional[Integer]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Time to wait for close notify in <strong>seconds</strong></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>timeout_connect</span>
+      
+      
+        <span class='type'>(<tt>Optional[Integer]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Time to wait for a remote host connection in <strong>seconds</strong></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>timeout_idle</span>
+      
+      
+        <span class='type'>(<tt>Optional[Integer]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Time to keep an idle connection in <strong>seconds</strong></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>trusted_nets</span>
+      
+      
+        <span class='type'>(<tt>Simplib::Netlist</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>simplib::lookup(&#39;simp_options::trusted_nets&#39;, { &#39;default_value&#39; =&gt; [&#39;127.0.0.1&#39;] })</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Set this if you don&#39;t want to allow all IP addresses to access this
+connection</p>
+<ul><li>
+<p>This only makes sense for servers</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>firewall</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>simplib::lookup(&#39;simp_options::firewall&#39;, { &#39;default_value&#39; =&gt; false })</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Include the SIMP <code>iptables</code> module to manage the firewall</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>tcpwrappers</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>simplib::lookup(&#39;simp_options::tcpwrappers&#39;, { &#39;default_value&#39; =&gt; false })</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Include the SIMP <code>tcpwrappers</code> module to manage tcpwrappers</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>exec</span>
+      
+      
+        <span class='type'>(<tt>Optional[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>undef</tt>)</em>
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>execargs</span>
+      
+      
+        <span class='type'>(<tt>Array[String]</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>stunnelstunnel.conf(5)</li>
+    
+      <li>stunnelstunnel.conf(8)</li>
+    
+      <li>stunnelstunnel.conf(5)</li>
+    
+      <li>stunnelstunnel.conf(8)</li>
+    
+  </ul>
+<p class="tag_title">Author:</p>
+<ul class="author">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'>
+<p>Trevor Vaughan <a
+href="mailto:tvaughan@onyxpoint.com">tvaughan@onyxpoint.com</a></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><div class="method_details_list">
+  <table class="source_code">
+    <tr>
+      <td>
+        <pre class="lines">
+
+
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320</pre>
+      </td>
+      <td>
+        <pre class="code"><span class="info file"># File 'manifests/connection.pp', line 198</span>
+
+define stunnel::connection (
+  Stunnel::Connect                            $connect,
+  Variant[Simplib::Port, Simplib::Host::Port] $accept,
+  Boolean                                     $client                  = true,
+  Enum[&#39;rr&#39;,&#39;prio&#39;]                           $failover                = &#39;rr&#39;,
+  Optional[String]                            $sni                     = undef,
+  Optional[Stdlib::Absolutepath]              $app_pki_key             = undef,
+  Optional[Stdlib::Absolutepath]              $app_pki_cert            = undef,
+  Stdlib::Absolutepath                        $app_pki_cacert          = &#39;/etc/pki/simp_apps/stunnel/x509/cacerts/cacerts.pem&#39;,
+  Stdlib::Absolutepath                        $app_pki_crl             = &#39;/etc/pki/simp_apps/stunnel/x509/crl&#39;,
+  Array[String]                               $openssl_cipher_suite    = [&#39;HIGH&#39;,&#39;-SSLv2&#39;],
+  Optional[String]                            $curve                   = undef,
+  Optional[String]                            $ssl_version             = undef,
+  Array[String]                               $options                 = [],
+  Integer                                     $verify                  = 2,
+  Optional[Simplib::URI]                      $ocsp                    = undef,
+  Stunnel::OcspFlags                          $ocsp_flags              = [],
+  Optional[String]                            $local                   = undef,
+  Optional[String]                            $protocol                = undef,
+  Optional[Enum[&#39;basic&#39;,&#39;NTLM&#39;]]              $protocol_authentication = undef,
+  Optional[String]                            $protocol_host           = undef,
+  Optional[String]                            $protocol_username       = undef,
+  Optional[String]                            $protocol_password       = undef,
+  Boolean                                     $delay                   = false,
+  Optional[Integer]                           $engine_num              = undef,
+  Optional[String]                            $exec                    = undef,
+  Array[String]                               $execargs                = [],
+  Boolean                                     $pty                     = false,
+  Boolean                                     $renegotiation           = true,
+  Boolean                                     $reset                   = true,
+  Boolean                                     $retry                   = false,
+  Optional[Integer]                           $session_cache_size      = undef,
+  Optional[Integer]                           $session_cache_timeout   = undef,
+  Optional[Integer]                           $stack                   = undef,
+  Optional[Integer]                           $timeout_busy            = undef,
+  Optional[Integer]                           $timeout_close           = undef,
+  Optional[Integer]                           $timeout_connect         = undef,
+  Optional[Integer]                           $timeout_idle            = undef,
+  Simplib::Netlist                            $trusted_nets            = simplib::lookup(&#39;simp_options::trusted_nets&#39;, { &#39;default_value&#39; =&gt; [&#39;127.0.0.1&#39;] }),
+  Boolean                                     $firewall                = simplib::lookup(&#39;simp_options::firewall&#39;, { &#39;default_value&#39; =&gt; false }),
+  Boolean                                     $tcpwrappers             = simplib::lookup(&#39;simp_options::tcpwrappers&#39;, { &#39;default_value&#39; =&gt; false })
+) {
+  include &#39;::stunnel&#39;
+
+  # Validation for RHEL6/7 Options. Defaulting to 7.
+  if ($facts[&#39;os&#39;][&#39;name&#39;] in [&#39;Red Hat&#39;,&#39;CentOS&#39;]) and ($facts[&#39;os&#39;][&#39;release&#39;][&#39;major&#39;] &lt; &#39;7&#39;) {
+    if $::stunnel::fips {
+      if $ssl_version { validate_array_member($ssl_version,[&#39;TLSv1&#39;]) }
+    }
+    else {
+      if $ssl_version { validate_array_member($ssl_version,[&#39;all&#39;,&#39;SSLv2&#39;,&#39;SSLv3&#39;,&#39;TLSv1&#39;]) }
+    }
+    if $protocol {
+      validate_array_member($protocol,[&#39;cifs&#39;,&#39;connect&#39;,&#39;imap&#39;,&#39;nntp&#39;,&#39;pgsql&#39;,&#39;pop3&#39;,&#39;smtp&#39;])
+    }
+  }
+  else {
+    if $::stunnel::fips {
+      if $ssl_version { validate_array_member($ssl_version,[&#39;TLSv1&#39;,&#39;TLSv1.1&#39;,&#39;TLSv1.2&#39;]) }
+    }
+    else {
+      if $ssl_version {
+        validate_array_member($ssl_version,[&#39;all&#39;,&#39;SSLv2&#39;,&#39;SSLv3&#39;,&#39;TLSv1&#39;,&#39;TLSv1.1&#39;,&#39;TLSv1.2&#39;])
+      }
+    }
+    if $protocol {
+      validate_array_member($protocol,[&#39;cifs&#39;,&#39;connect&#39;,&#39;imap&#39;,&#39;nntp&#39;,&#39;pgsql&#39;,&#39;pop3&#39;,&#39;proxy&#39;,&#39;smtp&#39;])
+    }
+  }
+
+  if $app_pki_key {
+    $_app_pki_key = $app_pki_key
+  }
+  else {
+    $_app_pki_key = $::stunnel::app_pki_key
+  }
+  if $app_pki_cert {
+    $_app_pki_cert = $app_pki_cert
+  }
+  else {
+    $_app_pki_cert = $::stunnel::app_pki_cert
+  }
+  if $app_pki_cacert {
+    $_app_pki_cacert = $app_pki_cacert
+  }
+  else {
+    $_app_pki_cacert = $::stunnel::app_pki_cacert
+  }
+  if $app_pki_crl {
+    $_app_pki_crl = $app_pki_crl
+  }
+  else {
+    $_app_pki_crl = $::stunnel::app_pki_crl
+  }
+
+  concat::fragment { &quot;stunnel_connection_${name}&quot;:
+    target  =&gt; &#39;/etc/stunnel/stunnel.conf&#39;,
+    content =&gt; template(&quot;${module_name}/stunnel.erb&quot;)
+  }
+
+  # The rules are pulled together from the accept_* and connect_*
+  # variables.
+  #
+  # This is only enabled if the system is a server.
+  if $firewall and !$client {
+    include &#39;::iptables&#39;
+
+    $_dport = [to_integer(split(to_string($accept),&#39;:&#39;)[-1])]
+
+    iptables::listen::tcp_stateful { &quot;allow_stunnel_${name}&quot;:
+      trusted_nets =&gt; $trusted_nets,
+      dports       =&gt; $_dport
+    }
+  }
+
+  if !$client and $tcpwrappers {
+    include &#39;::tcpwrappers&#39;
+
+    tcpwrappers::allow { &quot;allow_stunnel_${name}&quot;:
+      pattern =&gt; nets2ddq($trusted_nets)
+    }
+  }
+}</pre>
+      </td>
+    </tr>
+  </table>
+</div>
+</div>
+
+      <div id="footer">
+  Generated on Thu Jun 22 21:06:46 2017 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.9 (ruby-2.1.9).
+</div>
+
+    </div>
+  </body>
+</html>
