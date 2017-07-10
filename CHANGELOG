@@ -8,6 +8,7 @@
 - stunnel::connection is unofficially deprecated until the SIMP-7
   release, at which point stunnel::instance will replace
   stunnel::connection
+- Update puppet requirement in metadata.json
 
 * Fri Mar 17 2017 Ryan Russell-Yates, Liz Nemsick - 6.0.1-0
 - Flesh out README
