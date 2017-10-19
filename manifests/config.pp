@@ -142,14 +142,16 @@ class stunnel::config (
   if $pki {
     pki::copy { 'stunnel':
       source => $app_pki_external_source,
-      pki    => $pki
+      pki    => $pki,
+      owner  => $setuid,
+      group  => 'root',
     }
   }
 
   concat { '/etc/stunnel/stunnel.conf':
-    owner          => 'root',
+    owner          => $setuid,
     group          => 'root',
-    mode           => '0600',
+    mode           => '0640',
     ensure_newline => true,
     warn           => true
   }
@@ -157,7 +159,7 @@ class stunnel::config (
   concat::fragment { '0_stunnel_global':
     order   => 1,
     target  => '/etc/stunnel/stunnel.conf',
-    content => template('stunnel/stunnel.erb')
+    content => template('stunnel/connection_conf.erb')
   }
 
   if $_chroot {
@@ -236,6 +238,49 @@ class stunnel::config (
       mode    => '0640',
       recurse => true,
     }
+  }
+
+  file { dirname($pid):
+    ensure  => directory,
+    owner   => $setuid,
+    group   => $setgid,
+    mode    => '0644',
+    seluser => 'system_u',
+    selrole => 'object_r',
+    seltype => 'stunnel_var_run_t',
+  }
+
+
+  # These templates need variables, that's why they are here
+  if 'systemd' in $facts['init_systems'] {
+    file { '/etc/systemd/system/stunnel.service':
+      ensure  => file,
+      content => template('stunnel/connection_systemd.erb'),
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      notify  => Exec['stunnel daemon reload']
+    }
+    exec { 'stunnel daemon reload':
+      command     => '/usr/bin/systemctl daemon-reload',
+      refreshonly => true,
+    }
+
+  }
+  else {
+    file { '/etc/rc.d/init.d/stunnel':
+      ensure  => 'present',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0750',
+      content => template("stunnel/connection_init.erb"),
+      notify  => Exec['stunnel_chkconfig_update']
+    }
+    exec { 'stunnel_chkconfig_update':
+      command     => '/sbin/chkconfig --del stunnel; /sbin/chkconfig --add stunnel',
+      refreshonly => true,
+    }
+
   }
 
 }

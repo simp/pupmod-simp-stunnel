@@ -27,9 +27,6 @@ describe 'stunnel' do
 
     # Service
     it { is_expected.to create_class('stunnel::service') }
-    it { is_expected.to create_file('/etc/rc.d/init.d/stunnel').that_notifies('Exec[stunnel_chkconfig_update]') }
-    it { is_expected.to contain_service('stunnel').that_requires('File[/etc/rc.d/init.d/stunnel]') }
-    it { is_expected.to contain_exec('stunnel_chkconfig_update') }
   end
 
   context 'supported operating systems' do
@@ -38,6 +35,7 @@ describe 'stunnel' do
           let(:facts){
             _facts = facts.dup
             _facts[:selinux_current_mode] = 'disabled'
+            _facts[:selinux_enforced] = false
 
             _facts
           }
@@ -48,31 +46,27 @@ describe 'stunnel' do
           # Specific to chrooting
           if facts[:osfamily] == 'RedHat' && facts[:operatingsystemmajrelease] >= '7'
             # Fips should be disabled with default params for el 7 systems
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM
-# This file managed by Puppet. Manual changes will be erased!
-
-chroot = /var/stunnel
-setgid = stunnel
-setuid = stunnel
-debug = err
-syslog = no
-pid = /var/run/stunnel/stunnel.pid
-engine = auto
-fips = no
+            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
+                chroot = /var/stunnel
+                setgid = stunnel
+                setuid = stunnel
+                debug = err
+                syslog = no
+                pid = /var/run/stunnel/stunnel.pid
+                engine = auto
+                fips = no
               EOM
             )}
           else
             # Fips should not exist on an el 6 system
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM
-# This file managed by Puppet. Manual changes will be erased!
-
-chroot = /var/stunnel
-setgid = stunnel
-setuid = stunnel
-debug = err
-syslog = no
-pid = /var/run/stunnel/stunnel.pid
-engine = auto
+            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
+                chroot = /var/stunnel
+                setgid = stunnel
+                setuid = stunnel
+                debug = err
+                syslog = no
+                pid = /var/run/stunnel/stunnel.pid
+                engine = auto
               EOM
             )}
           end
@@ -88,6 +82,16 @@ engine = auto
           it { is_expected.to contain_file('/var/stunnel/etc/pki') }
           it { is_expected.to contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
 
+          if facts[:operatingsystemmajrelease].to_i >= 7
+            it { is_expected.to create_file('/etc/systemd/system/stunnel.service').that_notifies('Exec[stunnel daemon reload]') }
+            it { is_expected.to contain_service('stunnel').that_requires('File[/etc/systemd/system/stunnel.service]') }
+            it { is_expected.to contain_exec('stunnel daemon reload') }
+          else
+            it { is_expected.to create_file('/etc/rc.d/init.d/stunnel').that_notifies('Exec[stunnel_chkconfig_update]') }
+            it { is_expected.to contain_service('stunnel').that_requires('File[/etc/rc.d/init.d/stunnel]') }
+            it { is_expected.to contain_exec('stunnel_chkconfig_update') }
+          end
+
         end
 
         context 'with selinux = true (non-chrooted)' do
@@ -97,29 +101,25 @@ engine = auto
 
           if facts[:osfamily] == 'RedHat' && facts[:operatingsystemmajrelease] >= '7'
             # Fips should be disabled
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM
-# This file managed by Puppet. Manual changes will be erased!
-
-setgid = stunnel
-setuid = stunnel
-debug = err
-syslog = no
-pid = /var/run/stunnel/stunnel.pid
-engine = auto
-fips = no
+            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
+                setgid = stunnel
+                setuid = stunnel
+                debug = err
+                syslog = no
+                pid = /var/run/stunnel/stunnel.pid
+                engine = auto
+                fips = no
               EOM
             )}
           else
             # Fips should not exist on an el 6 system
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM
-# This file managed by Puppet. Manual changes will be erased!
-
-setgid = stunnel
-setuid = stunnel
-debug = err
-syslog = no
-pid = /var/run/stunnel/stunnel.pid
-engine = auto
+            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
+                setgid = stunnel
+                setuid = stunnel
+                debug = err
+                syslog = no
+                pid = /var/run/stunnel/stunnel.pid
+                engine = auto
               EOM
             )}
           end
@@ -136,10 +136,10 @@ engine = auto
         end
         context 'with pki = simp, haveged = true, syslog = true, and fips = true' do
           let(:params) {{
-            :pki => 'simp',
-            :haveged => true,
-            :syslog => true,
-            :fips => true
+            pki:     'simp',
+            haveged: true,
+            syslog:  true,
+            fips:    true
           }}
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('pki') }

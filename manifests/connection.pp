@@ -292,7 +292,7 @@ define stunnel::connection (
 
   concat::fragment { "stunnel_connection_${name}":
     target  => '/etc/stunnel/stunnel.conf',
-    content => template("${module_name}/stunnel.erb")
+    content => template("stunnel/connection_conf.erb")
   }
 
   # The rules are pulled together from the accept_* and connect_*

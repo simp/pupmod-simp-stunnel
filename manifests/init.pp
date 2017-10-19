@@ -84,10 +84,10 @@ class stunnel (
   String                        $setgid                  = 'stunnel',
   Integer                       $uid                     = 600,
   Integer                       $gid                     = $uid,
-  Boolean                       $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'      => false }),
-  Boolean                       $fips                    = simplib::lookup('simp_options::fips', { 'default_value'        => pick($facts['fips_enabled'], false) }),
-  Boolean                       $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value'     => false }),
-  Variant[Enum['simp'],Boolean] $pki                     = simplib::lookup('simp_options::pki', { 'default_value'         => false })
+  Boolean                       $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'  => false }),
+  Boolean                       $fips                    = simplib::lookup('simp_options::fips', { 'default_value'    => pick($facts['fips_enabled'], false) }),
+  Boolean                       $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value' => false }),
+  Variant[Enum['simp'],Boolean] $pki                     = simplib::lookup('simp_options::pki', { 'default_value'     => false })
 ) {
   if $haveged { include '::haveged' }
 

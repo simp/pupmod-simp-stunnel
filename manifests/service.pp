@@ -5,25 +5,15 @@
 #
 class stunnel::service {
 
-  file { '/etc/rc.d/init.d/stunnel':
-    ensure  => 'present',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0750',
-    content => file("${module_name}/stunnel.init"),
-    notify  => Exec['stunnel_chkconfig_update']
-  }
-
-  exec { 'stunnel_chkconfig_update':
-    command     => '/sbin/chkconfig --del stunnel; /sbin/chkconfig --add stunnel',
-    refreshonly => true,
-    before      => Service['stunnel']
-  }
-
-  service { 'stunnel':
-    ensure     => 'running',
-    hasrestart => true,
-    hasstatus  => true,
-    require    => File['/etc/rc.d/init.d/stunnel'],
+  if 'systemd' in $facts['init_systems'] {
+    service { 'stunnel':
+      ensure  => running,
+      require => File['/etc/systemd/system/stunnel.service']
+    }
+  } else {
+    service { 'stunnel':
+      ensure  => 'running',
+      require => File['/etc/rc.d/init.d/stunnel'],
+    }
   }
 }

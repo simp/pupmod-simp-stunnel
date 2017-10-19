@@ -1,12 +1,11 @@
 <%
-bool_translate = {
-  true => 'yes',
-  false => 'no'
-}
+  bool_translate = {
+    true  => 'yes',
+    false => 'no'
+  }
 
   stunnel_conf = []
 
-  stunnel_conf << ["# This file managed by Puppet. Manual changes will be erased!\n"]
   if @_chroot
     stunnel_conf << "chroot = #{@_chroot}"
   end

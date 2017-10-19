@@ -1,3 +1,14 @@
+* Wed Oct 25 2017 Nick Miller <nick.miller@onyxpoint.com> - 6.2.0
+- Added acceptance test to switch between SELinux enabled and disabled
+  - Renamed them to make more sense
+- Updated SysV scripts for safety concerns
+- PKI now is now owned by the proper $setuid
+- Renamed templates to make more sense
+- Manage PID dir in Puppet when possible
+  - Fixed bug where PID dir was being created with SELinux contexts
+    even when SELinux was disabled
+- Added systemd unit to `connection` for use on EL7 systems
+
 * Tue Jun 20 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.1.0
 - Added a define, stunnel::instance
   - Creates standalone connections with their own configurations
@@ -86,7 +97,8 @@
 * Tue Jul 21 2015 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-9
 - Moved stunnel's default pid location back to /var/run/stunnel/stunnel.pid.
 - Stunnel's init script now only creates and chowns the pid file directory
-  if it does not exist.
+  if it does not exist, which is needed because stunnel runs as the stunnel
+  user
 
 * Wed Jul 01 2015 Nick Markowski <nmarkowski@keywcorp.com> - 4.2.0-8
 - Stunnel's default pid file location moved from /var/run/stunnel/stunnel.pid
