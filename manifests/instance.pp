@@ -181,7 +181,7 @@
 # @param timeout_idle
 # @param verify
 #
-# @author Nick Markowski <nmarkowski@keywcorp.com>
+# @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 define stunnel::instance(
   Stunnel::Connect                            $connect,

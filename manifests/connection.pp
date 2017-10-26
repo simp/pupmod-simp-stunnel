@@ -193,7 +193,7 @@
 # @param exec
 # @param execargs
 #
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
+# @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 define stunnel::connection (
   Stunnel::Connect                            $connect,

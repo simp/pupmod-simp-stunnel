@@ -1,7 +1,6 @@
 # Manage the Stunnel Service
 #
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
-# @author Nick Markowski <nmarkowswki@keywcorp.com>
+# @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 class stunnel::service {
 

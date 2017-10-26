@@ -61,17 +61,13 @@
 # @param fips
 #   Set the fips global option
 #
-#   * We don't enable FIPS mode by default since we want to be able to use
-#     TLS1.2
-#
 #   * **NOTE:** This has no effect on EL < 7 due to stunnel not accepting the
 #     fips option in that version of stunnel.
 #
 # @param haveged
 #  Include the SIMP ``haveged`` module to assist with entropy generation
 #
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
-# @author Nick Markowski <nmarkowski@keywcorp.com>
+# @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 class stunnel (
   Stdlib::Absolutepath          $app_pki_dir             = '/etc/pki/simp_apps/stunnel/x509',

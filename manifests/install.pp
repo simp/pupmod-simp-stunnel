@@ -8,8 +8,7 @@
 #   * Accepts anything that the ``ensure`` parameter of the ``package``
 #     resource can handle
 #
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
-# @author Nick Markowski <nmarkowswki@keywcorp.com>
+# @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 class stunnel::install (
   Variant[String, Integer] $version = simplib::lookup('simp_options::package_ensure', { 'default_value' => 'installed' })

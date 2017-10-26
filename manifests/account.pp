@@ -22,6 +22,8 @@
 # @param shell
 #   The shell for the user
 #
+# @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
+#
 define stunnel::account (
   String               $groupname = $name,
   Integer              $uid       = 600,
