@@ -76,8 +76,6 @@ describe 'instance' do
         %w(stunnel stunnel_chroot stunnel_nfs).each do |service|
           on(host, "puppet resource service #{service} ensure=stopped enable=false")
         end
-        # on(host, 'rm -rf /etc/stunnel/*')   # Remove configuration
-        # on(host, 'rm -rf /var/stunnel*')    # Remove chroots
         on(host, 'service network restart') # Some network wackiness
         # Get rid of stunnels
         on(host, "ps aux | grep -ie stunnel | grep -v 'grep' | awk '{print $2}' | xargs --no-run-if-empty kill -9")

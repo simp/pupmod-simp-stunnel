@@ -298,9 +298,9 @@ define stunnel::instance(
 
   file { "/etc/stunnel/stunnel_${_safe_name}.conf":
     ensure  => 'present',
-    owner   => $setuid,
+    owner   => 'root',
     group   => 'root',
-    mode    => '0640',
+    mode    => '0600',
     content => template('stunnel/instance_conf.erb'),
     require => File['/etc/stunnel']
   }
@@ -309,8 +309,6 @@ define stunnel::instance(
     pki::copy { "stunnel_${_safe_name}":
       source => $app_pki_external_source,
       pki    => $pki,
-      owner  => $setuid,
-      group  => 'root',
       notify => Service["stunnel_${_safe_name}"]
     }
   }
