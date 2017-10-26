@@ -100,7 +100,8 @@
 #   from an external source
 #
 # @param chroot
-#   The location of the chroot jail
+#   The location of the chroot jail. If left unset, and selinux is NOT disabled,
+#   it will default to `/var/stunnel_${name}`.
 #
 #   * Do **NOT** make this anything under ``/var/run``
 #

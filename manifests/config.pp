@@ -1,7 +1,9 @@
 # Global stunnel options
 #
 # @param chroot
-#   The location of the chroot jail
+#   The location of the chroot jail, if it is not set to `undef`
+#   If SELinux is set to Enforced or Permissive, `$chroot` will be
+#   set to `undef`.
 #
 #   * Do **NOT** make this anything under ``/var/run``
 #
@@ -141,16 +143,14 @@ class stunnel::config (
   if $pki {
     pki::copy { 'stunnel':
       source => $app_pki_external_source,
-      pki    => $pki,
-      owner  => $setuid,
-      group  => 'root',
+      pki    => $pki
     }
   }
 
   concat { '/etc/stunnel/stunnel.conf':
-    owner          => $setuid,
+    owner          => 'root',
     group          => 'root',
-    mode           => '0640',
+    mode           => '0600',
     ensure_newline => true,
     warn           => true
   }
@@ -239,6 +239,7 @@ class stunnel::config (
     }
   }
 
+  # The selinux context settings are ignored if SELinux is disabled
   file { dirname($pid):
     ensure  => directory,
     owner   => $setuid,
@@ -273,11 +274,6 @@ class stunnel::config (
       group   => 'root',
       mode    => '0750',
       content => template("stunnel/connection_init.erb"),
-      notify  => Exec['stunnel_chkconfig_update']
-    }
-    exec { 'stunnel_chkconfig_update':
-      command     => '/sbin/chkconfig --del stunnel; /sbin/chkconfig --add stunnel',
-      refreshonly => true,
     }
 
   }

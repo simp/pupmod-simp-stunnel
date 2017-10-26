@@ -6,12 +6,12 @@
 # ####################################################################
 # # This file is managed by Puppet. Any changes will be overwritten. #
 # ####################################################################
-# Init script for stunnel_<%=@_safe_name%>
+# Init script for stunnel_<%= @_safe_name %>
 #
 # chkconfig: 345 20 99
-# description: stunnel_<%=@_safe_name%> TCP Encryption Utility
+# description: stunnel_<%= @_safe_name %> TCP Encryption Utility
 # processname: stunnel
-# config: /etc/stunnel/stunnel_<%=@_safe_name%>.conf
+# config: /etc/stunnel/stunnel_<%= @_safe_name %>.conf
 
 # Set up ulimits for heavily connected processes
 ulimit -n 1048576
@@ -25,31 +25,18 @@ ulimit -u unlimited
 # Account for the various locations in different OSs
 [ -f /usr/sbin/stunnel ] && exec=/usr/sbin/stunnel || exec=/usr/bin/stunnel
 
-conf=/etc/stunnel/stunnel_<%=@_safe_name%>.conf
+conf=/etc/stunnel/stunnel_<%= @_safe_name %>.conf
 
 # See if we're chroot'ed.
-chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel_<%=@_safe_name%>.conf | sed -e 's/chroot[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
+chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel_<%= @_safe_name %>.conf | sed -e 's/chroot[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
 
 # Find the pid file, normal by default
-pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel_<%=@_safe_name%>.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
+pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel_<%= @_safe_name %>.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
 piddir=`dirname "${pidfile}"`
 
 # Find the UID/GID of stunnel
-user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel_<%=@_safe_name%>.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel_<%=@_safe_name%>.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-
-# # Set the SELinux Contexts Properly
-# if [ -z "${pidfile}" ]; then
-#     if [ ! -d "${piddir}" ]; then
-#       mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "${piddir}"
-#       chown ${user}:${group} "${piddir}"
-#     fi
-# fi
-# if [ -n $chroot ]; then
-#     mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "${chroot}${piddir}"
-#     chown ${user}:${group} "${chroot}${piddir}"
-#     pidfile="${chroot}${pidfile}";
-# fi
+user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel_<%= @_safe_name %>.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
+group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel_<%= @_safe_name %>.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
 
 <% if @_chroot.to_s.length > 0 -%>
 pidfile="<%= "#{@_chroot}#{@pid}" %>";
@@ -59,7 +46,7 @@ if [ ! -d "${piddir}" ]; then
   mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "<%= $piddir %>"
   chown <%= @setuid %>:<%= @setgid %> "<%= $piddir %>"
 <%   else -%>
-  mkdir -p <%= $piddir %>
+  mkdir -p "<%= $piddir %>"
   chown <%= @setuid %>:<%= @setgid %> "<%= $piddir %>"
 <%   end -%>
 fi

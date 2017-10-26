@@ -1,6 +1,3 @@
-<%
-  $piddir = "#{@_chroot}#{File.dirname(@pid)}"
--%>
 #!/bin/bash
 #
 # ####################################################################
@@ -39,19 +36,12 @@ piddir=`dirname "${pidfile}"`
 user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
 group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
 
-<% if @_chroot.to_s.length > 0 -%>
-pidfile="<%= "#{@_chroot}#{@pid}" %>";
+pidfile="/var/stunnel/var/run/stunnel/stunnel.pid";
 piddir=`dirname "${pidfile}"`
 if [ ! -d "${piddir}" ]; then
-<%   if @_se_enabled -%>
-  mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "<%= $piddir %>"
-  chown <%= @setuid %>:<%= @setgid %> "<%= $piddir %>"
-<%   else -%>
-  mkdir -p "<%= $piddir %>"
-  chown <%= @setuid %>:<%= @setgid %> "<%= $piddir %>"
-<%   end -%>
+  mkdir -p "/var/stunnel/var/run/stunnel"
+  chown stunnel:stunnel "/var/stunnel/var/run/stunnel"
 fi
-<% end -%>
 
 
 # If the command doesn't exist, that's probably not going to work

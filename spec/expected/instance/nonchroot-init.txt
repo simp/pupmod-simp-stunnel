@@ -1,18 +1,14 @@
-<%
-  $piddir = "#{@_chroot}#{File.dirname(@pid)}"
--%>
 #!/bin/bash
 #
 # ####################################################################
 # # This file is managed by Puppet. Any changes will be overwritten. #
 # ####################################################################
-#
-# Init script for stunnel
+# Init script for stunnel_nfs
 #
 # chkconfig: 345 20 99
-# description: Stunnel TCP Encryption Utility
+# description: stunnel_nfs TCP Encryption Utility
 # processname: stunnel
-# config: /etc/stunnel/stunnel.conf
+# config: /etc/stunnel/stunnel_nfs.conf
 
 # Set up ulimits for heavily connected processes
 ulimit -n 1048576
@@ -26,32 +22,19 @@ ulimit -u unlimited
 # Account for the various locations in different OSs
 [ -f /usr/sbin/stunnel ] && exec=/usr/sbin/stunnel || exec=/usr/bin/stunnel
 
-conf=/etc/stunnel/stunnel.conf
+conf=/etc/stunnel/stunnel_nfs.conf
 
 # See if we're chroot'ed.
-chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/chroot[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
+chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/chroot[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
 
 # Find the pid file, normal by default
-pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
+pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
 piddir=`dirname "${pidfile}"`
 
 # Find the UID/GID of stunnel
-user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
+user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
+group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
 
-<% if @_chroot.to_s.length > 0 -%>
-pidfile="<%= "#{@_chroot}#{@pid}" %>";
-piddir=`dirname "${pidfile}"`
-if [ ! -d "${piddir}" ]; then
-<%   if @_se_enabled -%>
-  mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "<%= $piddir %>"
-  chown <%= @setuid %>:<%= @setgid %> "<%= $piddir %>"
-<%   else -%>
-  mkdir -p "<%= $piddir %>"
-  chown <%= @setuid %>:<%= @setgid %> "<%= $piddir %>"
-<%   end -%>
-fi
-<% end -%>
 
 
 # If the command doesn't exist, that's probably not going to work
@@ -89,10 +72,16 @@ start() {
 
 stop() {
   echo -n $"Shutting down stunnel: "
-  kill_floaters || killproc -p "$pidfile" "$prog"
-  RETVAL=$?
-  if [[ -f "$lock_file" ]]; then
-    rm "$lock_file"
+  status -p "$pidfile" stunnel 2>&1 /dev/null
+  statval=$?
+  if [ ! "$statval" -eq 3 ]; then
+    kill_floaters || killproc -p "$pidfile" "$prog"
+    RETVAL=$?
+    if [[ -f "$lock_file" ]]; then
+      rm "$lock_file"
+    fi
+  else
+    return 0
   fi
   echo
   return $RETVAL

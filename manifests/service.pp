@@ -7,11 +7,13 @@ class stunnel::service {
   if 'systemd' in $facts['init_systems'] {
     service { 'stunnel':
       ensure  => running,
+      enable  => true,
       require => File['/etc/systemd/system/stunnel.service']
     }
   } else {
+    # The script takes care of chkconfig
     service { 'stunnel':
-      ensure  => 'running',
+      ensure  => running,
       require => File['/etc/rc.d/init.d/stunnel'],
     }
   }

@@ -1,0 +1,12 @@
+# ####################################################################
+# # This file is managed by Puppet. Any changes will be overwritten. #
+# ####################################################################
+[Unit]
+Description=Start a stunnel listener
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
+KillMode=process
+LimitNOFILE=1048576
+LimitNPROC=infinity
