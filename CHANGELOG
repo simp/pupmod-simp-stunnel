@@ -8,6 +8,7 @@
   - Fixed bug where PID dir was being created with SELinux contexts
     even when SELinux was disabled
 - Added systemd unit to `connection` for use on EL7 systems
+- Added support for Puppet 5
 
 * Tue Jun 20 2017 Nick Markowski <nmarkowski@keywcorp.com> - 6.1.0
 - Added a define, stunnel::instance
