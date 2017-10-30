@@ -14,7 +14,10 @@
   stunnel_conf << "setuid = #{@setuid}"
   stunnel_conf << "debug = #{@stunnel_debug}"
   stunnel_conf << "syslog = #{bool_translate[@syslog]}"
-  stunnel_conf << "foreground = #{bool_translate[@_foreground]}"
+
+  if @_foreground
+    stunnel_conf << "foreground = #{bool_translate[@_foreground]}"
+  end
 
   if @_pid
     stunnel_conf << "pid = #{@_pid}"

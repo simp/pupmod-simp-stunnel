@@ -82,7 +82,7 @@ stop() {
   echo -n $"Shutting down stunnel: "
   status -p "$pidfile" stunnel 2>&1 /dev/null
   statval=$?
-  if [ ! "$statval" -eq 3 ]; then
+  if [ ! "$statval" = "3" ]; then
     # Send interrupt, then kill aggressively if needed
     killproc -p "$pidfile" "$prog" || kill_floaters
     RETVAL=$?

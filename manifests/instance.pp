@@ -297,20 +297,13 @@ define stunnel::instance(
     $_chroot = undef
   }
 
-  if $pid =~ Undef {
-    $on_systemd = 'systemd' in $facts['init_systems']
-    $_pid = $on_systemd ? {
-      true    => $pid,
-      default => "/var/run/stunnel/stunnel_${_safe_name}.pid"
-    }
-  } else {
-    $_pid = $pid
-  }
-
-  if 'systemd' in $facts['init_systems'] {
+  $on_systemd = 'systemd' in $facts['init_systems']
+  if ($pid =~ Undef and $on_systemd) {
     $_foreground = true
+    $_pid        = $pid
   } else {
-    $_foreground = false
+    $_foreground = undef
+    $_pid        = "/var/run/stunnel/stunnel_${_safe_name}.pid"
   }
 
   file { "/etc/stunnel/stunnel_${_safe_name}.conf":
