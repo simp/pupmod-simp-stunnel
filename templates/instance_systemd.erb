@@ -1,6 +1,3 @@
-<%
-  $piddir = "#{@_chroot}#{File.dirname(@pid)}"
--%>
 # ####################################################################
 # # This file is managed by Puppet. Any changes will be overwritten. #
 # ####################################################################
@@ -8,16 +5,8 @@
 Description=Start a stunnel_<%= @_safe_name %> listener
 
 [Service]
-Type=forking
+Type=simple
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_<%= @_safe_name %>.conf
-<% if @_chroot.to_s.length > 0 -%>
-PIDFile=<%= "#{@_chroot}#{@pid}" %>
-<%   if @_se_enabled -%>
-ExecStartPre=/usr/bin/rm -rf <%= $piddir %> ; /usr/bin/mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 <%= $piddir %> ; /usr/bin/chown <%= @setuid %>:<%= @setgid %> <%= $piddir %>
-<%   else -%>
-ExecStartPre=/usr/bin/rm -rf <%= $piddir %> ; /usr/bin/mkdir -p <%= $piddir %> ; /usr/bin/chown <%= @setuid %>:<%= @setgid %> <%= $piddir %>
-<%   end -%>
-<% end -%>
 KillMode=process
 LimitNOFILE=1048576
 LimitNPROC=infinity

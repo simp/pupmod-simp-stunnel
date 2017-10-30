@@ -5,7 +5,8 @@ setgid = stunnel
 setuid = stunnel
 debug = err
 syslog = no
-pid = /var/run/stunnel/stunnel_nfs.pid
+foreground = yes
+pid =
 engine = auto
 fips = yes
 [nfs]
@@ -30,6 +31,7 @@ setgid = stunnel
 setuid = stunnel
 debug = err
 syslog = no
+foreground = no
 pid = /var/run/stunnel/stunnel_nfs.pid
 engine = auto
 [nfs]
@@ -192,7 +194,10 @@ describe 'stunnel::instance' do
           connect: [2049],
           accept:  20490,
         }}
-        let(:pre_condition) { 'include stunnel' }
+        let(:pre_condition) { <<-EOF
+          include 'stunnel'
+          EOF
+        }
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_class('stunnel') }
         it { is_expected.to contain_class('stunnel::config') }

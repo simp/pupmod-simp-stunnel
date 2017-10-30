@@ -48,9 +48,7 @@ describe 'connection' do
 
       [20490,30490].each do |port|
         it "stunnel should be listening on #{port}" do
-          pid = on(host, 'cat /var/run/stunnel/stunnel.pid').stdout.strip
-          result = on(host, "netstat -plant | grep #{pid} | awk ' { print $4 }'").stdout.strip
-          expect(result).to include(port.to_s)
+          on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
         end
       end
     end
@@ -90,8 +88,7 @@ describe 'connection' do
 
         [20490,30490].each do |port|
           it "stunnel should be listening on #{port}" do
-            result = on(host, "netstat -plant | awk ' { print $4 }'").stdout.strip
-            expect(result).to include(port.to_s)
+            on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
           end
         end
       end
@@ -120,8 +117,7 @@ describe 'connection' do
 
         [20490,30490].each do |port|
           it "stunnel should be listening on #{port}" do
-            result = on(host, "netstat -plant | grep stunnel").stdout.strip
-            expect(result).to include(port.to_s)
+            on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
           end
         end
       end
@@ -162,8 +158,7 @@ describe 'connection' do
 
         [20490,30490].each do |port|
           it "stunnel should be listening on #{port}" do
-            result = on(host, "netstat -plant | grep stunnel").stdout.strip
-            expect(result).to include(port.to_s)
+            on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
           end
         end
       end
@@ -195,8 +190,7 @@ describe 'connection' do
 
         [20490,30490].each do |port|
           it "stunnel should be listening on #{port}" do
-            result = on(host, "netstat -plant | grep stunnel").stdout.strip
-            expect(result).to include(port.to_s)
+            on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
           end
         end
       end

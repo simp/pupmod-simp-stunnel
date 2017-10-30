@@ -5,7 +5,7 @@
 Description=Start a stunnel_nfs listener
 
 [Service]
-Type=forking
+Type=simple
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_nfs.conf
 KillMode=process
 LimitNOFILE=1048576

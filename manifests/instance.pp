@@ -135,6 +135,8 @@
 # @param gid
 #   The group id of the stunnel group
 #
+# @param pid Leave undef if no PID is desired. Default on systemd systems.
+#
 # All other configuration options can be found in the stunnel man pages
 # @see stunnel.conf(5)
 # @see stunnel.conf(8)
@@ -154,7 +156,6 @@
 # @param ocsp
 # @param ocsp_flags
 # @param output
-# @param pid
 # @param protocol
 # @param protocol_host
 # @param protocol_username
@@ -220,7 +221,7 @@ define stunnel::instance(
   Array[String]                               $openssl_cipher_suite    = ['HIGH','-SSLv2'],
   Array[String]                               $options                 = [],
   Optional[Stdlib::Absolutepath]              $output                  = undef,
-  Stdlib::Absolutepath                        $pid                     = "/var/run/stunnel/stunnel_${name}.pid",
+  Optional[Stdlib::Absolutepath]              $pid                     = undef,
   Optional[String]                            $protocol                = undef,
   Optional[Enum['basic','NTLM']]              $protocol_authentication = undef,
   Optional[String]                            $protocol_host           = undef,
@@ -296,6 +297,22 @@ define stunnel::instance(
     $_chroot = undef
   }
 
+  if $pid =~ Undef {
+    $on_systemd = 'systemd' in $facts['init_systems']
+    $_pid = $on_systemd ? {
+      true    => $pid,
+      default => "/var/run/stunnel/stunnel_${_safe_name}.pid"
+    }
+  } else {
+    $_pid = $pid
+  }
+
+  if 'systemd' in $facts['init_systems'] {
+    $_foreground = true
+  } else {
+    $_foreground = false
+  }
+
   file { "/etc/stunnel/stunnel_${_safe_name}.conf":
     ensure  => 'present',
     owner   => 'root',
@@ -314,6 +331,8 @@ define stunnel::instance(
   }
 
   if $_chroot !~ Undef {
+    $_stunnel_piddir = File[dirname("${_chroot}${_pid}")]
+
     file { $_chroot:
       ensure => 'directory',
       owner  => 'root',
@@ -360,6 +379,26 @@ define stunnel::instance(
       mode   => '0644'
     }
 
+    file { "${_chroot}/var/run":
+      ensure => 'directory',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0644'
+    }
+
+    # The selinux context settings are ignored if SELinux is disabled
+    ensure_resource('file', dirname("${_chroot}${_pid}"),
+      {
+        'ensure'  => 'directory',
+        'owner'   => $setuid,
+        'group'   => $setgid,
+        'mode'    => '0644',
+        'seluser' => 'system_u',
+        'selrole' => 'object_r',
+        'seltype' => 'stunnel_var_run_t'
+      }
+    )
+
     file { "${_chroot}/etc/pki":
       ensure => 'directory',
       owner  => 'root',
@@ -367,16 +406,37 @@ define stunnel::instance(
       mode   => '0640'
     }
 
-    $_require_pki =  $pki ? { true =>  Pki::Copy["stunnel_${_safe_name}"], default =>  undef }
+    $_require_pki =  $pki ? { true => Pki::Copy["stunnel_${_safe_name}"], default =>  undef }
 
     file { "${_chroot}/etc/pki/cacerts":
       source  => "file://${app_pki_dir}/cacerts",
       group   => $setgid,
       mode    => '0640',
       recurse => true,
-      require =>  $_require_pki
+      require => $_require_pki
     }
   }
+  else {
+    if $_pid {
+      $_stunnel_piddir = File[dirname($_pid)]
+
+      # The selinux context settings are ignored if SELinux is disabled
+      ensure_resource('file', dirname($_pid),
+        {
+          'ensure'  => 'directory',
+          'owner'   => $setuid,
+          'group'   => $setgid,
+          'mode'    => '0644',
+          'seluser' => 'system_u',
+          'selrole' => 'object_r',
+          'seltype' => 'stunnel_var_run_t',
+        }
+      )
+    } else {
+      $_stunnel_piddir = undef
+    }
+  }
+
 
   # The rules are pulled together from the accept_* and connect_*
   # variables.
@@ -426,14 +486,13 @@ define stunnel::instance(
     fail("Init systems ${$facts['init_systems']} not supported. Only systemd, upstart supported.")
   }
 
+
   service { "stunnel_${_safe_name}":
     ensure     => 'running',
     enable     => true,
-    hasrestart => true,
-    hasstatus  => true,
     require    => [
       File[$_service_file],
       File["/etc/stunnel/stunnel_${_safe_name}.conf"]
-    ],
+    ] + $_stunnel_piddir
   }
 }

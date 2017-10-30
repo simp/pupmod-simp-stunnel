@@ -38,11 +38,6 @@ group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setgid[[
 
 pidfile="/var/stunnel/var/run/stunnel/stunnel.pid";
 piddir=`dirname "${pidfile}"`
-if [ ! -d "${piddir}" ]; then
-  mkdir -p "/var/stunnel/var/run/stunnel"
-  chown stunnel:stunnel "/var/stunnel/var/run/stunnel"
-fi
-
 
 # If the command doesn't exist, that's probably not going to work
 [ -x ${exec} ] || exit 1
@@ -58,7 +53,7 @@ lock_file="/var/lock/subsys/${prog}"
 kill_floaters() {
   retval=1
   if [ ! -f "$pidfile" ]; then
-    pkill -u "$user" "$exec"
+    pkill -u "$user" "${exec} ${conf}"
     retval=$?
   fi
 
@@ -79,10 +74,17 @@ start() {
 
 stop() {
   echo -n $"Shutting down stunnel: "
-  kill_floaters || killproc -p "$pidfile" "$prog"
-  RETVAL=$?
-  if [[ -f "$lock_file" ]]; then
-    rm "$lock_file"
+  status -p "$pidfile" stunnel 2>&1 /dev/null
+  statval=$?
+  if [ ! "$statval" -eq 3 ]; then
+    # Send interrupt, then kill aggressively if needed
+    killproc -p "$pidfile" "$prog" || kill_floaters
+    RETVAL=$?
+    if [[ -f "$lock_file" ]]; then
+      rm "$lock_file"
+    fi
+  else
+    return 0
   fi
   echo
   return $RETVAL

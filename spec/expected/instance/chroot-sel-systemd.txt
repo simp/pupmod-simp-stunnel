@@ -5,10 +5,8 @@
 Description=Start a stunnel_sel listener
 
 [Service]
-Type=forking
+Type=simple
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_sel.conf
-PIDFile=/var/stunnel_sel/var/run/stunnel/stunnel_sel.pid
-ExecStartPre=/usr/bin/rm -rf /var/stunnel_sel/var/run/stunnel ; /usr/bin/mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 /var/stunnel_sel/var/run/stunnel ; /usr/bin/chown stunnel:stunnel /var/stunnel_sel/var/run/stunnel
 KillMode=process
 LimitNOFILE=1048576
 LimitNPROC=infinity

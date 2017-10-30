@@ -51,7 +51,8 @@ describe 'stunnel' do
                 setuid = stunnel
                 debug = err
                 syslog = no
-                pid = /var/run/stunnel/stunnel.pid
+                foreground = yes
+                pid =
                 engine = auto
                 fips = no
               EOM
@@ -64,6 +65,7 @@ describe 'stunnel' do
                 setuid = stunnel
                 debug = err
                 syslog = no
+                foreground = no
                 pid = /var/run/stunnel/stunnel.pid
                 engine = auto
               EOM
@@ -113,7 +115,8 @@ describe 'stunnel' do
                 setuid = stunnel
                 debug = err
                 syslog = no
-                pid = /var/run/stunnel/stunnel.pid
+                foreground = yes
+                pid =
                 engine = auto
                 fips = no
               EOM
@@ -125,6 +128,7 @@ describe 'stunnel' do
                 setuid = stunnel
                 debug = err
                 syslog = no
+                foreground = no
                 pid = /var/run/stunnel/stunnel.pid
                 engine = auto
               EOM

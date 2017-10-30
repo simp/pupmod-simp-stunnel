@@ -1,5 +1,7 @@
 <%
-  $piddir = "#{@_chroot}#{File.dirname(@pid)}"
+  unless @pid.nil?
+    $piddir = "#{@_chroot}#{File.dirname(@_pid)}"
+  end
 -%>
 #!/bin/bash
 #
@@ -39,19 +41,9 @@ user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel_<%= @_safe_name %>.conf | 
 group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel_<%= @_safe_name %>.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
 
 <% if @_chroot.to_s.length > 0 -%>
-pidfile="<%= "#{@_chroot}#{@pid}" %>";
+pidfile="<%= "#{@_chroot}#{@_pid}" %>";
 piddir=`dirname "${pidfile}"`
-if [ ! -d "${piddir}" ]; then
-<%   if @_se_enabled -%>
-  mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "<%= $piddir %>"
-  chown <%= @setuid %>:<%= @setgid %> "<%= $piddir %>"
-<%   else -%>
-  mkdir -p "<%= $piddir %>"
-  chown <%= @setuid %>:<%= @setgid %> "<%= $piddir %>"
-<%   end -%>
-fi
 <% end -%>
-
 
 # If the command doesn't exist, that's probably not going to work
 [ -x ${exec} ] || exit 1
@@ -67,7 +59,7 @@ lock_file="/var/lock/subsys/${prog}"
 kill_floaters() {
   retval=1
   if [ ! -f "$pidfile" ]; then
-    pkill -u "$user" "$exec"
+    pkill -u "$user" "${exec} ${conf}"
     retval=$?
   fi
 
@@ -91,7 +83,8 @@ stop() {
   status -p "$pidfile" stunnel 2>&1 /dev/null
   statval=$?
   if [ ! "$statval" -eq 3 ]; then
-    kill_floaters || killproc -p "$pidfile" "$prog"
+    # Send interrupt, then kill aggressively if needed
+    killproc -p "$pidfile" "$prog" || kill_floaters
     RETVAL=$?
     if [[ -f "$lock_file" ]]; then
       rm "$lock_file"

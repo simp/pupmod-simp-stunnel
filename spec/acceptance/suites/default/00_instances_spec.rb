@@ -4,36 +4,35 @@ test_name 'instance'
 
 describe 'instance' do
   hosts.each do |host|
+    let(:manifest) { <<-EOF
+      stunnel::instance { 'nfs':
+        client  => false,
+        connect => [2049],
+        accept  => 20490,
+      }
+      stunnel::instance { 'chroot':
+        client  => false,
+        connect => [4049],
+        accept  => 40490,
+        chroot  => '/var/stunnel_chroot'
+      }
+      stunnel::connection { 'rsync':
+        client  => false,
+        connect => [3049],
+        accept  => 30490
+      }
+      EOF
+    }
+    let(:hieradata) {{
+      'simp_options::pki'          => true,
+      'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
+      'simp_options::trusted_nets' => ['ANY']
+    }}
 
     # This test verifies the validity of basic stunnel configurations
     # and ensures multiple connections can co-exist as advertised. It
     # does not test stunnel itself.
     context 'set up legacy, chrooted, and non-chrooted connections' do
-      let(:manifest) { <<-EOF
-        stunnel::instance { 'nfs':
-          client  => false,
-          connect => [2049],
-          accept  => 20490,
-        }
-        stunnel::instance { 'chroot':
-          client  => false,
-          connect => [4049],
-          accept  => 40490,
-          chroot  => '/var/stunnel_chroot'
-        }
-        stunnel::connection { 'rsync':
-          client  => false,
-          connect => [3049],
-          accept  => 30490
-        }
-        EOF
-      }
-      let(:hieradata) {{
-        'simp_options::pki'          => true,
-        'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
-        'simp_options::trusted_nets' => ['ANY']
-      }}
-
       it 'should apply with no errors' do
         install_package(host, 'epel-release')
         set_hieradata_on(host,hieradata)
@@ -42,7 +41,7 @@ describe 'instance' do
       end
 
       it 'should be idempotent' do
-        apply_manifest_on(host,manifest,catch_changes: true)
+        apply_manifest_on(host,manifest, catch_changes: true)
       end
 
 
@@ -58,16 +57,44 @@ describe 'instance' do
         end
       end
 
-      it 'stunnel_nfs should be listening on 20490' do
-        pid = on(host, 'cat /var/run/stunnel/stunnel_nfs.pid').stdout.strip
-        result = on(host, "netstat -plant | grep #{pid} | awk ' { print $4 }'").stdout.strip
-        expect(result).to match(/0.0.0.0:20490/)
+      [20490,30490,40490].each do |port|
+        it "stunnel should be listening on #{port}" do
+          install_package(host, 'lsof')
+          on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
+        end
       end
+    end
 
-      it 'stunnel_chroot should be listening on 40490' do
-        pid = on(host, 'cat /var/stunnel_chroot/var/run/stunnel/stunnel_chroot.pid').stdout.strip
-        result = on(host, "netstat -plant | grep #{pid} | awk ' { print $4 }'").stdout.strip
-        expect(result).to match(/0.0.0.0:40490/)
+    context 'killing one instance should not kill the rest' do
+      it 'should have all services running' do
+        apply_manifest_on(host,manifest, catch_failures: true)
+      end
+      it 'after killing an instanced stunnel, have the other stunnel still running' do
+        on(host, 'puppet resource service stunnel_nfs ensure=stopped enable=false')
+
+        %w(stunnel_chroot stunnel).each do |service|
+          result = on(host, "puppet resource service #{service}").stdout
+          expect(result).to match(/running/)
+        end
+        on(host, 'netstat -plant | grep `lsof -ti :20490` | grep stunnel', acceptable_exit_codes: [1])
+        [30490,40490].each do |port|
+          on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
+        end
+      end
+      it 'should restart all services' do
+        apply_manifest_on(host,manifest, catch_failures: true)
+      end
+      it 'should kill the monolithic stunnel and have instances still running' do
+        on(host, 'puppet resource service stunnel ensure=stopped enable=false')
+
+        %w(stunnel_chroot stunnel_nfs).each do |service|
+          result = on(host, "puppet resource service #{service}").stdout
+          expect(result).to match(/running/)
+        end
+        on(host, 'netstat -plant | grep `lsof -ti :30490` | grep stunnel', acceptable_exit_codes: [1])
+        [20490,40490].each do |port|
+          on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
+        end
       end
     end
 
@@ -76,9 +103,10 @@ describe 'instance' do
         %w(stunnel stunnel_chroot stunnel_nfs).each do |service|
           on(host, "puppet resource service #{service} ensure=stopped enable=false")
         end
-        on(host, 'service network restart') # Some network wackiness
+        # There was an issue where the domain fact would cease to exist, causing failures
+        on(host, 'service network restart')
         # Get rid of stunnels
-        on(host, "ps aux | grep -ie stunnel | grep -v 'grep' | awk '{print $2}' | xargs --no-run-if-empty kill -9")
+        # on(host, "ps aux | grep -ie stunnel | grep -v 'grep' | awk '{print $2}' | xargs --no-run-if-empty kill -9")
       end
     end
   end

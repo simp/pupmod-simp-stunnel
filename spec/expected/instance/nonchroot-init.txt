@@ -36,7 +36,6 @@ user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/setui
 group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
 
 
-
 # If the command doesn't exist, that's probably not going to work
 [ -x ${exec} ] || exit 1
 # If the config file doesn't exist, we can't run stunnel
@@ -51,7 +50,7 @@ lock_file="/var/lock/subsys/${prog}"
 kill_floaters() {
   retval=1
   if [ ! -f "$pidfile" ]; then
-    pkill -u "$user" "$exec"
+    pkill -u "$user" "${exec} ${conf}"
     retval=$?
   fi
 
@@ -75,7 +74,8 @@ stop() {
   status -p "$pidfile" stunnel 2>&1 /dev/null
   statval=$?
   if [ ! "$statval" -eq 3 ]; then
-    kill_floaters || killproc -p "$pidfile" "$prog"
+    # Send interrupt, then kill aggressively if needed
+    killproc -p "$pidfile" "$prog" || kill_floaters
     RETVAL=$?
     if [[ -f "$lock_file" ]]; then
       rm "$lock_file"
