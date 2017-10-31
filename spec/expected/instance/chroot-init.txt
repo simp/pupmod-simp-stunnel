@@ -24,17 +24,6 @@ ulimit -u unlimited
 
 conf=/etc/stunnel/stunnel_nfs.conf
 
-# See if we're chroot'ed.
-chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/chroot[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
-
-# Find the pid file, normal by default
-pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
-piddir=`dirname "${pidfile}"`
-
-# Find the UID/GID of stunnel
-user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel_nfs.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-
 pidfile="/var/stunnel_nfs/var/run/stunnel/stunnel_nfs.pid";
 piddir=`dirname "${pidfile}"`
 
@@ -52,7 +41,7 @@ lock_file="/var/lock/subsys/${prog}"
 kill_floaters() {
   retval=1
   if [ ! -f "$pidfile" ]; then
-    pkill -u "$user" "${exec} ${conf}"
+    pkill -u "stunnel" "${exec} ${conf}"
     retval=$?
   fi
 
@@ -75,7 +64,7 @@ stop() {
   echo -n $"Shutting down stunnel: "
   status -p "$pidfile" stunnel 2>&1 /dev/null
   statval=$?
-  if [ ! "$statval" = "3" ]; then
+  if [ "$statval" != "3" ]; then
     # Send interrupt, then kill aggressively if needed
     killproc -p "$pidfile" "$prog" || kill_floaters
     RETVAL=$?

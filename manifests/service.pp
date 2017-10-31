@@ -14,6 +14,7 @@ class stunnel::service {
     # The script takes care of chkconfig
     service { 'stunnel':
       ensure  => running,
+      enable  => true,
       require => File['/etc/rc.d/init.d/stunnel'],
     }
   }

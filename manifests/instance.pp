@@ -481,9 +481,9 @@ define stunnel::instance(
 
 
   service { "stunnel_${_safe_name}":
-    ensure     => 'running',
-    enable     => true,
-    require    => [
+    ensure  => 'running',
+    enable  => true,
+    require => [
       File[$_service_file],
       File["/etc/stunnel/stunnel_${_safe_name}.conf"]
     ] + $_stunnel_piddir

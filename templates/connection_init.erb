@@ -1,8 +1,3 @@
-<%
-  unless @pid.nil?
-    $piddir = "#{@_chroot}#{File.dirname(@_pid)}"
-  end
--%>
 #!/bin/bash
 #
 # ####################################################################
@@ -30,19 +25,11 @@ ulimit -u unlimited
 
 conf=/etc/stunnel/stunnel.conf
 
-# See if we're chroot'ed.
-chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/chroot[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
-
-# Find the pid file, normal by default
-pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
-piddir=`dirname "${pidfile}"`
-
-# Find the UID/GID of stunnel
-user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-
 <% if @_chroot.to_s.length > 0 -%>
 pidfile="<%= "#{@_chroot}#{@_pid}" %>";
+piddir=`dirname "${pidfile}"`
+<% else -%>
+pidfile="<%= "#{@_pid}" %>";
 piddir=`dirname "${pidfile}"`
 <% end -%>
 
@@ -60,7 +47,7 @@ lock_file="/var/lock/subsys/${prog}"
 kill_floaters() {
   retval=1
   if [ ! -f "$pidfile" ]; then
-    pkill -u "$user" "${exec} ${conf}"
+    pkill -u "<%= @setuid %>" "${exec} ${conf}"
     retval=$?
   fi
 
@@ -83,7 +70,7 @@ stop() {
   echo -n $"Shutting down stunnel: "
   status -p "$pidfile" stunnel 2>&1 /dev/null
   statval=$?
-  if [ ! "$statval" = "3" ]; then
+  if [ "$statval" != "3" ]; then
     # Send interrupt, then kill aggressively if needed
     killproc -p "$pidfile" "$prog" || kill_floaters
     RETVAL=$?
