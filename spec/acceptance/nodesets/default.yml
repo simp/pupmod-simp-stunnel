@@ -1,31 +1,21 @@
 HOSTS:
-  server7:
+  server-el7:
     roles:
-      - server7
+      - server-el7
       - default
     platform: el-7-x86_64
-    box :     centos/7
-    hypervisor : vagrant
-    yum_repos:
-      epel:
-        url: 'http://download.fedoraproject.org/pub/epel/7/$basearch'
-        gpgkeys:
-          - https://getfedora.org/static/352C64E5.txt
+    box:     centos/7
+    hypervisor: vagrant
 
-  server6:
+  server-el6:
     roles:
-      - server6
+      - server-el6
     platform: el-6-x86_64
-    box :     centos/6
-    hypervisor : vagrant
-    yum_repos:
-      epel:
-        url: 'http://download.fedoraproject.org/pub/epel/6/$basearch'
-        gpgkeys:
-          - https://getfedora.org/static/0608B895.txt
+    box:     centos/6
+    hypervisor: vagrant
 
 CONFIG:
   log_level: verbose
   type: aio
   vagrant_memsize: 256
-  synced_folder : disabled
+  synced_folder: disabled

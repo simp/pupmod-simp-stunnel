@@ -3,12 +3,12 @@
 # ####################################################################
 # # This file is managed by Puppet. Any changes will be overwritten. #
 # ####################################################################
-# Init script for stunnel_<%= @_safe_name %>
+# Init script for stunnel_nfs
 #
 # chkconfig: 345 20 99
-# description: stunnel_<%= @_safe_name %> TCP Encryption Utility
+# description: stunnel_nfs TCP Encryption Utility
 # processname: stunnel
-# config: /etc/stunnel/stunnel_<%= @_safe_name %>.conf
+# config: /etc/stunnel/stunnel_nfs.conf
 
 # Set up ulimits for heavily connected processes
 ulimit -n 1048576
@@ -22,15 +22,10 @@ ulimit -u unlimited
 # Account for the various locations in different OSs
 [ -f /usr/sbin/stunnel ] && exec=/usr/sbin/stunnel || exec=/usr/bin/stunnel
 
-conf=/etc/stunnel/stunnel_<%= @_safe_name %>.conf
+conf=/etc/stunnel/stunnel_nfs.conf
 
-<% if @_chroot.to_s.length > 0 -%>
-pidfile="<%= "#{@_chroot}#{@_pid}" %>";
+pidfile="/var/run/stunnel/stunnel_nfs.pid";
 piddir=`dirname "${pidfile}"`
-<% else -%>
-pidfile="<%= "#{@_pid}" %>";
-piddir=`dirname "${pidfile}"`
-<% end -%>
 
 # If the command doesn't exist, that's probably not going to work
 [ -x ${exec} ] || exit 1
@@ -46,7 +41,7 @@ lock_file="/var/lock/subsys/${prog}"
 kill_floaters() {
   retval=1
   if [ ! -f "$pidfile" ]; then
-    pkill -u "<%= @setuid %>" -f "${exec} ${conf}"
+    pkill -u "stunnel" -f "${exec} ${conf}"
     retval=$?
   fi
 

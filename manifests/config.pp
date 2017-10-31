@@ -1,7 +1,9 @@
 # Global stunnel options
 #
 # @param chroot
-#   The location of the chroot jail
+#   The location of the chroot jail, if it is not set to `undef`
+#   If SELinux is set to Enforced or Permissive, `$chroot` will be
+#   set to `undef`. This option only affects `stunnel::connection`.
 #
 #   * Do **NOT** make this anything under ``/var/run``
 #
@@ -103,8 +105,7 @@
 #
 # @param socket_options
 #
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
-# @author Nick Markowski <nmarkowski@keywcorp.com>
+# @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 class stunnel::config (
   Variant[Enum['simp'],Boolean]  $pki                     = $::stunnel::pki,
@@ -115,7 +116,7 @@ class stunnel::config (
   Stdlib::Absolutepath           $app_pki_ca_dir          = $::stunnel::app_pki_ca_dir,
   Stdlib::Absolutepath           $app_pki_crl             = $::stunnel::app_pki_crl,
   Stdlib::Absolutepath           $chroot                  = '/var/stunnel',
-  Stdlib::Absolutepath           $pid                     = '/var/run/stunnel/stunnel.pid',
+  Optional[Stdlib::Absolutepath] $pid                     = undef,
   String                         $setuid                  = $::stunnel::setuid,
   String                         $setgid                  = $::stunnel::setgid,
   String                         $stunnel_debug           = 'err',
@@ -146,6 +147,15 @@ class stunnel::config (
     }
   }
 
+  $on_systemd = 'systemd' in $facts['init_systems']
+  if ($pid =~ Undef and $on_systemd) {
+    $_foreground = true
+    $_pid        = $pid
+  } else {
+    $_foreground = undef
+    $_pid        = '/var/run/stunnel/stunnel.pid'
+  }
+
   concat { '/etc/stunnel/stunnel.conf':
     owner          => 'root',
     group          => 'root',
@@ -157,7 +167,7 @@ class stunnel::config (
   concat::fragment { '0_stunnel_global':
     order   => 1,
     target  => '/etc/stunnel/stunnel.conf',
-    content => template('stunnel/stunnel.erb')
+    content => template('stunnel/connection_conf.erb')
   }
 
   if $_chroot {
@@ -236,6 +246,48 @@ class stunnel::config (
       mode    => '0640',
       recurse => true,
     }
+  }
+
+  # These templates need variables, that's why they are here
+  if 'systemd' in $facts['init_systems'] {
+    file { '/etc/systemd/system/stunnel.service':
+      ensure  => file,
+      content => template('stunnel/connection_systemd.erb'),
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      notify  => Exec['stunnel daemon reload']
+    }
+    exec { 'stunnel daemon reload':
+      command     => '/usr/bin/systemctl daemon-reload',
+      refreshonly => true,
+    }
+
+  }
+  else {
+    if $_pid {
+      # The selinux context settings are ignored if SELinux is disabled
+      ensure_resource('file', dirname($_pid),
+        {
+          'ensure'  => 'directory',
+          'owner'   => $setuid,
+          'group'   => $setgid,
+          'mode'    => '0644',
+          'seluser' => 'system_u',
+          'selrole' => 'object_r',
+          'seltype' => 'stunnel_var_run_t',
+        }
+      )
+    }
+
+    file { '/etc/rc.d/init.d/stunnel':
+      ensure  => 'present',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0750',
+      content => template("stunnel/connection_init.erb"),
+    }
+
   }
 
 }

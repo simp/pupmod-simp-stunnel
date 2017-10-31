@@ -193,7 +193,7 @@
 # @param exec
 # @param execargs
 #
-# @author Trevor Vaughan <tvaughan@onyxpoint.com>
+# @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 define stunnel::connection (
   Stunnel::Connect                            $connect,
@@ -292,7 +292,7 @@ define stunnel::connection (
 
   concat::fragment { "stunnel_connection_${name}":
     target  => '/etc/stunnel/stunnel.conf',
-    content => template("${module_name}/stunnel.erb")
+    content => template("stunnel/connection_conf.erb")
   }
 
   # The rules are pulled together from the accept_* and connect_*

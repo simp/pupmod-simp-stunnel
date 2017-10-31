@@ -1,15 +1,14 @@
 <%
 bool_translate = {
-  true => 'yes',
+  true  => 'yes',
   false => 'no'
 }
 
-  stunnel_conf = []
+stunnel_conf = []
 
 # This is just a stupid way to differentate between global options and
 # service options
 if has_variable?('setgid')
-  stunnel_conf << ["# This file managed by Puppet. Manual changes will be erased!\n"]
   if @_chroot
     stunnel_conf << "chroot = #{@_chroot}"
   end
@@ -19,8 +18,14 @@ if has_variable?('setgid')
   stunnel_conf << "debug = #{@stunnel_debug}"
   stunnel_conf << "syslog = #{bool_translate[@syslog]}"
 
-  if @pid
-    stunnel_conf << "pid = #{@pid}"
+  if @_foreground
+    stunnel_conf << "foreground = #{bool_translate[@_foreground]}"
+  end
+
+  if @_pid
+    stunnel_conf << "pid = #{@_pid}"
+  else
+    stunnel_conf << "pid ="
   end
 
   if @compression

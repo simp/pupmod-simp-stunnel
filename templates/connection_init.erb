@@ -3,12 +3,13 @@
 # ####################################################################
 # # This file is managed by Puppet. Any changes will be overwritten. #
 # ####################################################################
-# Init script for stunnel_<%= @_safe_name %>
+#
+# Init script for stunnel
 #
 # chkconfig: 345 20 99
-# description: stunnel_<%= @_safe_name %> TCP Encryption Utility
+# description: Stunnel TCP Encryption Utility
 # processname: stunnel
-# config: /etc/stunnel/stunnel_<%= @_safe_name %>.conf
+# config: /etc/stunnel/stunnel.conf
 
 # Set up ulimits for heavily connected processes
 ulimit -n 1048576
@@ -22,7 +23,7 @@ ulimit -u unlimited
 # Account for the various locations in different OSs
 [ -f /usr/sbin/stunnel ] && exec=/usr/sbin/stunnel || exec=/usr/bin/stunnel
 
-conf=/etc/stunnel/stunnel_<%= @_safe_name %>.conf
+conf=/etc/stunnel/stunnel.conf
 
 <% if @_chroot.to_s.length > 0 -%>
 pidfile="<%= "#{@_chroot}#{@_pid}" %>";

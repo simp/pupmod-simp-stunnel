@@ -1,5 +1,9 @@
 #!/bin/bash
 #
+# ####################################################################
+# # This file is managed by Puppet. Any changes will be overwritten. #
+# ####################################################################
+#
 # Init script for stunnel
 #
 # chkconfig: 345 20 99
@@ -21,29 +25,8 @@ ulimit -u unlimited
 
 conf=/etc/stunnel/stunnel.conf
 
-# See if we're chroot'ed.
-chroot=`grep "chroot[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/chroot[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
-
-# Find the pid file, normal by default
-pidfile=`grep "pid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/pid[[:space:]]*=[[:space:]]*\(.*\)$/\1/'`;
+pidfile="/var/run/stunnel/stunnel.pid";
 piddir=`dirname "${pidfile}"`
-
-# Find the UID/GID of stunnel
-user=`grep "setuid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setuid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-group=`grep "setgid[[:space:]]*=" /etc/stunnel/stunnel.conf | sed -e 's/setgid[[:space:]]*=[[:space:]]*\(.*\)[[:space:]]*$/\1/'`;
-
-# Set the SELinux Contexts Properly
-if [ -z "${pidfile}" ]; then
-    if [ ! -d "${piddir}" ]; then
-      mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "${piddir}"
-      chown ${user}:${group} "${piddir}"
-    fi
-fi
-if [ -n $chroot ]; then
-    mkdir -p --context=system_u:object_r:stunnel_var_run_t:s0 "${chroot}${piddir}"
-    chown ${user}:${group} "${chroot}${piddir}"
-    pidfile="${chroot}${pidfile}";
-fi
 
 # If the command doesn't exist, that's probably not going to work
 [ -x ${exec} ] || exit 1
@@ -58,8 +41,8 @@ lock_file="/var/lock/subsys/${prog}"
 # It's a bit dangerous, but they'll end up interfering otherwise.
 kill_floaters() {
   retval=1
-  if [ ! -f "${pidfile}" ]; then
-    pkill -u $user $exec
+  if [ ! -f "$pidfile" ]; then
+    pkill -u "stunnel" -f "${exec} ${conf}"
     retval=$?
   fi
 
@@ -69,10 +52,10 @@ kill_floaters() {
 start() {
   echo -n $"Starting ${prog}: "
   kill_floaters
-  daemon --pidfile="${pidfile}" $exec $conf
+  daemon --pidfile="$pidfile" "$exec" "$conf"
   RETVAL=$?
-  if [ -d `dirname $lock_file` ]; then
-    touch $lock_file
+  if [ -d `dirname "$lock_file"` ]; then
+    touch "$lock_file"
   fi
   echo
   return $RETVAL
@@ -80,10 +63,17 @@ start() {
 
 stop() {
   echo -n $"Shutting down stunnel: "
-  kill_floaters ||  killproc -p "${pidfile}" $prog
-  RETVAL=$?
-  if [ -f $lock_file ]; then
-    rm $lock_file
+  status -p "$pidfile" stunnel 2>&1 /dev/null
+  statval=$?
+  if [ "$statval" != "3" ]; then
+    # Send interrupt, then kill aggressively if needed
+    killproc -p "$pidfile" "$prog" || kill_floaters
+    RETVAL=$?
+    if [[ -f "$lock_file" ]]; then
+      rm "$lock_file"
+    fi
+  else
+    return 0
   fi
   echo
   return $RETVAL
@@ -107,11 +97,11 @@ case "$1" in
     $1
     ;;
   condrestart)
-    status -p "${pidfile}" $prog >/dev/null 2>&1 || exit 0
+    status -p "$pidfile" "$prog" >/dev/null 2>&1 || exit 0
     restart
     ;;
   status)
-    status -p "${pidfile}" stunnel
+    status -p "$pidfile" stunnel
   ;;
     *)
   echo $"Usage: $0 {start|stop|restart|condrestart|status}"

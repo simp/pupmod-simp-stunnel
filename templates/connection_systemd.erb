@@ -2,11 +2,11 @@
 # # This file is managed by Puppet. Any changes will be overwritten. #
 # ####################################################################
 [Unit]
-Description=Start a stunnel_<%= @_safe_name %> listener
+Description=Start a stunnel listener
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_<%= @_safe_name %>.conf
+ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
 KillMode=process
 LimitNOFILE=1048576
 LimitNPROC=infinity
