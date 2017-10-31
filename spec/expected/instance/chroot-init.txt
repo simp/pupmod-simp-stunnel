@@ -41,7 +41,7 @@ lock_file="/var/lock/subsys/${prog}"
 kill_floaters() {
   retval=1
   if [ ! -f "$pidfile" ]; then
-    pkill -u "stunnel" "${exec} ${conf}"
+    pkill -u "stunnel" -f "${exec} ${conf}"
     retval=$?
   fi
 

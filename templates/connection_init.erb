@@ -47,7 +47,7 @@ lock_file="/var/lock/subsys/${prog}"
 kill_floaters() {
   retval=1
   if [ ! -f "$pidfile" ]; then
-    pkill -u "<%= @setuid %>" "${exec} ${conf}"
+    pkill -u "<%= @setuid %>" -f "${exec} ${conf}"
     retval=$?
   fi
 
