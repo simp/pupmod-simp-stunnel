@@ -22,6 +22,30 @@ describe 'connection' do
       EOF
     }
     let(:domain) { fact_on(host, 'domain') }
+    let(:minion_stunnel_conf) { <<-EOF
+        debug = err
+        syslog = yes
+        pid = /var/run/stunnel.pid
+        engine = auto
+        fips = no
+        foreground = yes
+        [nfs]
+        connect = 10.0.71.106:2049
+        accept = 127.0.0.1:20490
+        client = yes
+        failover = rr
+        key = /etc/pki/simp_apps/stunnel/x509/private/#{host}.#{domain}.pem
+        cert = /etc/pki/simp_apps/stunnel/x509/public/#{host}.#{domain}.pub
+        CAfile = /etc/pki/simp_apps/stunnel/x509/cacerts/cacerts.pem
+        CRLpath = /etc/pki/simp_apps/stunnel/x509/crl
+        ciphers = HIGH:-SSLv2
+        verify = 2
+        delay = no
+        retry = no
+        renegotiation = yes
+        reset = yes
+      EOF
+    }
 
 
     # This test verifies the validity of basic stunnel configurations
@@ -50,6 +74,17 @@ describe 'connection' do
         it "stunnel should be listening on #{port}" do
           on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
         end
+      end
+    end
+
+    context 'with an existing stunnel process' do
+      it 'should set up a stunnel process, ripe for killing' do
+        create_remote_file(host, '/etc/stunnel/stunnel.conf', minion_stunnel_conf)
+        on(host, 'stunnel /etc/stunnel/stunnel.conf')
+      end
+      it 'should still apply cleanly' do
+        apply_manifest_on(host,base_manifest, catch_failures: true)
+        apply_manifest_on(host,base_manifest, catch_changes: true)
       end
     end
 

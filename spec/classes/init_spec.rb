@@ -177,6 +177,22 @@ describe 'stunnel' do
             it { is_expected.to contain_concat__fragment('0_stunnel_global').without_content(/fips/) }
           end
         end
+
+        context 'with pid specified' do
+          # I have to go to hiera for this...
+          # stunnel::config::pid: /var/opt/run/stunnel.pid
+          let(:hieradata) { 'pid' }
+          it { is_expected.to compile.with_all_deps }
+          if os_facts[:operatingsystemmajrelease].to_i >= 7
+            let(:service_file) { File.read('spec/expected/connection/chroot-systemd-pid.txt') }
+            it { is_expected.to contain_file('/etc/systemd/system/stunnel.service') \
+              .with_content(service_file) }
+          else
+            let(:service_file) { File.read('spec/expected/connection/chroot-init-pid.txt') }
+            it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel') \
+              .with_content(service_file) }
+          end
+        end
       end
     end
   end

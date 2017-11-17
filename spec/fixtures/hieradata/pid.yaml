@@ -1,0 +1,2 @@
+---
+stunnel::config::pid: /var/opt/run/stunnel.pid

@@ -6,7 +6,7 @@ Description=Start a stunnel listener
 
 [Service]
 Type=simple
-ExecStartPre=-/usr/bin/pkill -F /var/stunnel/var/run/stunnel/stunnel.pid
+ExecStartPre=-/usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F /var/stunnel/var/run/stunnel/stunnel.pid
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
 KillMode=process
 LimitNOFILE=1048576
