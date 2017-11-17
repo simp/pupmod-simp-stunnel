@@ -33,9 +33,15 @@ describe 'instance' do
     # and ensures multiple connections can co-exist as advertised. It
     # does not test stunnel itself.
     context 'set up legacy, chrooted, and non-chrooted connections' do
-      it 'should apply with no errors' do
+      it 'should set up the box' do
+        on(host, "sed -i 's/enforce_for_root//g' /etc/pam.d/*")
+        on(host, 'echo "root:password" | chpasswd --crypt-method SHA256')
         install_package(host, 'epel-release')
+      end
+
+      it 'should apply with no errors' do
         set_hieradata_on(host,hieradata)
+        apply_manifest_on(host,manifest)
         apply_manifest_on(host,manifest, catch_failures: true)
         apply_manifest_on(host,manifest, catch_failures: true)
       end

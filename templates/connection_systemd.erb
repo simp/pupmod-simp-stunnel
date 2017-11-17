@@ -7,9 +7,9 @@ Description=Start a stunnel listener
 [Service]
 Type=simple
 <% if @_chroot -%>
-ExecStartPre=-/usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_chroot %><%= @_legacy_pid %>
+ExecStartPre=-/usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_chroot %><%= @_legacy_pid %> ; rm <%= @_chroot %><%= @_legacy_pid %>
 <% else -%>
-ExecStartPre=-/usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_legacy_pid %>
+ExecStartPre=-/usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_legacy_pid %> ; rm <%= @_chroot %><%= @_legacy_pid %>
 <% end -%>
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
 KillMode=process
