@@ -84,11 +84,11 @@ describe 'stunnel' do
 
           if os_facts[:operatingsystemmajrelease].to_i >= 7
             let(:service_file) { File.read('spec/expected/connection/chroot-systemd.txt') }
-            it { is_expected.to create_file('/etc/systemd/system/stunnel.service') \
-              .that_notifies('Exec[stunnel daemon reload]') \
-              .with_content(service_file) }
-            it { is_expected.to contain_service('stunnel') \
-              .that_requires('File[/etc/systemd/system/stunnel.service]') }
+            it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
+                                  .that_notifies('Exec[stunnel daemon reload]')
+                                  .with_content(service_file) }
+            it { is_expected.to contain_service('stunnel')
+                                  .that_requires('File[/etc/systemd/system/stunnel.service]') }
             it { is_expected.to contain_exec('stunnel daemon reload') }
           else
             let(:service_file) { File.read('spec/expected/connection/chroot-init.txt') }
@@ -145,11 +145,11 @@ describe 'stunnel' do
 
           if os_facts[:operatingsystemmajrelease].to_i >= 7
             let(:service_file) { File.read('spec/expected/connection/nonchroot-systemd.txt') }
-            it { is_expected.to create_file('/etc/systemd/system/stunnel.service') \
-              .that_notifies('Exec[stunnel daemon reload]') \
-              .with_content(service_file) }
-            it { is_expected.to contain_service('stunnel') \
-              .that_requires('File[/etc/systemd/system/stunnel.service]') }
+            it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
+                                   .that_notifies('Exec[stunnel daemon reload]')
+                                   .with_content(service_file) }
+            it { is_expected.to contain_service('stunnel')
+                                  .that_requires('File[/etc/systemd/system/stunnel.service]') }
             it { is_expected.to contain_exec('stunnel daemon reload') }
           else
             let(:service_file) { File.read('spec/expected/connection/nonchroot-init.txt') }
@@ -185,12 +185,12 @@ describe 'stunnel' do
           it { is_expected.to compile.with_all_deps }
           if os_facts[:operatingsystemmajrelease].to_i >= 7
             let(:service_file) { File.read('spec/expected/connection/chroot-systemd-pid.txt') }
-            it { is_expected.to contain_file('/etc/systemd/system/stunnel.service') \
-              .with_content(service_file) }
+            it { is_expected.to contain_file('/etc/systemd/system/stunnel.service')
+                                  .with_content(service_file) }
           else
             let(:service_file) { File.read('spec/expected/connection/chroot-init-pid.txt') }
-            it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel') \
-              .with_content(service_file) }
+            it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel')
+                                  .with_content(service_file) }
           end
         end
       end
