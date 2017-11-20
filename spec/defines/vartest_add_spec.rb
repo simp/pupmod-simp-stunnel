@@ -403,7 +403,7 @@ describe 'stunnel::connection' do
           variable_test(
             'nfs',
             :curve,
-            'jello_puddin_pops',
+            'longer_string_name',
             { :params => {
                 :connect => [2049],
                 :client => false,

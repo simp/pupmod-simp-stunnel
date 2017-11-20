@@ -147,13 +147,21 @@ class stunnel::config (
     }
   }
 
+  # $_legacy_pid is used to kill the old stunnel process set up from a previous
+  #   version of this module. It should be set to $_pid, unless $_pid is unset.
   $on_systemd = 'systemd' in $facts['init_systems']
-  if ($pid =~ Undef and $on_systemd) {
-    $_foreground = true
-    $_pid        = $pid
+  if $pid =~ Undef {
+    if $on_systemd {
+      $_foreground = true
+      $_pid        = $pid
+    } else {
+      $_foreground = undef
+      $_pid        = '/var/run/stunnel/stunnel.pid'
+    }
+    $_legacy_pid = '/var/run/stunnel/stunnel.pid'
   } else {
-    $_foreground = undef
-    $_pid        = '/var/run/stunnel/stunnel.pid'
+    $_pid        = $pid
+    $_legacy_pid = $pid
   }
 
   concat { '/etc/stunnel/stunnel.conf':
@@ -249,7 +257,7 @@ class stunnel::config (
   }
 
   # These templates need variables, that's why they are here
-  if 'systemd' in $facts['init_systems'] {
+  if $on_systemd {
     file { '/etc/systemd/system/stunnel.service':
       ensure  => file,
       content => template('stunnel/connection_systemd.erb'),
@@ -285,7 +293,7 @@ class stunnel::config (
       owner   => 'root',
       group   => 'root',
       mode    => '0750',
-      content => template("stunnel/connection_init.erb"),
+      content => template('stunnel/connection_init.erb'),
     }
 
   }

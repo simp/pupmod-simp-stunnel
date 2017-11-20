@@ -1,3 +1,8 @@
+* Fri Nov 17 2017 Nick Miller <nick.miller@onyxpoint.com> - 6.2.1
+- Add feature to systemd init script to kill stunnels started from
+  the previous version of the module
+- Fixed bug where `stunnel::config::pid` was being ignored
+
 * Wed Oct 25 2017 Nick Miller <nick.miller@onyxpoint.com> - 6.2.0
 - Added acceptance test to switch between SELinux enabled and disabled
   - Renamed them to make more sense

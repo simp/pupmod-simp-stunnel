@@ -34,8 +34,8 @@ describe 'instance' do
     # does not test stunnel itself.
     context 'set up legacy, chrooted, and non-chrooted connections' do
       it 'should apply with no errors' do
-        install_package(host, 'epel-release')
         set_hieradata_on(host,hieradata)
+        apply_manifest_on(host,manifest)
         apply_manifest_on(host,manifest, catch_failures: true)
         apply_manifest_on(host,manifest, catch_failures: true)
       end

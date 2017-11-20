@@ -1,4 +1,5 @@
 require 'spec_helper_acceptance'
+require 'timeout'
 
 test_name 'connection'
 
@@ -23,6 +24,49 @@ describe 'connection' do
     }
     let(:domain) { fact_on(host, 'domain') }
 
+    # The old version of the module used a SysV style init script, which is no
+    # longer used in the newer versions. However, the process started from the
+    # older init script may still be running. This will cause the new systemd
+    # unit to fail to start, citing the port already being in use.
+    context 'with an existing stunnel process on el7' do
+      if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
+        let(:minion_stunnel_conf) { <<-EOF
+            debug = err
+            syslog = yes
+            pid = /var/run/stunnel/stunnel.pid
+            foreground = no
+            [nfs]
+            connect = 0.0.0.0:2049
+            accept = 20490
+            failover = rr
+            key = /etc/pki/simp-testing/pki/private/#{host}.#{domain}.pem
+            cert = /etc/pki/simp-testing/pki/public/#{host}.#{domain}.pub
+            CAfile = /etc/pki/simp-testing/pki/cacerts/cacerts.pem
+            CRLpath = /etc/pki/simp-testing/pki/crl
+            ciphers = HIGH:-SSLv2
+            verify = 2
+            delay = no
+            retry = no
+            renegotiation = yes
+            reset = yes
+          EOF
+        }
+        it 'should set up a stunnel process, ripe for killing' do
+          create_remote_file(host, '/etc/stunnel/stunnel.conf', minion_stunnel_conf)
+          scp_to(host,'spec/expected/legacy_el7_init.txt','/etc/rc.d/init.d/stunnel_legacy')
+          on(host, 'mkdir -p /var/run/stunnel')
+          on(host, 'chmod +x /etc/rc.d/init.d/stunnel_legacy')
+
+          on(host, 'chown -R root:root /etc/pki/simp-testing/pki')
+          on(host, 'chmod -R go+r /etc/pki/simp-testing/pki')
+          on(host, 'chcon -R --type cert_t /etc/pki/simp-testing/pki')
+          on(host, '/etc/rc.d/init.d/stunnel_legacy start')
+
+          apply_manifest_on(host,base_manifest, catch_failures: true)
+          apply_manifest_on(host,base_manifest, catch_changes: true)
+        end
+      end
+    end
 
     # This test verifies the validity of basic stunnel configurations
     # and ensures multiple connections can co-exist as advertised. It

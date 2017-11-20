@@ -1,0 +1,111 @@
+#!/bin/bash
+#
+# ####################################################################
+# # This file is managed by Puppet. Any changes will be overwritten. #
+# ####################################################################
+#
+# Init script for stunnel
+#
+# chkconfig: 345 20 99
+# description: Stunnel TCP Encryption Utility
+# processname: stunnel
+# config: /etc/stunnel/stunnel.conf
+
+# Set up ulimits for heavily connected processes
+ulimit -n 1048576
+ulimit -u unlimited
+
+# Paths, variables, and system checks.
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Account for the various locations in different OSs
+[ -f /usr/sbin/stunnel ] && exec=/usr/sbin/stunnel || exec=/usr/bin/stunnel
+
+conf=/etc/stunnel/stunnel.conf
+
+pidfile="/var/stunnel/var/opt/run/stunnel.pid";
+piddir=`dirname "${pidfile}"`
+
+# If the command doesn't exist, that's probably not going to work
+[ -x ${exec} ] || exit 1
+# If the config file doesn't exist, we can't run stunnel
+[ -f ${conf} ] || exit 1
+
+RETVAL=0
+prog='stunnel'
+lock_file="/var/lock/subsys/${prog}"
+
+# Destroy any stunnel processes that this script doesn't know about.
+# It's a bit dangerous, but they'll end up interfering otherwise.
+kill_floaters() {
+  retval=1
+  if [ ! -f "$pidfile" ]; then
+    pkill -u "stunnel" -f "${exec} ${conf}"
+    retval=$?
+  fi
+
+  return $retval
+}
+
+start() {
+  echo -n $"Starting ${prog}: "
+  kill_floaters
+  daemon --pidfile="$pidfile" "$exec" "$conf"
+  RETVAL=$?
+  if [ -d `dirname "$lock_file"` ]; then
+    touch "$lock_file"
+  fi
+  echo
+  return $RETVAL
+}
+
+stop() {
+  echo -n $"Shutting down stunnel: "
+  status -p "$pidfile" stunnel 2>&1 /dev/null
+  statval=$?
+  if [ "$statval" != "3" ]; then
+    # Send interrupt, then kill aggressively if needed
+    killproc -p "$pidfile" "$prog" || kill_floaters
+    RETVAL=$?
+    if [[ -f "$lock_file" ]]; then
+      rm "$lock_file"
+    fi
+  else
+    return 0
+  fi
+  echo
+  return $RETVAL
+}
+
+restart() {
+  stop
+  # Sometimes the stunnel application hangs for a while shutting down.
+  sleep 3
+  start
+}
+
+case "$1" in
+  start)
+    $1
+    ;;
+  stop)
+    $1
+    ;;
+  restart)
+    $1
+    ;;
+  condrestart)
+    status -p "$pidfile" "$prog" >/dev/null 2>&1 || exit 0
+    restart
+    ;;
+  status)
+    status -p "$pidfile" stunnel
+  ;;
+    *)
+  echo $"Usage: $0 {start|stop|restart|condrestart|status}"
+  exit 2
+esac
+
+exit $?
