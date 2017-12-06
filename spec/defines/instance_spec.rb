@@ -90,16 +90,16 @@ describe 'stunnel::instance' do
         if os_facts[:os][:release][:major].to_i >= 7
           let(:service_file) { File.read('spec/expected/instance/nonchroot-systemd.txt') }
 
-          it { is_expected.to contain_file('/etc/stunnel/stunnel_nfs.conf') \
+          it { is_expected.to contain_file('/etc/stunnel/stunnel_managed_by_puppet_nfs.conf') \
             .with_content($el7_non_chroot) }
-          it { is_expected.to create_file('/etc/systemd/system/stunnel_nfs.service') \
+          it { is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service') \
             .with_content(service_file)}
         else
           let(:service_file) { File.read('spec/expected/instance/nonchroot-init.txt') }
 
-          it { is_expected.to contain_file('/etc/stunnel/stunnel_nfs.conf') \
+          it { is_expected.to contain_file('/etc/stunnel/stunnel_managed_by_puppet_nfs.conf') \
             .with_content($el6_non_chroot) }
-          it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_nfs') \
+          it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_managed_by_puppet_nfs') \
             .with_content(service_file)}
         end
         it { is_expected.to create_iptables__listen__tcp_stateful('allow_stunnel_nfs').with(
@@ -134,16 +134,16 @@ describe 'stunnel::instance' do
         if os_facts[:os][:release][:major].to_i >= 7
           let(:service_file) { File.read('spec/expected/instance/chroot-systemd.txt') }
 
-          it { is_expected.to contain_file('/etc/stunnel/stunnel_nfs.conf') \
+          it { is_expected.to contain_file('/etc/stunnel/stunnel_managed_by_puppet_nfs.conf') \
             .with_content(/.*chroot = \/var\/stunnel_nfs.*/)}
-          it { is_expected.to create_file('/etc/systemd/system/stunnel_nfs.service') \
+          it { is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service') \
             .with_content(service_file) }
         else
           let(:service_file) { File.read('spec/expected/instance/chroot-init.txt') }
 
-          it { is_expected.to contain_file('/etc/stunnel/stunnel_nfs.conf') \
+          it { is_expected.to contain_file('/etc/stunnel/stunnel_managed_by_puppet_nfs.conf') \
             .with_content(/.*chroot = \/var\/stunnel_nfs.*/)}
-          it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_nfs') \
+          it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_managed_by_puppet_nfs') \
             .with_content(service_file) }
         end
       end
@@ -173,16 +173,16 @@ describe 'stunnel::instance' do
         if os_facts[:os][:release][:major].to_i >= 7
           let(:service_file) { File.read('spec/expected/instance/chroot-sel-systemd.txt') }
 
-          it { is_expected.to contain_file('/etc/stunnel/stunnel_sel.conf') \
+          it { is_expected.to contain_file('/etc/stunnel/stunnel_managed_by_puppet_sel.conf') \
             .with_content(/.*chroot = \/var\/stunnel_sel.*/)}
-          it { is_expected.to create_file('/etc/systemd/system/stunnel_sel.service') \
+          it { is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_sel.service') \
             .with_content(service_file) }
         else
           let(:service_file) { File.read('spec/expected/instance/chroot-sel-init.txt') }
 
-          it { is_expected.to contain_file('/etc/stunnel/stunnel_sel.conf') \
+          it { is_expected.to contain_file('/etc/stunnel/stunnel_managed_by_puppet_sel.conf') \
             .with_content(/.*chroot = \/var\/stunnel_sel.*/)}
-          it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_sel') \
+          it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_managed_by_puppet_sel') \
             .with_content(service_file) }
         end
       end
@@ -194,7 +194,10 @@ describe 'stunnel::instance' do
           accept:  20490,
         }}
         let(:pre_condition) { <<-EOF
-          include 'stunnel'
+            stunnel::connection { 'test':
+              connect => [1234],
+              accept  => 1234
+            }
           EOF
         }
         it { is_expected.to compile.with_all_deps }
@@ -202,6 +205,23 @@ describe 'stunnel::instance' do
         it { is_expected.to contain_class('stunnel::config') }
         it { is_expected.to contain_class('stunnel::service') }
         it { is_expected.to contain_class('stunnel::install') }
+
+        # Ensure that conflicting connection and instances fail to compile
+        context 'with conflicting instances and connections' do
+          let(:pre_condition) { <<-EOF
+              stunnel::connection { 'conflicting_test':
+                connect => [1234],
+                accept  => #{params[:accept]}
+              }
+            EOF
+          }
+
+          it {
+            is_expected.to compile.and_raise_error(
+              /Duplicate.*\s+Stunnel::Instance::Reserve_port\[#{params[:accept]}\]/
+            )
+          }
+        end
       end
 
       context 'when selinux is disabled' do
@@ -212,10 +232,10 @@ describe 'stunnel::instance' do
         let(:facts) { os_facts.merge(selinux_enforced: false) }
 
         if os_facts[:os][:release][:major].to_i >= 7
-          it { is_expected.to create_file('/etc/systemd/system/stunnel_nfs.service') \
+          it { is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service') \
             .without_content(/system_u:object_r:stunnel_var_run_t/)}
         else
-          it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_nfs') \
+          it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_managed_by_puppet_nfs') \
             .without_content(/^\s+mkdir -p system_u:object_r:stunnel_var_run_t/)}
         end
       end

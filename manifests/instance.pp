@@ -10,8 +10,7 @@
 # - Spawns service 'stunnel_rsync' from stunnel_rsync.conf
 #
 # @param name [String]
-#   The name of the stunnel process. For example, a name of 'nfs'
-#   would result in a service stunnel_nfs
+#   The name of the stunnel process.
 #
 # @param connect
 #   Address and port to which to **forward** connections
@@ -101,7 +100,7 @@
 #
 # @param chroot
 #   The location of the chroot jail. If left unset, and selinux is NOT disabled,
-#   it will default to `/var/stunnel_${name}`.
+#   it will default to `/var/stunnel_<local bind port>`.
 #
 #   * Do **NOT** make this anything under ``/var/run``
 #
@@ -188,7 +187,6 @@
 define stunnel::instance(
   Stunnel::Connect                            $connect,
   Variant[Simplib::Port, Simplib::Host::Port] $accept,
-
   Simplib::Netlist                            $trusted_nets            = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
   Boolean                                     $firewall                = simplib::lookup('simp_options::firewall', { 'default_value' => false }),
   Boolean                                     $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value' => true }),
@@ -252,10 +250,14 @@ define stunnel::instance(
   Optional[Integer]                           $timeout_idle            = undef,
   Integer                                     $verify                  = 2
 ){
+  $_safe_name = regsubst($name, '(/|\s)', '__')
+  $_dport = split(to_string($accept),':')[-1]
 
-  include '::stunnel::install'
+  stunnel::instance::reserve_port { $_dport: }
 
   if $haveged { include '::haveged' }
+
+  include '::stunnel'
 
   # Validation for RHEL6/7 Options. Defaulting to 7.
   if ($facts['os']['name'] in ['Red Hat','CentOS']) and ($facts['os']['release']['major'] < '7') {
@@ -283,9 +285,13 @@ define stunnel::instance(
     }
   }
 
-  ensure_resource('stunnel::account', $setuid, { 'groupname' => $setgid, 'uid' => $uid, 'gid' => $gid })
-
-  $_safe_name = regsubst($name, '(/|\s)', '__')
+  ensure_resource('stunnel::account', $setuid,
+    {
+      'groupname' => $setgid,
+      'uid'       => $uid,
+      'gid'       => $gid
+    }
+  )
 
   if $chroot {
     $_chroot = $chroot
@@ -297,8 +303,7 @@ define stunnel::instance(
     $_chroot = undef
   }
 
-  $on_systemd = 'systemd' in $facts['init_systems']
-  if ($pid =~ Undef and $on_systemd) {
+  if !$pid and ( 'systemd' in $facts['init_systems'] ) {
     $_foreground = true
     $_pid        = $pid
   } else {
@@ -306,7 +311,7 @@ define stunnel::instance(
     $_pid        = "/var/run/stunnel/stunnel_${_safe_name}.pid"
   }
 
-  file { "/etc/stunnel/stunnel_${_safe_name}.conf":
+  file { "/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf":
     ensure  => 'present',
     owner   => 'root',
     group   => 'root',
@@ -316,21 +321,55 @@ define stunnel::instance(
   }
 
   if $pki {
-    pki::copy { "stunnel_${_safe_name}":
+    pki::copy { "stunnel_${name}":
       source => $app_pki_external_source,
       pki    => $pki,
-      notify => Service["stunnel_${_safe_name}"]
+      notify => Service["stunnel_managed_by_puppet_${_safe_name}"]
     }
   }
 
-  if $_chroot !~ Undef {
-    $_stunnel_piddir = File[dirname("${_chroot}${_pid}")]
+  if $_chroot {
+    if $_pid {
+      $_stunnel_pid_dirname = dirname("${_chroot}/${_pid}")
+
+      $_stunnel_piddir = File[$_stunnel_pid_dirname]
+      $_stunnel_chroot_seltype = 'stunnel_var_run_t'
+
+      exec { "mkdir -p ${_stunnel_pid_dirname}":
+        path    => ['/bin','/usr/bin'],
+        creates => $_chroot,
+        before  => File[$_chroot]
+      }
+
+      ensure_resource('file', $_stunnel_pid_dirname,
+        {
+          'ensure'  => 'directory',
+          'owner'   => $setuid,
+          'group'   => $setgid,
+          'mode'    => '0644',
+          'seluser' => 'system_u',
+          'selrole' => 'object_r',
+          'seltype' => $_stunnel_chroot_seltype
+        }
+      )
+    }
+    else {
+      $_stunnel_piddir = undef
+      $_stunnel_chroot_seltype = undef
+
+      exec { "mkdir -p ${_chroot}":
+        path    => ['/bin','/usr/bin'],
+        creates => $_chroot,
+        before  => File[$_chroot]
+      }
+    }
 
     file { $_chroot:
-      ensure => 'directory',
-      owner  => 'root',
-      group  => $setgid,
-      mode   => '0770',
+      ensure  => 'directory',
+      owner   => 'root',
+      group   => $setgid,
+      mode    => '0640',
+      seltype => $_stunnel_chroot_seltype
     }
 
     # The following two entries are required to be able to properly resolve
@@ -339,14 +378,15 @@ define stunnel::instance(
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0755',
+      mode   => '0755'
     }
+
     file { "${_chroot}/etc/resolv.conf":
       ensure => 'file',
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/resolv.conf',
+      source => 'file:///etc/resolv.conf'
     }
 
     file { "${_chroot}/etc/nsswitch.conf":
@@ -354,7 +394,7 @@ define stunnel::instance(
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/nsswitch.conf',
+      source => 'file:///etc/nsswitch.conf'
     }
 
     file { "${_chroot}/etc/hosts":
@@ -362,7 +402,7 @@ define stunnel::instance(
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/hosts',
+      source => 'file:///etc/hosts'
     }
 
     file { "${_chroot}/var":
@@ -379,19 +419,6 @@ define stunnel::instance(
       mode   => '0644'
     }
 
-    # The selinux context settings are ignored if SELinux is disabled
-    ensure_resource('file', dirname("${_chroot}${_pid}"),
-      {
-        'ensure'  => 'directory',
-        'owner'   => $setuid,
-        'group'   => $setgid,
-        'mode'    => '0644',
-        'seluser' => 'system_u',
-        'selrole' => 'object_r',
-        'seltype' => 'stunnel_var_run_t'
-      }
-    )
-
     file { "${_chroot}/etc/pki":
       ensure => 'directory',
       owner  => 'root',
@@ -399,7 +426,7 @@ define stunnel::instance(
       mode   => '0640'
     }
 
-    $_require_pki =  $pki ? { true => Pki::Copy["stunnel_${_safe_name}"], default =>  undef }
+    $_require_pki =  $pki ? { true => Pki::Copy["stunnel_${name}"], default => undef }
 
     file { "${_chroot}/etc/pki/cacerts":
       source  => "file://${app_pki_dir}/cacerts",
@@ -430,7 +457,6 @@ define stunnel::instance(
     }
   }
 
-
   # The rules are pulled together from the accept_* and connect_*
   # variables.
   #
@@ -438,11 +464,9 @@ define stunnel::instance(
   if $firewall and !$client {
     include '::iptables'
 
-    $_dport = [to_integer(split(to_string($accept),':')[-1])]
-
     iptables::listen::tcp_stateful { "allow_stunnel_${_safe_name}":
       trusted_nets => $trusted_nets,
-      dports       => $_dport
+      dports       => [to_integer($_dport)]
     }
   }
 
@@ -454,19 +478,8 @@ define stunnel::instance(
     }
   }
 
-  $_se_enabled = $facts['selinux_enforced']
-  if 'upstart' in $facts['init_systems'] {
-    $_service_file = "/etc/rc.d/init.d/stunnel_${_safe_name}"
-    file { $_service_file:
-      ensure  => 'present',
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0750',
-      content => template('stunnel/instance_init.erb')
-    }
-  }
-  elsif 'systemd' in $facts['init_systems'] {
-    $_service_file = "/etc/systemd/system/stunnel_${_safe_name}.service"
+  if 'systemd' in $facts['init_systems'] {
+    $_service_file = "/etc/systemd/system/stunnel_managed_by_puppet_${_safe_name}.service"
     file { $_service_file:
       ensure  => 'present',
       owner   => 'root',
@@ -475,17 +488,27 @@ define stunnel::instance(
       content => template('stunnel/instance_systemd.erb'),
     }
   }
+  elsif 'sysv' in $facts['init_systems'] {
+    $_service_file = "/etc/rc.d/init.d/stunnel_managed_by_puppet_${_safe_name}"
+
+    file { $_service_file:
+      ensure  => 'present',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0750',
+      content => template('stunnel/instance_init.erb')
+    }
+  }
   else {
-    fail("Init systems ${$facts['init_systems']} not supported. Only systemd, upstart supported.")
+    fail("Init systems ${$facts['init_systems']} not supported. Only 'systemd' and 'sysv' supported.")
   }
 
-
-  service { "stunnel_${_safe_name}":
+  service { "stunnel_managed_by_puppet_${_safe_name}":
     ensure  => 'running',
     enable  => true,
     require => [
       File[$_service_file],
-      File["/etc/stunnel/stunnel_${_safe_name}.conf"]
+      File["/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf"]
     ] + $_stunnel_piddir
   }
 }

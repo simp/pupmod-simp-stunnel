@@ -3,6 +3,7 @@
 # ####################################################################
 [Unit]
 Description=Start a stunnel listener
+Wants=network-online.target
 
 [Service]
 Type=simple
@@ -11,3 +12,7 @@ ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
 KillMode=process
 LimitNOFILE=1048576
 LimitNPROC=infinity
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

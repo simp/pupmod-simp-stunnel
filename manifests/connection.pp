@@ -237,7 +237,12 @@ define stunnel::connection (
   Boolean                                     $firewall                = simplib::lookup('simp_options::firewall', { 'default_value' => false }),
   Boolean                                     $tcpwrappers             = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false })
 ) {
-  include '::stunnel'
+
+  $_dport = split(to_string($accept),':')[-1]
+
+  stunnel::instance::reserve_port { $_dport: }
+
+  include '::stunnel::monolithic'
 
   # Validation for RHEL6/7 Options. Defaulting to 7.
   if ($facts['os']['name'] in ['Red Hat','CentOS']) and ($facts['os']['release']['major'] < '7') {
@@ -302,11 +307,9 @@ define stunnel::connection (
   if $firewall and !$client {
     include '::iptables'
 
-    $_dport = [to_integer(split(to_string($accept),':')[-1])]
-
     iptables::listen::tcp_stateful { "allow_stunnel_${name}":
       trusted_nets => $trusted_nets,
-      dports       => $_dport
+      dports       => [to_integer($_dport)]
     }
   }
 

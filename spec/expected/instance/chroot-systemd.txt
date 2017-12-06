@@ -3,10 +3,15 @@
 # ####################################################################
 [Unit]
 Description=Start a stunnel_nfs listener
+Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_nfs.conf
+ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_managed_by_puppet_nfs.conf
 KillMode=process
 LimitNOFILE=1048576
 LimitNPROC=infinity
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

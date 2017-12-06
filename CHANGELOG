@@ -1,3 +1,14 @@
+* Wed Dec 13 2017 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.1
+- Isolated the 'instance' logic away from the 'connection' logic
+- Added a private 'monolithic' class that arranges everything properly for the
+  legacy stunnel connections
+- Ensure that 'instances' and 'connections' do not conflict by using a
+  'reserve_port' class
+- Add a native type that will clean up all instances that would be randomly
+  created by the 'stunnel::instance' defines and will come before both legacy
+  and new stunnel connections so that we do not have random left over services
+  that may conflict with new services
+
 * Fri Nov 17 2017 Nick Miller <nick.miller@onyxpoint.com> - 6.2.1
 - Add feature to systemd init script to kill stunnels started from
   the previous version of the module

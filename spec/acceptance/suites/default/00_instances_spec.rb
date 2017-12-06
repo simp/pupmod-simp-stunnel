@@ -29,6 +29,13 @@ describe 'instance' do
       'simp_options::trusted_nets' => ['ANY']
     }}
 
+    context 'it should set up SSH Password access' do
+      on(host, %(sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config))
+      on(host, %(service sshd restart))
+      on(host, 'service firewalld stop ||:', :accept_all_exit_codes => true)
+      on(host, 'service iptables stop ||:', :accept_all_exit_codes => true)
+    end
+
     # This test verifies the validity of basic stunnel configurations
     # and ensures multiple connections can co-exist as advertised. It
     # does not test stunnel itself.
@@ -45,15 +52,15 @@ describe 'instance' do
       end
 
 
-      it 'should be running stunnel, stunnel_nfs, and stunnel chroot' do
+      it 'should be running stunnel, stunnel_managed_by_puppet_nfs, and stunnel_managed_by_puppet_chroot' do
         if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
           on(host, 'systemctl status stunnel')
-          on(host, 'systemctl status stunnel_nfs')
-          on(host, 'systemctl status stunnel_chroot')
+          on(host, 'systemctl status stunnel_managed_by_puppet_nfs')
+          on(host, 'systemctl status stunnel_managed_by_puppet_chroot')
         else
           on(host, 'service stunnel status')
-          on(host, 'service stunnel_nfs status')
-          on(host, 'service stunnel_chroot status')
+          on(host, 'service stunnel_managed_by_puppet_nfs status')
+          on(host, 'service stunnel_managed_by_puppet_chroot status')
         end
       end
 
@@ -70,9 +77,12 @@ describe 'instance' do
         apply_manifest_on(host,manifest, catch_failures: true)
       end
       it 'after killing an instanced stunnel, have the other stunnel still running' do
-        on(host, 'puppet resource service stunnel_nfs ensure=stopped enable=false')
+        on(host, 'puppet resource service stunnel_managed_by_puppet_nfs ensure=stopped enable=false')
 
-        %w(stunnel_chroot stunnel).each do |service|
+        [
+          'stunnel_managed_by_puppet_chroot',
+          'stunnel'
+        ].each do |service|
           result = on(host, "puppet resource service #{service}").stdout
           expect(result).to match(/running/)
         end
@@ -87,7 +97,10 @@ describe 'instance' do
       it 'should kill the monolithic stunnel and have instances still running' do
         on(host, 'puppet resource service stunnel ensure=stopped enable=false')
 
-        %w(stunnel_chroot stunnel_nfs).each do |service|
+        [
+          'stunnel_managed_by_puppet_chroot',
+          'stunnel_managed_by_puppet_nfs'
+        ].each do |service|
           result = on(host, "puppet resource service #{service}").stdout
           expect(result).to match(/running/)
         end
@@ -98,11 +111,35 @@ describe 'instance' do
       end
     end
 
+    context 'renaming an stunnel session but keeping the same port' do
+      rename_manifest = <<-EOM
+        stunnel::instance { 'new_test_service':
+          client  => false,
+          connect => [5049],
+          accept  => 50490
+        }
+      EOM
+
+      it 'should succeed' do
+        apply_manifest_on(host, rename_manifest)
+      end
+
+      it 'should clean up old config files' do
+        result = on(host, 'ls /etc/stunnel/*nfs*', :accept_all_exit_codes => true).stdout.strip
+        expect(result).to be_empty
+      end
+    end
+
     context 'clean up' do
       it 'should stop and clean up stunnel' do
-        %w(stunnel stunnel_chroot stunnel_nfs).each do |service|
+        [
+          'stunnel',
+          'stunnel_managed_by_puppet_chroot',
+          'stunnel_managed_by_puppet_nfs'
+        ].each do |service|
           on(host, "puppet resource service #{service} ensure=stopped enable=false")
         end
+
         # There was an issue where the domain fact would cease to exist, causing failures
         on(host, 'service network restart')
         # Get rid of stunnels

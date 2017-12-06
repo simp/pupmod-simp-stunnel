@@ -3,10 +3,15 @@
 # ####################################################################
 [Unit]
 Description=Start a stunnel_<%= @_safe_name %> listener
+Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_<%= @_safe_name %>.conf
+ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_managed_by_puppet_<%= @_safe_name %>.conf
 KillMode=process
 LimitNOFILE=1048576
 LimitNPROC=infinity
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
