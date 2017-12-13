@@ -1,4 +1,4 @@
-* Wed Dec 13 2017 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.1
+* Wed Dec 13 2017 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.0
 - Isolated the 'instance' logic away from the 'connection' logic
 - Added a private 'monolithic' class that arranges everything properly for the
   legacy stunnel connections
