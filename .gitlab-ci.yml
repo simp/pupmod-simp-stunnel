@@ -20,6 +20,8 @@
     - bundle exec rake check:test_file
     - bundle exec rake pkg:check_version
     - bundle exec rake compare_latest_tag
+    - bundle exec rake lint
+    - puppet module build
 
 .spec_tests: &spec_tests
   script:
@@ -120,7 +122,9 @@ acceptance-default-fips:
   stage: acceptance
   tags:
     - beaker
+  variables:
+    BEAKER_fips: 'yes'
   <<: *cache_bundler
   <<: *setup_bundler_env
   script:
-    - BEAKER_fips=yes bundle exec rake beaker:suites[default]
+    - bundle exec rake beaker:suites[default]
