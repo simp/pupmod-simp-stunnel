@@ -85,14 +85,21 @@ class stunnel (
   Boolean                       $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value' => false }),
   Variant[Enum['simp'],Boolean] $pki                     = simplib::lookup('simp_options::pki', { 'default_value'     => false })
 ) {
-  if $haveged { include '::haveged' }
 
   contain '::stunnel::install'
-  contain '::stunnel::config'
-  contain '::stunnel::service'
 
-  ensure_resource('stunnel::account', $setuid, { 'groupname' => $setgid, 'uid' => $uid, 'gid' => $gid })
-
-  Class['stunnel::install'] -> Stunnel::Account[$setuid] -> Class['stunnel::config']
-  Class['stunnel::config'] ~> Class['stunnel::service']
+  # This is present to ensure that any 'stunnel::instance' resources are
+  # appropriately purged prior to running in legacy mode or creating additional
+  # instances
+  #
+  # The native type has an 'autobefore' that will do the right thing
+  stunnel_instance_purge { 'stunnel_managed_by_puppet':
+    # Update this list if stunnel::instance drops additional files that need to
+    # be purged
+    dirs => [
+      '/etc/stunnel',
+      '/etc/rc.d/init.d',
+      '/etc/systemd/system'
+    ]
+  }
 }

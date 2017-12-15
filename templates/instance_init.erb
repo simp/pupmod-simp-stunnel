@@ -22,7 +22,7 @@ ulimit -u unlimited
 # Account for the various locations in different OSs
 [ -f /usr/sbin/stunnel ] && exec=/usr/sbin/stunnel || exec=/usr/bin/stunnel
 
-conf=/etc/stunnel/stunnel_<%= @_safe_name %>.conf
+conf=/etc/stunnel/stunnel_managed_by_puppet_<%= @_safe_name %>.conf
 
 <% if @_chroot.to_s.length > 0 -%>
 pidfile="<%= "#{@_chroot}#{@_pid}" %>";

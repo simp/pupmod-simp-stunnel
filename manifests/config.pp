@@ -63,6 +63,12 @@
 # @param setgid
 #   The group stunnel should run as
 #
+# @param uid
+#   The UID of the stunnel user
+#
+# @param gid
+#   The GID of the stunnel user
+#
 # @param stunnel_debug
 #   The debug level for logging
 #
@@ -119,6 +125,8 @@ class stunnel::config (
   Optional[Stdlib::Absolutepath] $pid                     = undef,
   String                         $setuid                  = $::stunnel::setuid,
   String                         $setgid                  = $::stunnel::setgid,
+  Integer                        $uid                     = $::stunnel::uid,
+  Integer                        $gid                     = $::stunnel::gid,
   String                         $stunnel_debug           = 'err',
   Optional[Enum['zlib','rle']]   $compression             = undef,
   Optional[String]               $egd                     = undef,
@@ -132,6 +140,16 @@ class stunnel::config (
   Boolean                        $syslog                  = $::stunnel::syslog,
   Boolean                        $fips                    = $::stunnel::fips
 ) inherits stunnel {
+
+  include '::stunnel::monolithic'
+
+  ensure_resource('stunnel::account', $setuid,
+    {
+      'groupname' => $setgid,
+      'uid'       => $uid,
+      'gid'       => $gid
+    }
+  )
 
   if $facts['selinux_current_mode'] and $facts['selinux_current_mode'] != 'disabled' {
     $_chroot = undef

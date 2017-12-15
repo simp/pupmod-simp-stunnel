@@ -22,9 +22,9 @@ ulimit -u unlimited
 # Account for the various locations in different OSs
 [ -f /usr/sbin/stunnel ] && exec=/usr/sbin/stunnel || exec=/usr/bin/stunnel
 
-conf=/etc/stunnel/stunnel_nfs.conf
+conf=/etc/stunnel/stunnel_managed_by_puppet_nfs.conf
 
-pidfile="/var/stunnel_nfs/var/run/stunnel/stunnel_nfs.pid";
+pidfile="/var/stunnel_nfs/var/run/stunnel/stunnel_managed_by_puppet_nfs.pid";
 piddir=`dirname "${pidfile}"`
 
 # If the command doesn't exist, that's probably not going to work
