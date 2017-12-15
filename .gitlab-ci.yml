@@ -115,3 +115,12 @@ acceptance-default:
   <<: *setup_bundler_env
   script:
     - bundle exec rake beaker:suites[default]
+
+acceptance-default-fips:
+  stage: acceptance
+  tags:
+    - beaker
+  <<: *cache_bundler
+  <<: *setup_bundler_env
+  script:
+    - BEAKER_fips=yes bundle exec rake beaker:suites[default]
