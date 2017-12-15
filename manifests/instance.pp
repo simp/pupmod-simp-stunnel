@@ -6,8 +6,15 @@
 #    connect => ['1.2.3.4:8730']
 #  }
 #
-# - Creates /etc/stunnel/stunnel_rsync.conf
-# - Spawns service 'stunnel_rsync' from stunnel_rsync.conf
+# * Creates /etc/stunnel/stunnel_managed_by_puppet_rsync.conf
+# * Spawns service 'stunnel_managed_by_puppet_rsync' from the configuration
+#   file
+#
+# Any instances created with this defined type will be removed from the system
+# if no longer managed to prevent conflicts.
+#
+# Instances created with versions of the module prior to 6.3.0 may need to be
+# independently removed since there is no safe way to remove those files.
 #
 # @param name [String]
 #   The name of the stunnel process.
@@ -308,7 +315,7 @@ define stunnel::instance(
     $_pid        = $pid
   } else {
     $_foreground = undef
-    $_pid        = "/var/run/stunnel/stunnel_${_safe_name}.pid"
+    $_pid        = "/var/run/stunnel/stunnel_managed_by_puppet_${_safe_name}.pid"
   }
 
   file { "/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf":

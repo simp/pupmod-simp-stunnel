@@ -1,7 +1,7 @@
 # **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**
 #
-# This is simply present to isolate the logic of the installation from the
-# internals
+# Prevent global connection and configuration from being instantiated when only
+# stunnel::instance resources are required.
 class stunnel::monolithic {
   assert_private()
 

@@ -31,7 +31,7 @@ setgid = stunnel
 setuid = stunnel
 debug = err
 syslog = no
-pid = /var/run/stunnel/stunnel_nfs.pid
+pid = /var/run/stunnel/stunnel_managed_by_puppet_nfs.pid
 engine = auto
 [nfs]
 connect = 2049

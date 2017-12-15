@@ -24,7 +24,7 @@ ulimit -u unlimited
 
 conf=/etc/stunnel/stunnel_managed_by_puppet_sel.conf
 
-pidfile="/var/stunnel_sel/var/run/stunnel/stunnel_sel.pid";
+pidfile="/var/stunnel_sel/var/run/stunnel/stunnel_managed_by_puppet_sel.pid";
 piddir=`dirname "${pidfile}"`
 
 # If the command doesn't exist, that's probably not going to work
