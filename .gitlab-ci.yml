@@ -64,7 +64,7 @@ puppet-5:
   <<: *cache_bundler
   <<: *setup_bundler_env
   <<: *static_tests
-
+  allow_failure: true
 
 default:
   stage: acceptance
