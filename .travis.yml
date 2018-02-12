@@ -25,6 +25,10 @@ before_install:
   - rm -f Gemfile.lock
 
 jobs:
+  allow_failures:
+    # https://tickets.puppetlabs.com/browse/PUP-8418
+    - env: STRICT_VARIABLES=yes TRUSTED_NODE_DATA=yes PUPPET_VERSION="~> 5.0"
+
   include:
     - stage: spec
       rvm: 2.4.1
@@ -33,9 +37,10 @@ jobs:
         - bundle exec rake check:dot_underscore
         - bundle exec rake check:test_file
         - bundle exec rake pkg:check_version
-        - bundle exec rake metadata_lint
-        - bundle exec rake compare_latest_tag
         - bundle exec rake lint
+        - bundle exec rake metadata_lint
+        - bundle exec rake pkg:compare_latest_tag
+        - bundle exec rake pkg:create_tag_changelog
         - bundle exec puppet module build
 
     - stage: spec
@@ -62,6 +67,7 @@ jobs:
       script:
         - bundle exec rake spec
 
+    # This needs to be last since we have an acceptance test
     - stage: deploy
       rvm: 2.4.1
       script:
@@ -69,7 +75,6 @@ jobs:
       before_deploy:
         - "export PUPMOD_METADATA_VERSION=`ruby -r json -e \"puts JSON.parse(File.read('metadata.json')).fetch('version')\"`"
         - '[[ $TRAVIS_TAG =~ ^simp-${PUPMOD_METADATA_VERSION}$|^${PUPMOD_METADATA_VERSION}$ ]]'
-
       deploy:
         - provider: releases
           api_key:
