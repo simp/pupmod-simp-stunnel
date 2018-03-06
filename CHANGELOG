@@ -1,3 +1,10 @@
+* Tue Mar 06 2018 Liz Nemsick <lnemsick.simp@gmail.com> - 6.3.0
+- Fixed bug in which the stunnel systemd pre-exec script failed to
+  execute completely, because one command did not have a fully
+  qualified path.
+- Reworked stunnel systemd pre-exec scripts to only emit error
+  messages when errors have occurred.
+
 * Wed Dec 13 2017 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.0
 - Isolated the 'instance' logic away from the 'connection' logic
 - Added a private 'monolithic' class that arranges everything properly for the

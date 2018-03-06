@@ -7,7 +7,8 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStartPre=-/usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F /var/run/stunnel/stunnel.pid ; rm /var/run/stunnel/stunnel.pid
+ExecStartPre=/bin/bash -c 'if test -f /var/run/stunnel/stunnel.pid; then /usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F /var/run/stunnel/stunnel.pid; fi'
+ExecStartPre=/usr/bin/rm -f /var/run/stunnel/stunnel.pid
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
 KillMode=process
 LimitNOFILE=1048576

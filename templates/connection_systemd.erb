@@ -8,9 +8,11 @@ Wants=network-online.target
 [Service]
 Type=simple
 <% if @_chroot -%>
-ExecStartPre=-/usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_chroot %><%= @_legacy_pid %> ; rm <%= @_chroot %><%= @_legacy_pid %>
+ExecStartPre=/bin/bash -c 'if test -f <%= @_chroot %><%= @_legacy_pid %>; then /usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_chroot %><%= @_legacy_pid %>; fi'
+ExecStartPre=/usr/bin/rm -f <%= @_chroot %><%= @_legacy_pid %>
 <% else -%>
-ExecStartPre=-/usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_legacy_pid %> ; rm <%= @_chroot %><%= @_legacy_pid %>
+ExecStartPre=/bin/bash -c 'if test -f <%= @_legacy_pid %>; then /usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_legacy_pid %>; fi'
+ExecStartPre=/usr/bin/rm -f <%= @_legacy_pid %>
 <% end -%>
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
 KillMode=process
