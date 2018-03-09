@@ -51,7 +51,7 @@ describe 'connection' do
             reset = yes
           EOF
         }
-        it 'should set up a stunnel process, ripe for killing' do
+        it 'should kill running stunnel process started with old SysV-type init script' do
           create_remote_file(host, '/etc/stunnel/stunnel.conf', minion_stunnel_conf)
           scp_to(host,'spec/expected/legacy_el7_init.txt','/etc/rc.d/init.d/stunnel_legacy')
           on(host, 'mkdir -p /var/run/stunnel')
@@ -61,9 +61,13 @@ describe 'connection' do
           on(host, 'chmod -R go+r /etc/pki/simp-testing/pki')
           on(host, 'chcon -R --type cert_t /etc/pki/simp-testing/pki')
           on(host, '/etc/rc.d/init.d/stunnel_legacy start')
+          pid = on(host, 'cat /var/run/stunnel/stunnel.pid').stdout.strip
+          on(host, "ps -f --pid #{pid}")
 
           apply_manifest_on(host,base_manifest, catch_failures: true)
           apply_manifest_on(host,base_manifest, catch_changes: true)
+          on(host, "ps -f --pid #{pid}", :acceptable_exit_codes => [1])
+          on(host, 'ls /var/run/stunnel/stunnel.pid', :acceptable_exit_codes => [2])
         end
       end
     end
@@ -139,7 +143,19 @@ describe 'connection' do
 
       context 'after reboot' do
         it 'should reboot and have selinux disabled' do
+          # There is an issue in which the domain fact ceases to exist after
+          # reboot, because NetworkManager generates an empty /etc/resolv.conf.
+          # To work around this problem, backup /etc/resolv.conf and restore
+          # as needed.
+          on(host,'cp /etc/resolv.conf /etc/resolv.conf.bak')
           host.reboot
+
+          if fact_on(host, 'domain').strip.empty?
+            on(host, 'cp /etc/resolv.conf.bak /etc/resolv.conf')
+            if fact_on(host, 'domain').strip.empty?
+              fail('Cannot determine domain even after restore of /etc/resolv.conf')
+            end
+          end
 
           result = on(host, 'getenforce')
           expect(result.stdout).to include('Disabled')
@@ -212,10 +228,16 @@ describe 'connection' do
           on(host, "puppet resource service stunnel ensure=stopped enable=false")
           host.reboot
 
+          if fact_on(host, 'domain').strip.empty?
+            # Restore working resolv.conf, as it has been munged by NetworkManager
+            on(host, 'cp /etc/resolv.conf.bak /etc/resolv.conf')
+            if fact_on(host, 'domain').strip.empty?
+              fail('Cannot determine domain even after restore of /etc/resolv.conf')
+            end
+          end
+
           result = on(host, 'getenforce')
           expect(result.stdout).to include('Enforcing')
-          on(host, "echo domain #{domain} >> /etc/resolv.conf")
-          on(host, "echo search #{domain} >> /etc/resolv.conf")
 
           apply_manifest_on(host,base_manifest, catch_failures: true)
         end

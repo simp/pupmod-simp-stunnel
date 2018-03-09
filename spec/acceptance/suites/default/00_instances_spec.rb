@@ -139,11 +139,6 @@ describe 'instance' do
         ].each do |service|
           on(host, "puppet resource service #{service} ensure=stopped enable=false")
         end
-
-        # There was an issue where the domain fact would cease to exist, causing failures
-        on(host, 'service network restart')
-        # Get rid of stunnels
-        # on(host, "ps aux | grep -ie stunnel | grep -v 'grep' | awk '{print $2}' | xargs --no-run-if-empty kill -9")
       end
     end
   end
