@@ -171,7 +171,7 @@ class stunnel::config (
   if $pid =~ Undef {
     if $on_systemd {
       $_foreground = true
-      $_pid        = $pid
+      $_pid        = '/var/run/stunnel/stunnel.pid'
     } else {
       $_foreground = undef
       $_pid        = '/var/run/stunnel/stunnel.pid'
@@ -196,7 +196,12 @@ class stunnel::config (
     content => template('stunnel/connection_conf.erb')
   }
 
-  if $_chroot {
+  if $_chroot !~ Undef {
+    # $chroot should never be undef here, or just '/'.
+    if $_chroot in ['/',''] {
+      fail("stunnel: \$chroot should not be root ('/')")
+    }
+
     # The _chroot directory
     file { $_chroot:
       ensure => 'directory',
