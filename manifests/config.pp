@@ -171,15 +171,30 @@ class stunnel::config (
   if $pid =~ Undef {
     if $on_systemd {
       $_foreground = true
-      $_pid        = '/var/run/stunnel/stunnel.pid'
     } else {
       $_foreground = undef
-      $_pid        = '/var/run/stunnel/stunnel.pid'
     }
+    $_pid        = '/var/run/stunnel/stunnel.pid'
     $_legacy_pid = '/var/run/stunnel/stunnel.pid'
+
   } else {
     $_pid        = $pid
     $_legacy_pid = $pid
+  }
+
+  if $_pid {
+    $_stunnel_piddir = File[dirname($_pid)]
+    ensure_resource('file', dirname($_pid),
+      {
+        'ensure'  => 'directory',
+        'owner'   => $setuid,
+        'group'   => $setgid,
+        'mode'    => '0644',
+        'seluser' => 'system_u',
+        'selrole' => 'object_r',
+        'seltype' => 'stunnel_var_run_t',
+      }
+    )
   }
 
   concat { '/etc/stunnel/stunnel.conf':
