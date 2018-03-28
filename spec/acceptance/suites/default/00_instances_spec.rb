@@ -43,8 +43,6 @@ describe 'instance' do
       it 'should apply with no errors' do
         set_hieradata_on(host,hieradata)
         apply_manifest_on(host,manifest)
-        apply_manifest_on(host,manifest, catch_failures: true)
-        apply_manifest_on(host,manifest, catch_failures: true)
       end
 
       it 'should be idempotent' do

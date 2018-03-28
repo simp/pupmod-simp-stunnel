@@ -60,14 +60,13 @@ describe 'connection' do
           on(host, 'chown -R root:root /etc/pki/simp-testing/pki')
           on(host, 'chmod -R go+r /etc/pki/simp-testing/pki')
           on(host, 'chcon -R --type cert_t /etc/pki/simp-testing/pki')
-          on(host, '/etc/rc.d/init.d/stunnel_legacy start')
+          on(host, 'SYSTEMCTL_SKIP_REDIRECT=yes /etc/rc.d/init.d/stunnel_legacy start')
           pid = on(host, 'cat /var/run/stunnel/stunnel.pid').stdout.strip
           on(host, "ps -f --pid #{pid}")
 
           apply_manifest_on(host,base_manifest, catch_failures: true)
           apply_manifest_on(host,base_manifest, catch_changes: true)
           on(host, "ps -f --pid #{pid}", :acceptable_exit_codes => [1])
-          on(host, 'ls /var/run/stunnel/stunnel.pid', :acceptable_exit_codes => [2])
         end
       end
     end

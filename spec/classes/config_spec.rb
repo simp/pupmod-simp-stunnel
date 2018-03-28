@@ -51,7 +51,7 @@ describe 'stunnel::config' do
                 debug = err
                 syslog = no
                 foreground = yes
-                pid =
+                pid = /var/run/stunnel/stunnel.pid
                 engine = auto
                 fips = no
               EOM
@@ -86,13 +86,24 @@ describe 'stunnel::config' do
             it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
                                   .that_notifies('Exec[stunnel daemon reload]')
                                   .with_content(service_file) }
+            it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel').with_ensure('absent')}
             it { is_expected.to contain_service('stunnel')
-                                  .that_requires('File[/etc/systemd/system/stunnel.service]') }
+                                  .that_requires(['File[/etc/systemd/system/stunnel.service]','File[/etc/rc.d/init.d/stunnel]']) }
             it { is_expected.to contain_exec('stunnel daemon reload') }
           else
             let(:service_file) { File.read('spec/expected/connection/chroot-init.txt') }
             it { is_expected.to create_file('/etc/rc.d/init.d/stunnel').with_content(service_file) }
             it { is_expected.to contain_service('stunnel').that_requires('File[/etc/rc.d/init.d/stunnel]') }
+          end
+        end
+
+        context 'with parameters chroot set to /' do
+          let(:params) {{
+            chroot:     '/',
+          }}
+          #          Evaluation Error: Error while evaluating a Function Call, stunnel: $chroot should not be root ('/') at /var/jmg/SIMP-4568/pupmod-simp-stunnel/spec/fixtures/modules/stunnel/manifests/config.pp:202:7 on node ws151.tasty.bacon
+          it "is expected to fail" do
+            expect { catalogue }.to raise_error Puppet::Error, /chroot should not be root/
           end
         end
 
@@ -114,7 +125,7 @@ describe 'stunnel::config' do
                 debug = err
                 syslog = no
                 foreground = yes
-                pid =
+                pid = /var/run/stunnel/stunnel.pid
                 engine = auto
                 fips = no
               EOM

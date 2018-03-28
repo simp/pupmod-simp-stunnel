@@ -1,3 +1,10 @@
+* Tue Mar 27 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.0
+- Ensure init.d script is absent if systemd system because puppet
+  was finding it and running it and setting permissions on root to
+  stunnel:stunnel.
+- Ensure pid file name is not left undefined to prevent unplanned results.
+- Added check to make sure chroot has not evaluated to '/'.
+
 * Tue Mar 06 2018 Liz Nemsick <lnemsick.simp@gmail.com> - 6.3.0
 - Fixed bug in which the stunnel systemd pre-exec script failed to
   execute completely, because one command did not have a fully
