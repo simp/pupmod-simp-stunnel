@@ -1,3 +1,7 @@
+* Fri Mar 30 2018 Liz Nemsick <lnemsick.simp@gmail.com> - 6.3.1
+- Fix bug in which stunnel.service does not startup and shutdown
+  properly for NFS.  Patch provided by Mark Fitch in SIMP-4598.
+
 * Tue Mar 27 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.0
 - Ensure init.d script is absent if systemd system because puppet
   was finding it and running it and setting permissions on root to
