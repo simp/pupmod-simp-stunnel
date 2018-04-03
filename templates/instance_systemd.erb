@@ -15,3 +15,13 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+<% if @systemd_wantedby -%>
+<%   @systemd_wantedby.each do |wanted| -%>
+WantedBy=<%= wanted %>
+<%   end -%>
+<% end -%>
+<% if @systemd_requiredby -%>
+<%   @systemd_requiredby.each do |required| -%>
+RequiredBy=<%= required %>
+<%   end -%>
+<% end -%>

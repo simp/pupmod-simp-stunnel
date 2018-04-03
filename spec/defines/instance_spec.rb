@@ -1,53 +1,5 @@
 require 'spec_helper'
 
-$el7_non_chroot = <<EOF
-setgid = stunnel
-setuid = stunnel
-debug = err
-syslog = no
-foreground = yes
-pid =
-engine = auto
-fips = yes
-[nfs]
-connect = 2049
-accept = 20490
-client = no
-failover = rr
-key = /etc/pki/simp_apps/stunnel_nfs/x509/private/foo.example.com.pem
-cert = /etc/pki/simp_apps/stunnel_nfs/x509/public/foo.example.com.pub
-CAfile = /etc/pki/simp_apps/stunnel_nfs/x509/cacerts/cacerts.pem
-CRLpath = /etc/pki/simp_apps/stunnel_nfs/x509/crl
-ciphers = HIGH:-SSLv2
-verify = 2
-delay = no
-retry = no
-renegotiation = yes
-reset = yes
-EOF
-
-$el6_non_chroot = <<EOF
-setgid = stunnel
-setuid = stunnel
-debug = err
-syslog = no
-pid = /var/run/stunnel/stunnel_managed_by_puppet_nfs.pid
-engine = auto
-[nfs]
-connect = 2049
-accept = 20490
-client = no
-failover = rr
-key = /etc/pki/simp_apps/stunnel_nfs/x509/private/foo.example.com.pem
-cert = /etc/pki/simp_apps/stunnel_nfs/x509/public/foo.example.com.pub
-CAfile = /etc/pki/simp_apps/stunnel_nfs/x509/cacerts/cacerts.pem
-CRLpath = /etc/pki/simp_apps/stunnel_nfs/x509/crl
-ciphers = HIGH:-SSLv2
-verify = 2
-delay = no
-retry = no
-EOF
-
 describe 'stunnel::instance' do
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
@@ -89,16 +41,18 @@ describe 'stunnel::instance' do
         # Some differences in el6 vs el7+ content
         if os_facts[:os][:release][:major].to_i >= 7
           let(:service_file) { File.read('spec/expected/instance/nonchroot-systemd.txt') }
+          let(:stunnel_conf) { File.read('spec/expected/instance/non_chroot_el7_stunnel.conf.txt') }
 
           it { is_expected.to contain_file('/etc/stunnel/stunnel_managed_by_puppet_nfs.conf') \
-            .with_content($el7_non_chroot) }
+            .with_content(stunnel_conf) }
           it { is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service') \
             .with_content(service_file)}
         else
           let(:service_file) { File.read('spec/expected/instance/nonchroot-init.txt') }
+          let(:stunnel_conf) { File.read('spec/expected/instance/non_chroot_el6_stunnel.conf.txt') }
 
           it { is_expected.to contain_file('/etc/stunnel/stunnel_managed_by_puppet_nfs.conf') \
-            .with_content($el6_non_chroot) }
+            .with_content(stunnel_conf) }
           it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_managed_by_puppet_nfs') \
             .with_content(service_file)}
         end
@@ -237,6 +191,22 @@ describe 'stunnel::instance' do
         else
           it { is_expected.to create_file('/etc/rc.d/init.d/stunnel_managed_by_puppet_nfs') \
             .without_content(/^\s+mkdir -p system_u:object_r:stunnel_var_run_t/)}
+        end
+      end
+
+      context 'with systemd dependencies' do
+        let(:params) {{
+          connect: [2049],
+          accept:  20490,
+          systemd_wantedby: ['nfs.service'],
+          systemd_requiredby: ['nfs-server.service']
+        }}
+
+        if os_facts[:os][:release][:major].to_i >= 7
+          it { is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service') \
+            .with_content(/WantedBy=nfs.service/) \
+            .with_content(/RequiredBy=nfs-server.service/)
+          }
         end
       end
 

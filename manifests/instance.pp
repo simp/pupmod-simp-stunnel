@@ -143,6 +143,10 @@
 #
 # @param pid Leave undef if no PID is desired. Default on systemd systems.
 #
+# @param systemd_wantedby Systemd services or targets that want stunnel
+#
+# @param systemd_requiredby Systemd services or targets that require stunnel
+#
 # All other configuration options can be found in the stunnel man pages
 # @see stunnel.conf(5)
 # @see stunnel.conf(8)
@@ -194,11 +198,11 @@
 define stunnel::instance(
   Stunnel::Connect                            $connect,
   Variant[Simplib::Port, Simplib::Host::Port] $accept,
+
   Simplib::Netlist                            $trusted_nets            = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
   Boolean                                     $firewall                = simplib::lookup('simp_options::firewall', { 'default_value' => false }),
   Boolean                                     $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value' => true }),
   Boolean                                     $tcpwrappers             = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }),
-
   Variant[Enum['simp'],Boolean]               $pki                     = simplib::lookup('simp_options::pki', { 'default_value' => false }),
   Stdlib::Absolutepath                        $app_pki_dir             = "/etc/pki/simp_apps/stunnel_${name}/x509",
   Stdlib::Absolutepath                        $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }),
@@ -255,7 +259,9 @@ define stunnel::instance(
   Optional[Integer]                           $timeout_close           = undef,
   Optional[Integer]                           $timeout_connect         = undef,
   Optional[Integer]                           $timeout_idle            = undef,
-  Integer                                     $verify                  = 2
+  Integer                                     $verify                  = 2,
+  Optional[Array[String]]                     $systemd_wantedby        = undef,
+  Optional[Array[String]]                     $systemd_requiredby      = undef,
 ){
   $_safe_name = regsubst($name, '(/|\s)', '__')
   $_dport = split(to_string($accept),':')[-1]
@@ -497,7 +503,6 @@ define stunnel::instance(
   }
   elsif 'sysv' in $facts['init_systems'] {
     $_service_file = "/etc/rc.d/init.d/stunnel_managed_by_puppet_${_safe_name}"
-
     file { $_service_file:
       ensure  => 'present',
       owner   => 'root',

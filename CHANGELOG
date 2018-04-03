@@ -1,3 +1,10 @@
+* Tue Apr 03 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.3.1
+- Added two new parameters to the stunnel::instance define:
+  - systemd_wantedby: sent to the WantedBy systemd unit install directive
+  - systemd_requiredby: sent to the RequiredBy systemd unit install directive
+  - These should allow ordering during boot. For example, if you have NFS set up
+    over stunnel, you want stunnel to start before NFS.
+
 * Tue Mar 27 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.0
 - Ensure init.d script is absent if systemd system because puppet
   was finding it and running it and setting permissions on root to
