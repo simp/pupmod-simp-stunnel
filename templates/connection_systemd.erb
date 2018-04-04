@@ -7,6 +7,11 @@ Wants=network-online.target
 
 [Service]
 Type=simple
+<% if @_pid -%>
+PIDFile=<%= @_pid %>
+ExecStartPre=-/usr/bin/mkdir -p <%= File.dirname(@_pid) %>
+ExecStartPre=/usr/bin/chown <%= @setuid %>:<%= @setgid %> <%= File.dirname(@_pid) %>
+<% end -%>
 <% if @_chroot -%>
 ExecStartPre=/bin/bash -c 'if test -f <%= @_chroot %><%= @_legacy_pid %>; then /usr/bin/pkill -f "stunnel /etc/stunnel/stunnel.conf" -F <%= @_chroot %><%= @_legacy_pid %>; fi'
 ExecStartPre=/usr/bin/rm -f <%= @_chroot %><%= @_legacy_pid %>
@@ -16,6 +21,7 @@ ExecStartPre=/usr/bin/rm -f <%= @_legacy_pid %>
 <% end -%>
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
 KillMode=process
+PrivateTmp=yes
 LimitNOFILE=1048576
 LimitNPROC=infinity
 Restart=on-failure

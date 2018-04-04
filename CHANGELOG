@@ -4,6 +4,8 @@
   - systemd_requiredby: sent to the RequiredBy systemd unit install directive
   - These should allow ordering during boot. For example, if you have NFS set up
     over stunnel, you want stunnel to start before NFS.
+- Fixed the systemd startup scripts to properly pre-create the PID directory if
+  required
 
 * Tue Mar 27 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.0
 - Ensure init.d script is absent if systemd system because puppet

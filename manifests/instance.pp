@@ -266,6 +266,8 @@ define stunnel::instance(
   $_safe_name = regsubst($name, '(/|\s)', '__')
   $_dport = split(to_string($accept),':')[-1]
 
+  $_on_systemd = 'systemd' in $facts['init_systems']
+
   stunnel::instance::reserve_port { $_dport: }
 
   if $haveged { include '::haveged' }
@@ -316,7 +318,7 @@ define stunnel::instance(
     $_chroot = undef
   }
 
-  if !$pid and ( 'systemd' in $facts['init_systems'] ) {
+  if !$pid and $_on_systemd {
     $_foreground = true
     $_pid        = $pid
   } else {
@@ -342,6 +344,13 @@ define stunnel::instance(
   }
 
   if $_chroot {
+    if $_chroot in ['/',''] {
+      fail("stunnel: \$chroot should not be root ('/')")
+    }
+    if $_chroot =~ /^\/var\/run/ {
+      fail("stunnel: \$chroot cannot be under /var/run")
+    }
+
     if $_pid {
       $_stunnel_pid_dirname = dirname("${_chroot}/${_pid}")
 
@@ -354,17 +363,19 @@ define stunnel::instance(
         before  => File[$_chroot]
       }
 
-      ensure_resource('file', $_stunnel_pid_dirname,
-        {
-          'ensure'  => 'directory',
-          'owner'   => $setuid,
-          'group'   => $setgid,
-          'mode'    => '0644',
-          'seluser' => 'system_u',
-          'selrole' => 'object_r',
-          'seltype' => $_stunnel_chroot_seltype
-        }
-      )
+      unless $_on_systemd {
+        ensure_resource('file', $_stunnel_pid_dirname,
+          {
+            'ensure'  => 'directory',
+            'owner'   => $setuid,
+            'group'   => $setgid,
+            'mode'    => '0644',
+            'seluser' => 'system_u',
+            'selrole' => 'object_r',
+            'seltype' => $_stunnel_chroot_seltype
+          }
+        )
+      }
     }
     else {
       $_stunnel_piddir = undef
@@ -453,18 +464,20 @@ define stunnel::instance(
     if $_pid {
       $_stunnel_piddir = File[dirname($_pid)]
 
-      # The selinux context settings are ignored if SELinux is disabled
-      ensure_resource('file', dirname($_pid),
-        {
-          'ensure'  => 'directory',
-          'owner'   => $setuid,
-          'group'   => $setgid,
-          'mode'    => '0644',
-          'seluser' => 'system_u',
-          'selrole' => 'object_r',
-          'seltype' => 'stunnel_var_run_t',
-        }
-      )
+      unless $_on_systemd {
+        # The selinux context settings are ignored if SELinux is disabled
+        ensure_resource('file', dirname($_pid),
+          {
+            'ensure'  => 'directory',
+            'owner'   => $setuid,
+            'group'   => $setgid,
+            'mode'    => '0644',
+            'seluser' => 'system_u',
+            'selrole' => 'object_r',
+            'seltype' => 'stunnel_var_run_t',
+          }
+        )
+      }
     } else {
       $_stunnel_piddir = undef
     }
@@ -491,7 +504,7 @@ define stunnel::instance(
     }
   }
 
-  if 'systemd' in $facts['init_systems'] {
+  if $_on_systemd {
     $_service_file = "/etc/systemd/system/stunnel_managed_by_puppet_${_safe_name}.service"
     file { $_service_file:
       ensure  => 'present',
