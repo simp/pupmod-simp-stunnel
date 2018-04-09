@@ -9,6 +9,7 @@ Wants=network-online.target
 Type=simple
 ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel_managed_by_puppet_nfs.conf
 KillMode=process
+PrivateTmp=yes
 LimitNOFILE=1048576
 LimitNPROC=infinity
 Restart=on-failure

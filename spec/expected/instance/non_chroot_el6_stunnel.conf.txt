@@ -1,0 +1,19 @@
+setgid = stunnel
+setuid = stunnel
+debug = err
+syslog = no
+pid = /var/run/stunnel/stunnel_managed_by_puppet_nfs.pid
+engine = auto
+[nfs]
+connect = 2049
+accept = 20490
+client = no
+failover = rr
+key = /etc/pki/simp_apps/stunnel_nfs/x509/private/foo.example.com.pem
+cert = /etc/pki/simp_apps/stunnel_nfs/x509/public/foo.example.com.pub
+CAfile = /etc/pki/simp_apps/stunnel_nfs/x509/cacerts/cacerts.pem
+CRLpath = /etc/pki/simp_apps/stunnel_nfs/x509/crl
+ciphers = HIGH:-SSLv2
+verify = 2
+delay = no
+retry = no

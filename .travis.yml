@@ -1,4 +1,3 @@
-# The testing matrix considers ruby/puppet versions supported by SIMP and PE:
 # ------------------------------------------------------------------------------
 #  release    pup   ruby      eol
 # PE 2016.4   4.7   2.1.9  TBD (LTS)
@@ -13,6 +12,7 @@ sudo: false
 
 bundler_args: --without development system_tests --path .vendor
 
+
 notifications:
   email: false
 
@@ -26,7 +26,6 @@ before_install:
 
 jobs:
   allow_failures:
-    # https://tickets.puppetlabs.com/browse/PUP-8418
     - env: STRICT_VARIABLES=yes TRUSTED_NODE_DATA=yes PUPPET_VERSION="~> 5.0"
 
   include:
@@ -67,7 +66,7 @@ jobs:
       script:
         - bundle exec rake spec
 
-    # This needs to be last since we have an acceptance test
+
     - stage: deploy
       rvm: 2.4.1
       script:

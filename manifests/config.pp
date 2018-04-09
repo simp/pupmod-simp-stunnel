@@ -168,6 +168,7 @@ class stunnel::config (
   # $_legacy_pid is used to kill the old stunnel process set up from a previous
   #   version of this module. It should be set to $_pid, unless $_pid is unset.
   $on_systemd = 'systemd' in $facts['init_systems']
+
   if $pid =~ Undef {
     if $on_systemd {
       $_foreground = true
@@ -182,7 +183,7 @@ class stunnel::config (
     $_legacy_pid = $pid
   }
 
-  if $_pid {
+  if $_pid and !$on_systemd {
     $_stunnel_piddir = File[dirname($_pid)]
     ensure_resource('file', dirname($_pid),
       {
@@ -212,9 +213,11 @@ class stunnel::config (
   }
 
   if $_chroot !~ Undef {
-    # $chroot should never be undef here, or just '/'.
     if $_chroot in ['/',''] {
       fail("stunnel: \$chroot should not be root ('/')")
+    }
+    if $_chroot =~ /^\/var\/run/ {
+      fail("stunnel: \$chroot cannot be under /var/run")
     }
 
     # The _chroot directory
