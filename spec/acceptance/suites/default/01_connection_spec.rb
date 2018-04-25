@@ -6,7 +6,7 @@ test_name 'connection'
 describe 'connection' do
   hosts.each do |host|
 
-    let(:base_hieradata) {{
+    let(:hieradata) {{
       'simp_options::pki'          => true,
       'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
       'simp_options::trusted_nets' => ['ANY']
@@ -77,7 +77,7 @@ describe 'connection' do
     context 'with selinux on' do
       it 'should apply with no errors' do
         install_package(host, 'epel-release')
-        set_hieradata_on(host,base_hieradata)
+        set_hieradata_on(host,hieradata)
         apply_manifest_on(host,base_manifest, catch_failures: true)
       end
 
@@ -116,7 +116,7 @@ describe 'connection' do
         end
 
         it 'should apply with no errors' do
-          set_hieradata_on(host,base_hieradata)
+          set_hieradata_on(host,hieradata)
           apply_manifest_on(host,base_manifest, catch_failures: true)
         end
 
@@ -197,7 +197,7 @@ describe 'connection' do
         end
 
         it 'should apply with no errors' do
-          set_hieradata_on(host,base_hieradata)
+          set_hieradata_on(host,hieradata)
           apply_manifest_on(host,base_manifest, catch_failures: true)
         end
 
