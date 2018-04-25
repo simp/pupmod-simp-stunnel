@@ -103,7 +103,6 @@ describe 'connection' do
     context 'with selinux off' do
       context 'before reboot' do
         it 'should disable selinux without a reboot' do
-          hieradata = base_hieradata.merge({'simp_options::selinux' => false})
           set_hieradata_on(host,hieradata)
           on(host, 'cat /etc/puppetlabs/code/hieradata/default.yaml')
 
@@ -185,7 +184,6 @@ describe 'connection' do
     context 'with selinux re-enabled' do
       context 'before reboot' do
         it 'should reenable selinux without a reboot' do
-          hieradata = base_hieradata.merge({'simp_options::selinux' => true})
           set_hieradata_on(host,hieradata)
           on(host, 'cat /etc/puppetlabs/code/hieradata/default.yaml')
 

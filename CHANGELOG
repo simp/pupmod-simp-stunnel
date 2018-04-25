@@ -1,3 +1,7 @@
+* Mon Apr 23 2018 Jeanne Greulich  <jeanne.greulich@onyxpoint.com> - 6.3.2
+- Updated selinux settings in acceptance tests to reflect removal of
+  simp_options::selinux setting and use selinux::ensure setting.
+
 * Tue Apr 03 2018 Nick Miller <nick.miller@onyxpoint.com> - 6.3.1
 - Added two new parameters to the stunnel::instance define:
   - systemd_wantedby: sent to the WantedBy systemd unit install directive
