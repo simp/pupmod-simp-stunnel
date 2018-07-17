@@ -500,7 +500,8 @@ define stunnel::instance(
     include '::tcpwrappers'
 
     tcpwrappers::allow { "allow_stunnel_${_safe_name}":
-      pattern => nets2ddq($trusted_nets)
+      pattern => nets2ddq($trusted_nets),
+      svc     => $_safe_name
     }
   }
 
