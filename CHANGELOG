@@ -1,4 +1,4 @@
-* Tue Jul 07 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.2
+* Tue Jul 17 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.2
 - Fix the service name used by stunnel so that tcpwrappers would not
   incorrectly drop connections.
 
