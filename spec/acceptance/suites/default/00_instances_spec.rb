@@ -29,13 +29,6 @@ describe 'instance' do
       'simp_options::trusted_nets' => ['ANY']
     }}
 
-    context 'it should set up SSH Password access' do
-      on(host, %(sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config))
-      on(host, %(service sshd restart))
-      on(host, 'service firewalld stop ||:', :accept_all_exit_codes => true)
-      on(host, 'service iptables stop ||:', :accept_all_exit_codes => true)
-    end
-
     # This test verifies the validity of basic stunnel configurations
     # and ensures multiple connections can co-exist as advertised. It
     # does not test stunnel itself.

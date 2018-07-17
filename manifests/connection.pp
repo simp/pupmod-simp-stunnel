@@ -317,6 +317,7 @@ define stunnel::connection (
     include '::tcpwrappers'
 
     tcpwrappers::allow { "allow_stunnel_${name}":
+      svc     => $name,
       pattern => nets2ddq($trusted_nets)
     }
   }
