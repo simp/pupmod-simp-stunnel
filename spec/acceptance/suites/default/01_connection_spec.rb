@@ -29,7 +29,8 @@ describe 'connection' do
     # older init script may still be running. This will cause the new systemd
     # unit to fail to start, citing the port already being in use.
     context 'with an existing stunnel process on el7' do
-      if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
+      if fact_on(host, 'operatingsystemmajrelease').to_s >= '7' && fact_on(host, 'operatingsystem') != 'OracleLinux'
+        let(:hostname) { fact_on(host, 'hostname') }
         let(:minion_stunnel_conf) { <<-EOF
             debug = err
             syslog = yes
@@ -39,8 +40,8 @@ describe 'connection' do
             connect = 0.0.0.0:2049
             accept = 20490
             failover = rr
-            key = /etc/pki/simp-testing/pki/private/#{host}.#{domain}.pem
-            cert = /etc/pki/simp-testing/pki/public/#{host}.#{domain}.pub
+            key = /etc/pki/simp-testing/pki/private/#{hostname}.#{domain}.pem
+            cert = /etc/pki/simp-testing/pki/public/#{hostname}.#{domain}.pub
             CAfile = /etc/pki/simp-testing/pki/cacerts/cacerts.pem
             CRLpath = /etc/pki/simp-testing/pki/crl
             ciphers = HIGH:-SSLv2
@@ -148,11 +149,8 @@ describe 'connection' do
           on(host,'cp /etc/resolv.conf /etc/resolv.conf.bak')
           host.reboot
 
-          if fact_on(host, 'domain').strip.empty?
+          if on(host, 'grep nameserver /etc/resolv.conf', :accept_all_exit_codes => true).stdout.strip.empty?
             on(host, 'cp /etc/resolv.conf.bak /etc/resolv.conf')
-            if fact_on(host, 'domain').strip.empty?
-              fail('Cannot determine domain even after restore of /etc/resolv.conf')
-            end
           end
 
           result = on(host, 'getenforce')
@@ -225,12 +223,9 @@ describe 'connection' do
           on(host, "puppet resource service stunnel ensure=stopped enable=false")
           host.reboot
 
-          if fact_on(host, 'domain').strip.empty?
+          if on(host, 'grep nameserver /etc/resolv.conf', :accept_all_exit_codes => true).stdout.strip.empty?
             # Restore working resolv.conf, as it has been munged by NetworkManager
             on(host, 'cp /etc/resolv.conf.bak /etc/resolv.conf')
-            if fact_on(host, 'domain').strip.empty?
-              fail('Cannot determine domain even after restore of /etc/resolv.conf')
-            end
           end
 
           result = on(host, 'getenforce')

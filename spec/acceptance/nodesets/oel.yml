@@ -6,12 +6,12 @@
   end
 -%>
 HOSTS:
-  server-el7.test:
+  server-el7:
     roles:
       - server-el7
       - default
     platform: el-7-x86_64
-    box:     centos/7
+    box: elastic/oel-7-x86_64
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:
@@ -19,11 +19,11 @@ HOSTS:
         gpgkeys:
           - https://getfedora.org/static/352C64E5.txt
 
-  server-el6.test:
+  server-el6:
     roles:
       - server-el6
     platform: el-6-x86_64
-    box:     centos/6
+    box: elastic/oel-6-x86_64
     hypervisor: <%= hypervisor %>
     yum_repos:
       epel:

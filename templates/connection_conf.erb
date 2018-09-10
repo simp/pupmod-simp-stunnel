@@ -44,7 +44,7 @@ if has_variable?('setgid')
     end
   end
 
-  if ['RedHat','CentOS'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'].to_s >= "7")
+  if ['RedHat','CentOS','OracleLinux'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'].to_s >= "7")
     stunnel_conf << "fips = #{bool_translate[(@facts['fips_enabled'] || @fips)]}"
   end
 
@@ -154,7 +154,7 @@ else
     stunnel_conf << "session = #{@session_cache_timeout}"
   end
 
-  if ['RedHat','CentOS'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'] > '6')
+  if ['RedHat','CentOS','OracleLinux'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'] > '6')
     stunnel_conf << "renegotiation = #{bool_translate[@renegotiation]}"
     stunnel_conf << "reset = #{bool_translate[@reset]}"
 
