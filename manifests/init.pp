@@ -71,7 +71,7 @@
 #
 class stunnel (
   Stdlib::Absolutepath          $app_pki_dir             = '/etc/pki/simp_apps/stunnel/x509',
-  Stdlib::Absolutepath          $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }),
+  String                        $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }),
   Stdlib::Absolutepath          $app_pki_key             = "${app_pki_dir}/private/${facts['fqdn']}.pem",
   Stdlib::Absolutepath          $app_pki_cert            = "${app_pki_dir}/public/${facts['fqdn']}.pub",
   Stdlib::Absolutepath          $app_pki_ca_dir          = "${app_pki_dir}/cacerts",

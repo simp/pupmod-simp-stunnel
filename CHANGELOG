@@ -1,3 +1,7 @@
+* Tue Sep 11 2018 Nicholas Markowski <nicholas.markowski@onyxpoint.com> - 6.3.3
+- Updated $app_pki_external_source to accept any string. This matches the
+  functionality of pki::copy.
+
 * Tue Jul 17 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.3.2
 - Fix the service name used by stunnel so that tcpwrappers would not
   incorrectly drop connections.
