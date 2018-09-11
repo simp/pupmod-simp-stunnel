@@ -116,7 +116,7 @@
 class stunnel::config (
   Variant[Enum['simp'],Boolean]  $pki                     = $::stunnel::pki,
   Stdlib::Absolutepath           $app_pki_dir             = $::stunnel::app_pki_dir,
-  Stdlib::Absolutepath           $app_pki_external_source = $::stunnel::app_pki_external_source,
+  String                         $app_pki_external_source = $::stunnel::app_pki_external_source,
   Stdlib::Absolutepath           $app_pki_key             = $::stunnel::app_pki_key,
   Stdlib::Absolutepath           $app_pki_cert            = $::stunnel::app_pki_cert,
   Stdlib::Absolutepath           $app_pki_ca_dir          = $::stunnel::app_pki_ca_dir,
