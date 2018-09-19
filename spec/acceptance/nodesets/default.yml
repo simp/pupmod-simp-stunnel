@@ -6,7 +6,7 @@
   end
 -%>
 HOSTS:
-  server-el7.test:
+  server-el7:
     roles:
       - server-el7
       - default
@@ -19,7 +19,7 @@ HOSTS:
         gpgkeys:
           - https://getfedora.org/static/352C64E5.txt
 
-  server-el6.test:
+  server-el6:
     roles:
       - server-el6
     platform: el-6-x86_64
