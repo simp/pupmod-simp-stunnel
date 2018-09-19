@@ -163,6 +163,31 @@ pup5_3-unit:
   <<: *setup_bundler_env
   <<: *spec_tests
 
+# Puppet 5.5 for PE 2018.1 support (EOL: 2018-07)
+# See: https://puppet.com/misc/puppet-enterprise-lifecycle
+# --------------------------------------
+pup5_5-validation:
+  stage: validation
+  tags:
+    - docker
+  image: ruby:2.4
+  variables:
+    PUPPET_VERSION: '~> 5.5'
+  <<: *cache_bundler
+  <<: *setup_bundler_env
+  <<: *validation_checks
+
+pup5_5-unit:
+  stage: unit
+  tags:
+    - docker
+  image: ruby:2.4
+  variables:
+    PUPPET_VERSION: '~> 5.5'
+  <<: *cache_bundler
+  <<: *setup_bundler_env
+  <<: *spec_tests
+
 
 # Keep an eye on the latest puppet 5
 # ----------------------------------
@@ -197,7 +222,7 @@ default:
   <<: *cache_bundler
   <<: *setup_bundler_env
   variables:
-    PUPPET_VERSION: '~> 4.10.0'
+    PUPPET_VERSION: '~> 4.10'
   script:
     - bundle exec rake beaker:suites[default]
 
@@ -209,7 +234,7 @@ default-fips:
   <<: *setup_bundler_env
   variables:
     BEAKER_fips: 'yes'
-    PUPPET_VERSION: '~> 4.10.0'
+    PUPPET_VERSION: '~> 4.10'
   script:
     - bundle exec rake beaker:suites[default]
 
@@ -220,7 +245,7 @@ default-puppet5:
   <<: *cache_bundler
   <<: *setup_bundler_env
   variables:
-    PUPPET_VERSION: '~> 5.3'
+    PUPPET_VERSION: '~> 5.5'
     BEAKER_PUPPET_COLLECTION: 'puppet5'
   script:
     - bundle exec rake beaker:suites[default]
@@ -234,7 +259,7 @@ default-fips-puppet5:
   <<: *only_with_SIMP_FULL_MATRIX
   variables:
     BEAKER_fips: 'yes'
-    PUPPET_VERSION: '~> 5.3'
+    PUPPET_VERSION: '~> 5.5'
     BEAKER_PUPPET_COLLECTION: 'puppet5'
   script:
     - bundle exec rake beaker:suites[default]
@@ -247,7 +272,7 @@ default-oel:
   <<: *setup_bundler_env
   <<: *only_with_SIMP_FULL_MATRIX
   variables:
-    PUPPET_VERSION: '4.10'
+    PUPPET_VERSION: '~> 4.10'
   script:
     - bundle exec rake beaker:suites[default,oel]
   # FIXME: OEL tests will fail until SIMP maintained OEL boxes are
@@ -263,12 +288,9 @@ default-fips-oel:
   <<: *only_with_SIMP_FULL_MATRIX
   variables:
     BEAKER_fips: 'yes'
-    PUPPET_VERSION: '4.10'
+    PUPPET_VERSION: '~> 4.10'
   script:
     - bundle exec rake beaker:suites[default,oel]
-  # FIXME: OEL tests will fail until SIMP maintained OEL boxes are
-  # completed and OEL support is officially added
-  allow_failure: true
 
 default-puppet5-oel:
   stage: acceptance
@@ -276,15 +298,11 @@ default-puppet5-oel:
     - beaker
   <<: *cache_bundler
   <<: *setup_bundler_env
-  <<: *only_with_SIMP_FULL_MATRIX
   variables:
-    PUPPET_VERSION: '~> 5.3'
+    PUPPET_VERSION: '~> 5.5'
     BEAKER_PUPPET_COLLECTION: 'puppet5'
   script:
     - bundle exec rake beaker:suites[default,oel]
-  # FIXME: OEL tests will fail until SIMP maintained OEL boxes are
-  # completed and OEL support is officially added
-  allow_failure: true
 
 default-fips-puppet5-oel:
   stage: acceptance
@@ -295,11 +313,7 @@ default-fips-puppet5-oel:
   <<: *only_with_SIMP_FULL_MATRIX
   variables:
     BEAKER_fips: 'yes'
-    PUPPET_VERSION: '~> 5.3'
+    PUPPET_VERSION: '~> 5.5'
     BEAKER_PUPPET_COLLECTION: 'puppet5'
   script:
     - bundle exec rake beaker:suites[default,oel]
-  # FIXME: OEL tests will fail until SIMP maintained OEL boxes are
-  # completed and OEL support is officially added
-  allow_failure: true
-

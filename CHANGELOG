@@ -1,4 +1,4 @@
-* Fri Sep 14 2018 Adam Yohrling <adam.yohrling@onyxpoint.com> - 6.3.4
+* Fri Sep 14 2018 Adam Yohrling <adam.yohrling@onyxpoint.com> - 6.3.3
 - Add support for Puppet5
 - Clean up acceptance tests to use facts for hostname, domain
 
