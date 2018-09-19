@@ -245,7 +245,7 @@ define stunnel::connection (
   include '::stunnel::monolithic'
 
   # Validation for RHEL6/7 Options. Defaulting to 7.
-  if ($facts['os']['name'] in ['Red Hat','CentOS']) and ($facts['os']['release']['major'] < '7') {
+  if ($facts['os']['name'] in ['RedHat','CentOS','OracleLinux']) and ($facts['os']['release']['major'] < '7') {
     if $::stunnel::fips {
       if $ssl_version { validate_array_member($ssl_version,['TLSv1']) }
     }

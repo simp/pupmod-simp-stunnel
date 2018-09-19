@@ -295,6 +295,12 @@ class stunnel::config (
       mode    => '0640',
       recurse => true,
     }
+
+    # If we're setting up PKI here, we also need to make sure the
+    # correct structure is setup prior to copy or we get errors.
+    if $pki {
+      Pki::Copy['stunnel'] -> File["${_chroot}/etc/pki/cacerts"]
+    }
   }
 
   # These templates need variables, that's why they are here

@@ -38,7 +38,16 @@ describe 'instance connectivity' do
 
     context 'set up a bi-directional connection set' do
       hosts.each do |host|
+
         context "on #{host}" do
+          # FIXME: Need to disable firewalld by default in base OEL box in the future
+          # Account for this now by stopping the service
+          it 'should disable firewalld if necessary' do
+            if fact_on(host, 'operatingsystem').strip == 'OracleLinux' and fact_on(host, 'operatingsystemmajrelease').strip == '7'
+              on(host, 'puppet resource service firewalld ensure=stopped enable=false')
+            end
+          end
+
           it 'should apply with no errors' do
             set_hieradata_on(host, hieradata)
             apply_manifest_on(host, manifest)
