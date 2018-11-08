@@ -1,3 +1,6 @@
+* Tue Jun 04 2019 Steven Pritchard <steven.pritchard@onyxpoint.com> - 6.4.3
+- Add v2 compliance_markup data
+
 * Fri Apr 12 2019 Joseph Sharkey <shark.bruhaha@gmail.com> - 6.4.2
 - Removed out of date doc/
 - Updated tests for pup6 support and removed pup4 support

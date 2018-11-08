@@ -7,7 +7,9 @@ fixtures:
     # This needs to be in place for the rspec-puppet Hiera 5 hook to work
     # No idea why, it may be because Puppet sees a custom backend and loads all
     # of the global parts.
-    compliance_markup: https://github.com/simp/pupmod-simp-compliance_markup
+    compliance_markup:
+      repo: "https://github.com/simp/pupmod-simp-compliance_markup"
+      branch: "testing_hotfix_06062019"
     concat: https://github.com/simp/puppetlabs-concat
     haveged: https://github.com/simp/pupmod-simp-haveged
     iptables: https://github.com/simp/pupmod-simp-iptables
