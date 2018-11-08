@@ -130,12 +130,12 @@ variables:
   script:
     - 'bundle exec rake spec'
 
-.acceptance_base: &acceptance_base
+.acceptance_tests: &acceptance_tests
   stage: 'acceptance'
   tags: ['beaker']
   <<: *setup_bundler_env
 
-.compliance_base: &compliance_base
+.compliance_tests: &compliance_tests
   stage: 'compliance'
   tags: ['beaker']
   <<: *setup_bundler_env
@@ -201,44 +201,44 @@ pup6-unit:
 # ==============================================================================
 pup4.10:
   <<: *pup_4_10
-  <<: *acceptance_base
+  <<: *acceptance_tests
   script:
     - 'bundle exec rake beaker:suites'
 
 pup4.10-fips:
   <<: *pup_4_10
-  <<: *acceptance_base
+  <<: *acceptance_tests
   <<: *only_with_SIMP_FULL_MATRIX
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites'
 
 pup5.5.7:
   <<: *pup_5_5_7
-  <<: *acceptance_base
+  <<: *acceptance_tests
   script:
     - 'bundle exec rake beaker:suites'
 
 pup5.5.7-fips:
   <<: *pup_5_5_7
-  <<: *acceptance_base
+  <<: *acceptance_tests
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites'
 
 pup5.5.7-oel:
   <<: *pup_5_5_7
-  <<: *acceptance_base
+  <<: *acceptance_tests
   script:
     - 'bundle exec rake beaker:suites[default,oel]'
 
 pup5.5.7-oel-fips:
   <<: *pup_5_5_7
-  <<: *acceptance_base
+  <<: *acceptance_tests
   <<: *only_with_SIMP_FULL_MATRIX
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites[default,oel]'
 
 # pup5.5.7-compliance-fips:
 #   <<: *pup_5_5_7
-#   <<: *compliance_base
+#   <<: *compliance_tests
 #   script:
 #     - 'BEAKER_fips=yes bundle exec rake beaker:suites[compliance]'
