@@ -105,7 +105,6 @@ describe 'connection' do
       context 'before reboot' do
         it 'should disable selinux without a reboot' do
           set_hieradata_on(host,hieradata)
-          on(host, 'cat /etc/puppetlabs/code/hieradata/default.yaml')
 
           manifest = base_manifest + <<-EOF
             class { 'selinux': ensure => 'disabled' }
@@ -183,7 +182,6 @@ describe 'connection' do
       context 'before reboot' do
         it 'should reenable selinux without a reboot' do
           set_hieradata_on(host,hieradata)
-          on(host, 'cat /etc/puppetlabs/code/hieradata/default.yaml')
 
           manifest = base_manifest + <<-EOF
             class { 'selinux': ensure => 'enforcing' }
