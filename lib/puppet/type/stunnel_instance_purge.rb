@@ -1,3 +1,5 @@
+require 'puppet/parameter/boolean'
+
 Puppet::Type.newtype(:stunnel_instance_purge) do
   desc <<-EOM
     Disables all services and removes all associated files for

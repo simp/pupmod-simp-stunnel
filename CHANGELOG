@@ -1,3 +1,6 @@
+* Thu Dec 06 2018 Chris Tessmer <chris.tessmer@onyxpoint.com> - 6.3.4
+- Fix bug that broke `puppet describe <anything>`
+
 * Fri Sep 14 2018 Adam Yohrling <adam.yohrling@onyxpoint.com> - 6.3.3
 - Add support for Puppet5
 - Clean up acceptance tests to use facts for hostname, domain
