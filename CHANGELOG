@@ -1,3 +1,7 @@
+* Mon Jan 21 2019 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.4.0
+- Add ability for users to override stunnel::connection and stunnel::instance
+  options either globally or by specific identified instance.
+
 * Thu Dec 06 2018 Chris Tessmer <chris.tessmer@onyxpoint.com> - 6.3.4
 - Fix bug that broke `puppet describe <anything>`
 
