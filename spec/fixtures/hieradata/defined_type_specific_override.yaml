@@ -1,0 +1,5 @@
+---
+stunnel::connection::ssl_version: 'TLSv1'
+Stunnel::Connection[nfs]::ssl_version: 'all'
+stunnel::instance::ssl_version: 'TLSv1'
+Stunnel::Instance[nfs]::ssl_version: 'all'
