@@ -249,7 +249,7 @@ define stunnel::connection (
   Optional[Integer]                           $timeout_idle            = simplib::dlookup('stunnel::connection', 'timeout_idle', $name, { 'default_value' => undef }),
   Simplib::Netlist                            $trusted_nets            = pick(simplib::dlookup('stunnel::connection', 'trusted_nets', $name, {'default_value' => undef }), simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] })),
   Boolean                                     $firewall                = pick(simplib::dlookup('stunnel::connection', 'firewall', $name, {'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false })),
-  Boolean                                     $tcpwrappers             = pick(simplib::dlookup('stunnel::connection', 'firewall', $name, {'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))
+  Boolean                                     $tcpwrappers             = pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, {'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))
 ) {
 
   $_dport = split(to_string($accept),':')[-1]
