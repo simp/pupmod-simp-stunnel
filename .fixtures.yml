@@ -4,6 +4,10 @@ fixtures:
     auditd: https://github.com/simp/pupmod-simp-auditd
     augeasproviders_core: https://github.com/simp/augeasproviders_core
     augeasproviders_grub: https://github.com/simp/augeasproviders_grub
+    # This needs to be in place for the rspec-puppet Hiera 5 hook to work
+    # No idea why, it may be because Puppet sees a custom backend and loads all
+    # of the global parts.
+    compliance_markup: https://github.com/simp/pupmod-simp-compliance_markup
     concat:
       # master is beyond 4.1.1, but has breaking changes to
       # how fragments are ordered (MODULES-6625)
