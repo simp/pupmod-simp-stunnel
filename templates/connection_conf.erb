@@ -80,8 +80,11 @@ else
   stunnel_conf << "client = #{bool_translate[@client]}"
   stunnel_conf << "failover = #{@failover}"
 
-  if @sni
-    stunnel_conf << "sni = #{@sni}"
+
+  if @facts['os']['release']['major'] > '6'
+    if @sni
+      stunnel_conf << "sni = #{@sni}"
+    end
   end
 
   stunnel_conf << "key = #{@_app_pki_key}"
@@ -145,13 +148,13 @@ else
       stunnel_conf << "execargs = #{@execargs.join(' ')}"
     end
     stunnel_conf << "pty = #{bool_translate[@pty]}"
-    stunnel_conf << "retry = #{@retry}"
+    stunnel_conf << "retry = #{bool_translate[@retry]}"
   end
 
-  stunnel_conf << "retry = #{bool_translate[@retry]}"
-
-  if @session_cache_timeout
-    stunnel_conf << "session = #{@session_cache_timeout}"
+  if @facts['os']['release']['major'] < '7'
+    if @session_cache_timeout
+      stunnel_conf << "session = #{@session_cache_timeout}"
+    end
   end
 
   if ['RedHat','CentOS','OracleLinux'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'] > '6')

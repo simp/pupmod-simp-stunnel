@@ -1,3 +1,41 @@
 ---
+stunnel::connection::failover: 'prio'
+stunnel::connection::sni: 'global.sni.server'
+stunnel::connection::app_pki_key: '/some/global/test.pem'
+stunnel::connection::app_pki_cert: '/some/global/test.pub'
+stunnel::connection::app_pki_cacert: '/some/global/cacerts.pem'
+stunnel::connection::app_pki_crl: '/some/globa/crl'
+stunnel::connection::openssl_cipher_suite: [ 'AES128-SHA256' ]
+stunnel::connection::curve: 'prime256v1'
 stunnel::connection::ssl_version: 'TLSv1'
+stunnel::connection::options: ['SSL_OP_NETSCAPE_CHALLENGE_BUG' ]
+stunnel::connection::verify: 4
+stunnel::connection::ocsp: 'http://foo.bar.baz'
+stunnel::connection::ocsp_flags: [ 'NOCHAIN' ]
+stunnel::connection::local: '1.2.3.4'
+stunnel::connection::protocol: 'connect'
+stunnel::connection::protocol_authentication: 'basic'
+stunnel::connection::protocol_host: '1.2.3.5:2050'
+stunnel::connection::protocol_username: 'some_user'
+stunnel::connection::protocol_password: 'some_password'
+stunnel::connection::delay: true
+stunnel::connection::engine_num: 1
+stunnel::connection::exec: '/some/exec'
+stunnel::connection::execargs: ['arg1', 'arg2']
+stunnel::connection::pty: true
+stunnel::connection::renegotiation: false
+stunnel::connection::reset: false
+stunnel::connection::retry: true
+stunnel::connection::session_cache_size: 20
+stunnel::connection::session_cache_timeout: 1000
+stunnel::connection::stack: 1024
+stunnel::connection::timeout_busy: 5
+stunnel::connection::timeout_close: 10
+stunnel::connection::timeout_connect: 15
+stunnel::connection::timeout_idle: 20
+stunnel::connection::trusted_nets: [ '1.2.3.0/24' ]
+stunnel::connection::firewall: true
+stunnel::connection::tcpwrappers: true
+
+
 stunnel::instance::ssl_version: 'TLSv1'

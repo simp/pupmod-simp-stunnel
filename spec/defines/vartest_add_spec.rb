@@ -291,7 +291,8 @@ describe 'stunnel::connection' do
       { :params => {
           :connect => [2049],
           :client => false,
-          :accept => 20490
+          :accept => 20490,
+          :exec => '/bin/foo',
       },
       :val_str => 'yes'
     })

@@ -83,8 +83,6 @@
 #   The ECDH curve name to use. To get a list of supported curves use:
 #   ``openssl ecparam -list_curves`` on your *client*
 #
-#   * This option is only valid on EL 7+
-#
 # @param ssl_version
 #   Dictate the SSL version that can be used on the system
 #
@@ -145,8 +143,6 @@
 #
 # @param engine_num
 #   The engine number from which to read the private key
-#
-#   * This option is only supported on RHEL/CentOS 7+
 #
 # @param pty
 #   Reserve and assign a pty to a program that is run by stunnel inetd-style
