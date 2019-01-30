@@ -18,6 +18,5 @@ CRLpath = /etc/pki/simp_apps/stunnel_nfs/x509/crl
 ciphers = HIGH:-SSLv2
 verify = 2
 delay = no
-retry = no
 renegotiation = yes
 reset = yes

@@ -1,9 +1,9 @@
 * Mon Jan 21 2019 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.4.0
 - Add ability for users to override stunnel::connection and stunnel::instance
   options either globally or by specific identified instance.
-- Fixed stunnel::connection template bugs
+- Fixed stunnel::connection and stunnel::instance template bugs
   - sni is not applicable on EL6
-  - retry is only appliable when exec is specified and
+  - retry is only applicable when exec is specified and
     needs to be translated from a boolean to 'yes'/'no'
   - session is only applicable on EL6
 

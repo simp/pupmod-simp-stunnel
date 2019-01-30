@@ -14,9 +14,10 @@ describe 'stunnel::instance' do
       context 'with default parameters' do
         let(:params) {{
           connect: [2049],
-          accept:  20490,
+          accept:  '10.1.2.3:20490',
         }}
         it { is_expected.to compile.with_all_deps }
+        it { is_expected.to create_stunnel__instance__reserve_port('20490') }
         it { is_expected.to contain_class('stunnel::install') }
         it { is_expected.to_not create_iptables__listen__tcp_stateful('allow_stunnel_nfs') }
         it { is_expected.to_not create_tcpwrappers__allow('allow_stunnel_nfs') }
@@ -219,7 +220,92 @@ describe 'stunnel::instance' do
         it { is_expected.to compile.and_raise_error(/Init systems.*not supported/) }
       end
 
-      context "with Hiera overrides" do
+      context 'with other parameters set' do
+        let(:title){ 'test_tunnel' }
+        let(:conf_file){ '/etc/stunnel/stunnel_managed_by_puppet_test_tunnel.conf' }
+        let(:params){{
+          :connect                 => [2048,2049],
+          :accept                  => '10.1.2.3:20490',
+          :compression             => 'zlib',
+          :curve                   => 'prime256v1',
+          :egd                     => '/some/socket/path',
+          :engine_ctrl             => 'LOAD',
+          :engine_num              => 1,
+          :exec                    => '/some/exec',
+          :execargs                => ['arg1', 'arg2'],
+          :local                   => '1.2.3.4',
+          :options                 => ['SSL_OP_NETSCAPE_CHALLENGE_BUG', 'SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS'],
+          :output                  => '/some/log',
+          :protocol                => 'connect',
+          :protocol_authentication => 'basic',
+          :protocol_host           => '1.2.3.5:2050',
+          :protocol_password       => 'some_password',
+          :protocol_username       => 'some_user',
+          :rnd_bytes               => 2048,
+          :rnd_file                => '/some/random',
+          :session_cache_timeout   => 20,
+          :session_cache_size      => 1000,
+          :sni                     => 'test.sni.server',
+          :socket_options          => [ 'l:SO_LINGER=1:60', 'r:TCP_NODELAY=1' ],
+          :ssl_version             => 'TLSv1',
+          :stack                   => 1024,
+          :timeout_busy            => 5,
+          :timeout_close           => 10,
+          :timeout_connect         => 15,
+          :timeout_idle            => 20
+        }}
+
+        it { is_expected.to compile.with_all_deps }
+
+        if os_facts[:os][:release][:major] < '7'
+          it { is_expected.to create_file(conf_file).with_content(/session = 20/) }
+        else
+          [ /sni = test.sni.server/,
+            /sessionCacheTimeout = 20/,
+            /sessionCacheSize = 1000/,
+            /renegotiation = yes/,
+            /reset = yes/
+          ].each do |exp_regex|
+            it { is_expected.to create_file(conf_file).with_content(exp_regex) }
+          end
+        end
+
+        [ /compression = zlib/,
+          /curve = prime256v1/,
+          /EGD = \/some\/socket\/path/,
+          /engineCtrl = LOAD/,
+          /engineNum = 1/,
+          /exec = \/some\/exec/,
+          /execargs = arg1 arg2/,
+          /local = 1.2.3.4/,
+          /options = SSL_OP_NETSCAPE_CHALLENGE_BUG/,
+          /options = SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS/,
+          /output = \/some\/log/,
+          /protocol = connect/,
+          /protocolAuthentication = basic/,
+          /protocolHost = 1\.2\.3\.5:2050/,
+          /protocolPassword = some_password/,
+          /protocolUsername = some_user/,
+          /pty = no/,
+          /retry = no/,
+          /RNDbytes = 2048/,
+          /RNDfile = \/some\/random/,
+# SIMP-6060
+#          /RNDoverwrite = false/,
+          /socket = l:SO_LINGER=1:60/,
+          /socket = r:TCP_NODELAY=1/,
+          /sslVersion = TLSv1/,
+          /stack = 1024/,
+          /TIMEOUTbusy = 5/,
+          /TIMEOUTclose = 10/,
+          /TIMEOUTconnect = 15/,
+          /TIMEOUTidle = 20/
+        ].each do |exp_regex|
+          it { is_expected.to create_file(conf_file).with_content(exp_regex) }
+        end
+      end
+
+      context 'with Hiera overrides' do
         let(:pre_condition) { <<-EOM
           stunnel::instance{ 'nfs_client':
             accept  => '127.0.0.1:2049',
@@ -239,30 +325,141 @@ describe 'stunnel::instance' do
           :ocsp_flags   => ['NOCERTS']
         }}
 
-        context "disabled" do
-          let(:ocsp) { 'https://disabled.bar.baz' }
-
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_stunnel__instance(title).with_ssl_version(nil) }
-          it { is_expected.to create_stunnel__instance("nfs_client").with_ssl_version(nil) }
-        end
-
-        context "global" do
+        context 'global override' do
           let(:ocsp) { 'https://global.bar.baz' }
           let(:hieradata){ 'defined_type_global_override' }
 
           it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_stunnel__instance(title).with_ssl_version('TLSv1') }
-          it { is_expected.to create_stunnel__instance("nfs_client").with_ssl_version('TLSv1') }
+          it { is_expected.to create_stunnel__instance(title).with(
+            :app_pki_ca_dir          => '/some/global/ca/dir',
+            :app_pki_cacert          => '/some/global/cacerts.pem',
+            :app_pki_cert            => '/some/global/test.pub',
+            :app_pki_crl             => '/some/global/crl',
+            :app_pki_dir             => '/some/global/dir',
+            :app_pki_external_source => '/some/global/ext',
+            :app_pki_key             => '/some/global/test.pem',
+            :compression             => 'zlib',
+            :curve                   => 'prime256v1',
+            :delay                   => true,
+            :egd                     => '/some/socket/path',
+            :engine                  => 'dynamic',
+            :engine_ctrl             => 'LOAD',
+            :engine_num              => 1,
+            :exec                    => '/some/exec',
+            :execargs                => ['arg1', 'arg2'],
+            :failover                => 'prio',
+            :fips                    => false,
+            :firewall                => true,
+            :haveged                 => false,
+            :local                   => '1.2.3.4',
+            :ocsp                    => 'https://global.bar.baz',
+            :ocsp_flags              => [ 'NOCERTS' ],
+            :openssl_cipher_suite    => [ 'AES128-SHA256' ],
+            :options                 => ['SSL_OP_NETSCAPE_CHALLENGE_BUG' ],
+            :output                  => '/some/log',
+            :pki                     => true,
+            :protocol                => 'connect',
+            :protocol_authentication => 'basic',
+            :protocol_host           => '1.2.3.5:2050',
+            :protocol_password       => 'some_password',
+            :protocol_username       => 'some_user',
+            :pty                     => true,
+            :renegotiation           => false,
+            :reset                   => false,
+            :retry                   => true,
+            :rnd_bytes               => 2048,
+            :rnd_file                => '/some/random',
+            :rnd_overwrite           => true,
+            :session_cache_size      => 20,
+            :session_cache_timeout   => 1000,
+            :setuid                  => 'testuid',
+            :setgid                  => 'testid',
+            :sni                     => 'global.sni.server',
+            :socket_options          => [ 'l:SO_LINGER=1:60', 'r:TCP_NODELAY=1' ],
+            :ssl_version             => 'TLSv1',
+            :stack                   => 1024,
+            :stunnel_debug           => 'info',
+            :syslog                  => true,
+            :systemd_wantedby        => [ 'some.service' ],
+            :systemd_requiredby      => [ 'someother.service' ],
+            :tcpwrappers             => true,
+            :timeout_busy            => 5,
+            :timeout_close           => 10,
+            :timeout_connect         => 15,
+            :timeout_idle            => 20,
+            :trusted_nets            => [ 'any' ],
+            :verify                  => 4,
+          ) }
+
+          it { is_expected.to create_stunnel__instance('nfs_client').with(
+            :app_pki_ca_dir          => '/some/global/ca/dir',
+            :app_pki_cacert          => '/some/global/cacerts.pem',
+            :app_pki_cert            => '/some/global/test.pub',
+            :app_pki_crl             => '/some/global/crl',
+            :app_pki_dir             => '/some/global/dir',
+            :app_pki_external_source => '/some/global/ext',
+            :app_pki_key             => '/some/global/test.pem',
+            :compression             => 'zlib',
+            :curve                   => 'prime256v1',
+            :delay                   => true,
+            :egd                     => '/some/socket/path',
+            :engine                  => 'dynamic',
+            :engine_ctrl             => 'LOAD',
+            :engine_num              => 1,
+            :exec                    => '/some/exec',
+            :execargs                => ['arg1', 'arg2'],
+            :failover                => 'prio',
+            :fips                    => false,
+            :firewall                => true,
+            :haveged                 => false,
+            :local                   => '1.2.3.4',
+            :ocsp                    => 'http://foo.bar.baz',
+            :ocsp_flags              => [ 'NOCHAIN' ],
+            :openssl_cipher_suite    => [ 'AES128-SHA256' ],
+            :options                 => ['SSL_OP_NETSCAPE_CHALLENGE_BUG' ],
+            :output                  => '/some/log',
+            :pki                     => true,
+            :protocol                => 'connect',
+            :protocol_authentication => 'basic',
+            :protocol_host           => '1.2.3.5:2050',
+            :protocol_password       => 'some_password',
+            :protocol_username       => 'some_user',
+            :pty                     => true,
+            :renegotiation           => false,
+            :reset                   => false,
+            :retry                   => true,
+            :rnd_bytes               => 2048,
+            :rnd_file                => '/some/random',
+            :rnd_overwrite           => true,
+            :session_cache_size      => 20,
+            :session_cache_timeout   => 1000,
+            :setuid                  => 'testuid',
+            :setgid                  => 'testid',
+            :sni                     => 'global.sni.server',
+            :socket_options          => [ 'l:SO_LINGER=1:60', 'r:TCP_NODELAY=1' ],
+            :ssl_version             => 'TLSv1',
+            :stack                   => 1024,
+            :stunnel_debug           => 'info',
+            :syslog                  => true,
+            :systemd_wantedby        => [ 'some.service' ],
+            :systemd_requiredby      => [ 'someother.service' ],
+            :tcpwrappers             => true,
+            :timeout_busy            => 5,
+            :timeout_close           => 10,
+            :timeout_connect         => 15,
+            :timeout_idle            => 20,
+            :trusted_nets            => [ '1.2.3.0/24' ],
+            :verify                  => 4,
+          ) }
         end
 
-        context "specific" do
+        context 'specific override' do
           let(:ocsp) { 'https://specific.bar.baz' }
           let(:hieradata){ 'defined_type_specific_override' }
 
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to create_stunnel__instance(title).with_ssl_version('all') }
-          it { is_expected.to create_stunnel__instance("nfs_client").with_ssl_version('TLSv1') }
+          it { is_expected.to create_stunnel__instance('nfs_client').with_ssl_version('TLSv1') }
         end
       end
     end
