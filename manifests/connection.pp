@@ -1,5 +1,19 @@
 # Set up a stunnel connection for the service ``$name``
 #
+# NOTE: Since many of the parameters here may need to be modified on a
+# case-by-base basis, this defined type uses capabilities presented by the
+# ``simplib::dlookup`` function to allow for either global overrides or
+# instance-specific overrides.
+#
+# Global overrides work the same way as classes
+# (``stunnel::instance::ssl_version: 'TLSv1.2'``) but will affect **all**
+# instances of the defined type that are not specifically overridden as shown
+# below.
+#
+# Instance specific overrides preclude the need for a resource collector in
+# that you can place the follwing in Hiera to affect a single instance named
+# ``rsync``: ``Stunnel::Connection[rsync]::ssl_version: 'TLSv1.2'``
+#
 # @example Add an Rsync listener
 #  stunnel::connection ('rsync':
 #    accept       => '873',
@@ -69,8 +83,6 @@
 #   The ECDH curve name to use. To get a list of supported curves use:
 #   ``openssl ecparam -list_curves`` on your *client*
 #
-#   * This option is only valid on EL 7+
-#
 # @param ssl_version
 #   Dictate the SSL version that can be used on the system
 #
@@ -131,8 +143,6 @@
 #
 # @param engine_num
 #   The engine number from which to read the private key
-#
-#   * This option is only supported on RHEL/CentOS 7+
 #
 # @param pty
 #   Reserve and assign a pty to a program that is run by stunnel inetd-style
@@ -199,43 +209,43 @@ define stunnel::connection (
   Stunnel::Connect                            $connect,
   Variant[Simplib::Port, Simplib::Host::Port] $accept,
   Boolean                                     $client                  = true,
-  Enum['rr','prio']                           $failover                = 'rr',
-  Optional[String]                            $sni                     = undef,
-  Optional[Stdlib::Absolutepath]              $app_pki_key             = undef,
-  Optional[Stdlib::Absolutepath]              $app_pki_cert            = undef,
-  Stdlib::Absolutepath                        $app_pki_cacert          = '/etc/pki/simp_apps/stunnel/x509/cacerts/cacerts.pem',
-  Stdlib::Absolutepath                        $app_pki_crl             = '/etc/pki/simp_apps/stunnel/x509/crl',
-  Array[String]                               $openssl_cipher_suite    = ['HIGH','-SSLv2'],
-  Optional[String]                            $curve                   = undef,
-  Optional[String]                            $ssl_version             = undef,
-  Array[String]                               $options                 = [],
-  Integer                                     $verify                  = 2,
-  Optional[Simplib::URI]                      $ocsp                    = undef,
-  Stunnel::OcspFlags                          $ocsp_flags              = [],
-  Optional[String]                            $local                   = undef,
-  Optional[String]                            $protocol                = undef,
-  Optional[Enum['basic','NTLM']]              $protocol_authentication = undef,
-  Optional[String]                            $protocol_host           = undef,
-  Optional[String]                            $protocol_username       = undef,
-  Optional[String]                            $protocol_password       = undef,
-  Boolean                                     $delay                   = false,
-  Optional[Integer]                           $engine_num              = undef,
-  Optional[String]                            $exec                    = undef,
-  Array[String]                               $execargs                = [],
-  Boolean                                     $pty                     = false,
-  Boolean                                     $renegotiation           = true,
-  Boolean                                     $reset                   = true,
-  Boolean                                     $retry                   = false,
-  Optional[Integer]                           $session_cache_size      = undef,
-  Optional[Integer]                           $session_cache_timeout   = undef,
-  Optional[Integer]                           $stack                   = undef,
-  Optional[Integer]                           $timeout_busy            = undef,
-  Optional[Integer]                           $timeout_close           = undef,
-  Optional[Integer]                           $timeout_connect         = undef,
-  Optional[Integer]                           $timeout_idle            = undef,
-  Simplib::Netlist                            $trusted_nets            = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
-  Boolean                                     $firewall                = simplib::lookup('simp_options::firewall', { 'default_value' => false }),
-  Boolean                                     $tcpwrappers             = simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false })
+  Enum['rr','prio']                           $failover                = simplib::dlookup('stunnel::connection', 'failover', $name, { 'default_value' => 'rr' }),
+  Optional[String]                            $sni                     = simplib::dlookup('stunnel::connection', 'sni', $name, { 'default_value' => undef }),
+  Optional[Stdlib::Absolutepath]              $app_pki_key             = simplib::dlookup('stunnel::connection', 'app_pki_key', $name, { 'default_value' => undef }),
+  Optional[Stdlib::Absolutepath]              $app_pki_cert            = simplib::dlookup('stunnel::connection', 'app_pki_cert', $name, { 'default_value' => undef }),
+  Stdlib::Absolutepath                        $app_pki_cacert          = simplib::dlookup('stunnel::connection', 'app_pki_cacert', $name, { 'default_value' => '/etc/pki/simp_apps/stunnel/x509/cacerts/cacerts.pem' }),
+  Stdlib::Absolutepath                        $app_pki_crl             = simplib::dlookup('stunnel::connection', 'app_pki_crl', $name, { 'default_value' => '/etc/pki/simp_apps/stunnel/x509/crl' }),
+  Array[String]                               $openssl_cipher_suite    = simplib::dlookup('stunnel::connection', 'openssl_cipher_suite', $name, { 'default_value' => ['HIGH','-SSLv2'] }),
+  Optional[String]                            $curve                   = simplib::dlookup('stunnel::connection', 'curve', $name, { 'default_value' => undef }),
+  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::connection', 'ssl_version', $name, { 'default_value' => undef }),
+  Array[String]                               $options                 = simplib::dlookup('stunnel::connection', 'options', $name, { 'default_value' => [] }),
+  Integer                                     $verify                  = simplib::dlookup('stunnel::connection', 'verify', $name, { 'default_value' => 2 }),
+  Optional[Simplib::URI]                      $ocsp                    = simplib::dlookup('stunnel::connection', 'ocsp', $name, { 'default_value' => undef }),
+  Stunnel::OcspFlags                          $ocsp_flags              = simplib::dlookup('stunnel::connection', 'ocsp_flags', $name, { 'default_value' => [] }),
+  Optional[String]                            $local                   = simplib::dlookup('stunnel::connection', 'local', $name, { 'default_value' => undef }),
+  Optional[String]                            $protocol                = simplib::dlookup('stunnel::connection', 'protocol', $name, { 'default_value' => undef }),
+  Optional[Enum['basic','NTLM']]              $protocol_authentication = simplib::dlookup('stunnel::connection', 'protocol_authentication', $name, { 'default_value' => undef }),
+  Optional[String]                            $protocol_host           = simplib::dlookup('stunnel::connection', 'protocol_host', $name, { 'default_value' => undef }),
+  Optional[String]                            $protocol_username       = simplib::dlookup('stunnel::connection', 'protocol_username', $name, { 'default_value' => undef }),
+  Optional[String]                            $protocol_password       = simplib::dlookup('stunnel::connection', 'protocol_password', $name, { 'default_value' => undef }),
+  Boolean                                     $delay                   = simplib::dlookup('stunnel::connection', 'delay', $name, { 'default_value' => false }),
+  Optional[Integer]                           $engine_num              = simplib::dlookup('stunnel::connection', 'engine_num', $name, { 'default_value' => undef }),
+  Optional[String]                            $exec                    = simplib::dlookup('stunnel::connection', 'exec', $name, { 'default_value' => undef }),
+  Array[String]                               $execargs                = simplib::dlookup('stunnel::connection', 'execargs', $name, { 'default_value' => [] }),
+  Boolean                                     $pty                     = simplib::dlookup('stunnel::connection', 'pty', $name, { 'default_value' => false }),
+  Boolean                                     $renegotiation           = simplib::dlookup('stunnel::connection', 'renegotiation', $name, { 'default_value' => true }),
+  Boolean                                     $reset                   = simplib::dlookup('stunnel::connection', 'reset', $name, { 'default_value' => true }),
+  Boolean                                     $retry                   = simplib::dlookup('stunnel::connection', 'retry', $name, { 'default_value' => false }),
+  Optional[Integer]                           $session_cache_size      = simplib::dlookup('stunnel::connection', 'session_cache_size', $name, { 'default_value' => undef }),
+  Optional[Integer]                           $session_cache_timeout   = simplib::dlookup('stunnel::connection', 'session_cache_timeout', $name, { 'default_value' => undef }),
+  Optional[Integer]                           $stack                   = simplib::dlookup('stunnel::connection', 'stack', $name, { 'default_value' => undef }),
+  Optional[Integer]                           $timeout_busy            = simplib::dlookup('stunnel::connection', 'timeout_busy', $name, { 'default_value' => undef }),
+  Optional[Integer]                           $timeout_close           = simplib::dlookup('stunnel::connection', 'timeout_close', $name, { 'default_value' => undef }),
+  Optional[Integer]                           $timeout_connect         = simplib::dlookup('stunnel::connection', 'timeout_connect', $name, { 'default_value' => undef }),
+  Optional[Integer]                           $timeout_idle            = simplib::dlookup('stunnel::connection', 'timeout_idle', $name, { 'default_value' => undef }),
+  Simplib::Netlist                            $trusted_nets            = pick(simplib::dlookup('stunnel::connection', 'trusted_nets', $name, {'default_value' => undef }), simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] })),
+  Boolean                                     $firewall                = pick(simplib::dlookup('stunnel::connection', 'firewall', $name, {'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false })),
+  Boolean                                     $tcpwrappers             = pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, {'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))
 ) {
 
   $_dport = split(to_string($accept),':')[-1]

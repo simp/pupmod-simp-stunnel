@@ -188,6 +188,11 @@ describe 'stunnel::config' do
         end
 
         context 'with pid specified' do
+          # Change a param to force a recompile and full hiera lookup
+          let(:params) {{
+            fips: true
+          }}
+
           # I have to go to hiera for this...
           # stunnel::config::pid: /var/opt/run/stunnel.pid
           let(:hieradata) { 'pid' }

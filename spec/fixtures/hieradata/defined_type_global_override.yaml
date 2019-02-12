@@ -1,0 +1,98 @@
+---
+stunnel::connection::app_pki_cacert: '/some/global/cacerts.pem'
+stunnel::connection::app_pki_cert: '/some/global/test.pub'
+stunnel::connection::app_pki_crl: '/some/global/crl'
+stunnel::connection::app_pki_key: '/some/global/test.pem'
+stunnel::connection::curve: 'prime256v1'
+stunnel::connection::delay: true
+stunnel::connection::engine_num: 1
+stunnel::connection::exec: '/some/exec'
+stunnel::connection::execargs: ['arg1', 'arg2']
+stunnel::connection::failover: 'prio'
+stunnel::connection::firewall: true
+stunnel::connection::local: '1.2.3.4'
+stunnel::connection::ocsp: 'http://foo.bar.baz'
+stunnel::connection::ocsp_flags: [ 'NOCHAIN' ]
+stunnel::connection::openssl_cipher_suite: [ 'AES128-SHA256' ]
+stunnel::connection::options: ['SSL_OP_NETSCAPE_CHALLENGE_BUG' ]
+stunnel::connection::protocol: 'connect'
+stunnel::connection::protocol_authentication: 'basic'
+stunnel::connection::protocol_host: '1.2.3.5:2050'
+stunnel::connection::protocol_password: 'some_password'
+stunnel::connection::protocol_username: 'some_user'
+stunnel::connection::pty: true
+stunnel::connection::renegotiation: false
+stunnel::connection::reset: false
+stunnel::connection::retry: true
+stunnel::connection::session_cache_size: 20
+stunnel::connection::session_cache_timeout: 1000
+stunnel::connection::sni: 'global.sni.server'
+stunnel::connection::ssl_version: 'TLSv1'
+stunnel::connection::stack: 1024
+stunnel::connection::tcpwrappers: true
+stunnel::connection::timeout_busy: 5
+stunnel::connection::timeout_close: 10
+stunnel::connection::timeout_connect: 15
+stunnel::connection::timeout_idle: 20
+stunnel::connection::trusted_nets: [ '1.2.3.0/24' ]
+stunnel::connection::verify: 4
+
+
+stunnel::instance::app_pki_ca_dir: '/some/global/ca/dir'
+stunnel::instance::app_pki_cacert: '/some/global/cacerts.pem'
+stunnel::instance::app_pki_cert: '/some/global/test.pub'
+stunnel::instance::app_pki_crl: '/some/global/crl'
+stunnel::instance::app_pki_dir: '/some/global/dir'
+stunnel::instance::app_pki_external_source: '/some/global/ext'
+stunnel::instance::app_pki_key: '/some/global/test.pem'
+stunnel::instance::compression: 'zlib'
+stunnel::instance::curve: 'prime256v1'
+stunnel::instance::delay: true
+stunnel::instance::egd: '/some/socket/path'
+stunnel::instance::engine: 'dynamic'
+stunnel::instance::engine_ctrl: 'LOAD'
+stunnel::instance::engine_num: 1
+stunnel::instance::exec: '/some/exec'
+stunnel::instance::execargs: ['arg1', 'arg2']
+stunnel::instance::failover: 'prio'
+stunnel::instance::fips: false
+stunnel::instance::firewall: true
+stunnel::instance::haveged: false
+stunnel::instance::local: '1.2.3.4'
+stunnel::instance::ocsp: 'http://foo.bar.baz'
+stunnel::instance::ocsp_flags: [ 'NOCHAIN' ]
+stunnel::instance::openssl_cipher_suite: [ 'AES128-SHA256' ]
+stunnel::instance::options: ['SSL_OP_NETSCAPE_CHALLENGE_BUG' ]
+stunnel::instance::output: '/some/log'
+stunnel::instance::pki: true
+stunnel::instance::protocol: 'connect'
+stunnel::instance::protocol_authentication: 'basic'
+stunnel::instance::protocol_host: '1.2.3.5:2050'
+stunnel::instance::protocol_password: 'some_password'
+stunnel::instance::protocol_username: 'some_user'
+stunnel::instance::pty: true
+stunnel::instance::renegotiation: false
+stunnel::instance::reset: false
+stunnel::instance::retry: true
+stunnel::instance::rnd_bytes: 2048
+stunnel::instance::rnd_file: '/some/random'
+stunnel::instance::rnd_overwrite: true
+stunnel::instance::session_cache_size: 20
+stunnel::instance::session_cache_timeout: 1000
+stunnel::instance::setuid: 'testuid'
+stunnel::instance::setgid: 'testid'
+stunnel::instance::sni: 'global.sni.server'
+stunnel::instance::socket_options: [ 'l:SO_LINGER=1:60', 'r:TCP_NODELAY=1' ]
+stunnel::instance::ssl_version: 'TLSv1'
+stunnel::instance::stack: 1024
+stunnel::instance::stunnel_debug: 'info'
+stunnel::instance::syslog: true
+stunnel::instance::systemd_wantedby: [ 'some.service' ]
+stunnel::instance::systemd_requiredby: [ 'someother.service' ]
+stunnel::instance::tcpwrappers: true
+stunnel::instance::timeout_busy: 5
+stunnel::instance::timeout_close: 10
+stunnel::instance::timeout_connect: 15
+stunnel::instance::timeout_idle: 20
+stunnel::instance::trusted_nets: [ '1.2.3.0/24' ]
+stunnel::instance::verify: 4
