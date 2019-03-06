@@ -527,7 +527,7 @@ accepting the  fips option in that version of stunnel</p>
         <span class='type'>(<tt>Boolean</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>false</tt>)</em>
+        <em class="default">(defaults to: <tt>true</tt>)</em>
       
       
         &mdash;
@@ -747,7 +747,7 @@ class stunnel::config (
   Optional[Stdlib::Absolutepath] $output                  = undef,
   Optional[Integer]              $rnd_bytes               = undef,
   Optional[Stdlib::Absolutepath] $rnd_file                = undef,
-  Boolean                        $rnd_overwrite           = false,
+  Boolean                        $rnd_overwrite           = true,
   Array[String]                  $socket_options          = [],
   Boolean                        $syslog                  = $::stunnel::syslog,
   Boolean                        $fips                    = $::stunnel::fips

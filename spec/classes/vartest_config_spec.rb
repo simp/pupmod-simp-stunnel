@@ -51,7 +51,7 @@ describe 'stunnel::config' do
         variable_test(:engine_ctrl,'TEST_CTRL',{:key_str => 'engineCtrl'})
         variable_test(:output,'/foo.bar.out')
         variable_test(:rnd_bytes,20,{:key_str => 'RNDbytes'})
-        variable_test(:rnd_overwrite,true,{:key_str => 'RNDoverwrite',:val_str => 'yes'})
+        variable_test(:rnd_overwrite,false,{:key_str => 'RNDoverwrite',:val_str => 'no'})
         variable_test(:socket_options,['a:foo=bar'],{:key_str => 'socket', :val_str => 'a:foo=bar'})
         variable_test(:socket_options,'a:foo=bar',{:err => Puppet::Error, :errmsg => /expects an Array value, got String/})
       end
