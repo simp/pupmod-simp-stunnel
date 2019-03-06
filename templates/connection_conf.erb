@@ -60,9 +60,7 @@ if has_variable?('setgid')
     stunnel_conf << "RNDfile = #{@rnd_file}"
   end
 
-  if @rnd_overwrite
-    stunnel_conf << "RNDoverwrite = #{bool_translate[@rnd_overwrite]}"
-  end
+  stunnel_conf << "RNDoverwrite = #{bool_translate[@rnd_overwrite]}"
 
   if @socket_options
     @socket_options.each do |sock_opt|

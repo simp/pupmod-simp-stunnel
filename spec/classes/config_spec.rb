@@ -54,6 +54,7 @@ describe 'stunnel::config' do
                 pid = /var/run/stunnel/stunnel.pid
                 engine = auto
                 fips = no
+                RNDoverwrite = yes
               EOM
             )}
           else
@@ -66,6 +67,7 @@ describe 'stunnel::config' do
                 syslog = no
                 pid = /var/run/stunnel/stunnel.pid
                 engine = auto
+                RNDoverwrite = yes
               EOM
             )}
           end
@@ -128,6 +130,7 @@ describe 'stunnel::config' do
                 pid = /var/run/stunnel/stunnel.pid
                 engine = auto
                 fips = no
+                RNDoverwrite = yes
               EOM
             )}
           else
@@ -139,6 +142,7 @@ describe 'stunnel::config' do
                 syslog = no
                 pid = /var/run/stunnel/stunnel.pid
                 engine = auto
+                RNDoverwrite = yes
               EOM
             )}
           end

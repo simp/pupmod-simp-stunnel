@@ -135,7 +135,7 @@ class stunnel::config (
   Optional[Stdlib::Absolutepath] $output                  = undef,
   Optional[Integer]              $rnd_bytes               = undef,
   Optional[Stdlib::Absolutepath] $rnd_file                = undef,
-  Boolean                        $rnd_overwrite           = false,
+  Boolean                        $rnd_overwrite           = true,
   Array[String]                  $socket_options          = [],
   Boolean                        $syslog                  = $::stunnel::syslog,
   Boolean                        $fips                    = $::stunnel::fips

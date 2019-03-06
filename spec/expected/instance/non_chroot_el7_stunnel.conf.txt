@@ -6,6 +6,7 @@ foreground = yes
 pid =
 engine = auto
 fips = yes
+RNDoverwrite = yes
 [nfs]
 connect = 2049
 accept = 20490
