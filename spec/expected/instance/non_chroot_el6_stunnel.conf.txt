@@ -4,6 +4,7 @@ debug = err
 syslog = no
 pid = /var/run/stunnel/stunnel_managed_by_puppet_nfs.pid
 engine = auto
+RNDoverwrite = yes
 [nfs]
 connect = 2049
 accept = 20490

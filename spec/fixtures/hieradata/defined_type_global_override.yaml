@@ -76,7 +76,7 @@ stunnel::instance::reset: false
 stunnel::instance::retry: true
 stunnel::instance::rnd_bytes: 2048
 stunnel::instance::rnd_file: '/some/random'
-stunnel::instance::rnd_overwrite: true
+stunnel::instance::rnd_overwrite: false
 stunnel::instance::session_cache_size: 20
 stunnel::instance::session_cache_timeout: 1000
 stunnel::instance::setuid: 'testuid'

@@ -256,7 +256,7 @@ define stunnel::instance(
   Boolean                                     $retry                   = simplib::dlookup('stunnel::instance', 'retry', $name, { 'default_value' => false }),
   Optional[Integer]                           $rnd_bytes               = simplib::dlookup('stunnel::instance', 'rnd_bytes', $name, { 'default_value' => undef }),
   Optional[Stdlib::Absolutepath]              $rnd_file                = simplib::dlookup('stunnel::instance', 'rnd_file', $name, { 'default_value' => undef }),
-  Boolean                                     $rnd_overwrite           = simplib::dlookup('stunnel::instance', 'rnd_overwrite', $name, { 'default_value' => false }),
+  Boolean                                     $rnd_overwrite           = simplib::dlookup('stunnel::instance', 'rnd_overwrite', $name, { 'default_value' => true }),
   Optional[Integer]                           $session_cache_size      = simplib::dlookup('stunnel::instance', 'session_cache_size', $name, { 'default_value' => undef }),
   Optional[Integer]                           $session_cache_timeout   = simplib::dlookup('stunnel::instance', 'session_cache_timeout', $name, { 'default_value' => undef }),
   String                                      $setuid                  = simplib::dlookup('stunnel::instance', 'setuid', $name, { 'default_value' => 'stunnel' }),
