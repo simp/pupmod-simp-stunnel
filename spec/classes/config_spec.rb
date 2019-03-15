@@ -103,7 +103,6 @@ describe 'stunnel::config' do
           let(:params) {{
             chroot:     '/',
           }}
-          #          Evaluation Error: Error while evaluating a Function Call, stunnel: $chroot should not be root ('/') at /var/jmg/SIMP-4568/pupmod-simp-stunnel/spec/fixtures/modules/stunnel/manifests/config.pp:202:7 on node ws151.tasty.bacon
           it "is expected to fail" do
             expect { catalogue }.to raise_error Puppet::Error, /chroot should not be root/
           end
