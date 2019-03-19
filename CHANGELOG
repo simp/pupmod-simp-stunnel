@@ -1,3 +1,10 @@
+* Tue Mar 19 2019 Liz Nemsick <lnemsick.simp@gmail.com> - 6.4.2
+- Use simplib::nets2ddq in lieu of simplib's deprecated Puppet 3 nets2ddq
+- Use Puppet Integer instead of simplib's deprecated Puppet 3 to_integer
+- Use Puppet String instead of simplib's deprecated Puppet 3 to_string
+- Use simplib::validate_array_member in lieu of simplib's deprecated
+  Puppet 3 validate_array_member
+
 * Wed Mar 06 2019 Michael Morrone <michael.morrone@onyxpoint.com> - 6.4.1
 - If statement evaluating boolean parameter prevented RNDoverwrite being
   set to 'no'. Fixed logic, updated tests, and changed default value
