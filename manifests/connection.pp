@@ -248,7 +248,7 @@ define stunnel::connection (
   Boolean                                     $tcpwrappers             = pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, {'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))
 ) {
 
-  $_dport = split(to_string($accept),':')[-1]
+  $_dport = split(String($accept),':')[-1]
 
   stunnel::instance::reserve_port { $_dport: }
 
@@ -257,26 +257,26 @@ define stunnel::connection (
   # Validation for RHEL6/7 Options. Defaulting to 7.
   if ($facts['os']['name'] in ['RedHat','CentOS','OracleLinux']) and ($facts['os']['release']['major'] < '7') {
     if $::stunnel::fips {
-      if $ssl_version { validate_array_member($ssl_version,['TLSv1']) }
+      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1']) }
     }
     else {
-      if $ssl_version { validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1']) }
+      if $ssl_version { simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1']) }
     }
     if $protocol {
-      validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','smtp'])
+      simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','smtp'])
     }
   }
   else {
     if $::stunnel::fips {
-      if $ssl_version { validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
+      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
     }
     else {
       if $ssl_version {
-        validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
+        simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
       }
     }
     if $protocol {
-      validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
+      simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
     }
   }
 
@@ -319,7 +319,7 @@ define stunnel::connection (
 
     iptables::listen::tcp_stateful { "allow_stunnel_${name}":
       trusted_nets => $trusted_nets,
-      dports       => [to_integer($_dport)]
+      dports       => [Integer($_dport)]
     }
   }
 
@@ -328,7 +328,7 @@ define stunnel::connection (
 
     tcpwrappers::allow { "allow_stunnel_${name}":
       svc     => $name,
-      pattern => nets2ddq($trusted_nets)
+      pattern => simplib::nets2ddq($trusted_nets)
     }
   }
 }
