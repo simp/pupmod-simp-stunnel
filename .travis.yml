@@ -5,15 +5,12 @@
 # https://puppet.com/docs/pe/2018.1/overview/getting_support_for_pe.html
 # ------------------------------------------------------------------------------
 # Release       Puppet   Ruby   EOL
-# SIMP 6.2      4.10     2.1.9  TBD
-# PE 2016.4     4.10     2.1.9  2018-12-31 (LTS)
 # PE 2017.3     5.3      2.4.4  2018-12-31
-# SIMP 6.3      5.5      2.4.4  TBD***
-# PE 2018.1     5.5      2.4.4  2020-05 (LTS)***
+# SIMP 6.3      5.5      2.4.5  TBD***
+# PE 2018.1     5.5      2.4.5  2020-05 (LTS)***
 # PE 2019.0     6.0      2.5.1  2019-08-31^^^
 #
 # *** = Modules created for SIMP 6.3+ are not required to support Puppet < 5.5
-# ^^^ = SIMP doesn't support 6 yet; tests are info-only and allowed to fail
 
 ---
 language: ruby
@@ -38,19 +35,16 @@ addons:
 
 before_install:
   - rm -f Gemfile.lock
-  - gem install -v '~> 1.16' bundler
+  - gem install -v '~> 1.17' bundler
 
 global:
   - STRICT_VARIABLES=yes
 
 jobs:
-  allow_failures:
-    - name: 'Latest Puppet 6.x (allowed to fail)'
-
   include:
     - stage: check
       name: 'Syntax, style, and validation checks'
-      rvm: 2.4.4
+      rvm: 2.4.5
       env: PUPPET_VERSION="~> 5"
       script:
         - bundle exec rake check:dot_underscore
@@ -63,42 +57,35 @@ jobs:
         - bundle exec puppet module build
 
     - stage: spec
-      name: 'Puppet 4.10 (SIMP 6.2, PE 2016.4)'
-      rvm: 2.1.9
-      env: PUPPET_VERSION="~> 4.10.0"
-      script:
-        - bundle exec rake spec
-
-    - stage: spec
       name: 'Puppet 5.3 (PE 2017.3)'
-      rvm: 2.4.4
+      rvm: 2.4.5
       env: PUPPET_VERSION="~> 5.3.0"
       script:
-        - bundle exec rake spec
+        - bundle exec rake spec_parallel
 
     - stage: spec
-      rvm: 2.4.4
+      rvm: 2.4.5
       name: 'Puppet 5.5 (SIMP 6.3, PE 2018.1)'
       env: PUPPET_VERSION="~> 5.5.0"
       script:
-        - bundle exec rake spec
+        - bundle exec rake spec_parallel
 
     - stage: spec
       name: 'Latest Puppet 5.x'
-      rvm: 2.4.4
+      rvm: 2.4.5
       env: PUPPET_VERSION="~> 5.0"
       script:
-        - bundle exec rake spec
+        - bundle exec rake spec_parallel
 
     - stage: spec
-      name: 'Latest Puppet 6.x (allowed to fail)'
+      name: 'Latest Puppet 6.x'
       rvm: 2.5.1
       env: PUPPET_VERSION="~> 6.0"
       script:
-        - bundle exec rake spec
+        - bundle exec rake spec_parallel
 
     - stage: deploy
-      rvm: 2.4.4
+      rvm: 2.4.5
       script:
         - true
       before_deploy:
@@ -107,7 +94,7 @@ jobs:
       deploy:
         - provider: releases
           api_key:
-            secure: "jgglRSJ/9nHKKQf6u7alEGsSltbhPECxzhvHRPh6pLiGIWLCJPN9FzDlAIXCLNSRaYkMReU8yBAshPxdQs7gLt/TFo82cs8FbZxZdFyXqX3GCwLuxZ3QDkhyqQZ+87DgDCAWG5zrkV3XlPybyLjSyRcR9aqAjuNE+5HoKqeSY3cbJs32G14lS5uue4PBp58tfcThvOqCHnndhyWlS70zNful/GQBMXha2cYkTNnMvDhYipJQRI03BWLerPLwdHBFptMgiMHPpZfnHD8umOATO/FhL7dh3m2iWE6bqX7gfY/jm3WDCZdeD8d3mi379W3AcBx0HoPYaM5odrD57bG4NzUT4FTcdYwHxcD1eT7FKoih2Eie1WMIoNLd4OyhvjBQ5gNWDXRiup3dkxRccGhtebgAel+af/ygcpiJ4ESpPtHmWQNHDJQMugdh/JJ9TQWHzxZgSXA/td+ZRD4oil5XIgW8P2r2l59wi9+yTAO1t9pD0t099TU4RgktAQpK2Nk4UmWaS7iB/mDMYFHeIkQSJxhKyvZ0oe93Fzj3Mf/7rVywZwqXm5yTFTfieKk3nZioirux2C2cejHxVlhOd/FN5F/WzO7+pm/iQCH1fLOzUSAhxDgbbvakHwut6FmDLjEwDGwxaqF2zurpcFxDVSkFKj7E4lGlbb/I1XIFbLWfa74="
+            secure: "Xu84X+7tUMAzO2qCw53d2Gq2tcg99+oTqAuIuSlB0gDxQL7lkWcjPWPf3CE9jmgu4C4fw56R4ZX2oYW3m0+mtcPCKDoJAFKwFswMImDbdYcfTLCr4Hn3I+yxqjw7ls6Zlr7XL4o9mfWbZhM/1eF2iWdDdcBzMhlzHxe7eD0J+K/N0VSWgJTRFhHercyUsOgr2aXZz0CwQPU4zHzd2uZaTGUUoX9nK9nSb6Ro64sefzaviUBuLJjt9T2v6YuKibXHKwXYCgpHG3anwOwS/SuGPMszOoGuR0KtGCF6McLtAOtsHYGn4CXL3CbB03rYYZ4TRHX7Av9qGwS79LcY+bDVEnCs5Hebim14W0t4N+rk5hB7uglvYP/X/BeBp40SvEzhNiT/o2k80Q+toUN17avyjBm5knvRmlzFBSXT8aI75FDv8/LJ5Mdq+N6c3QrUoGOayNWtjeabC0alGLC9mAPLyiR47SeniumrkndLkRPqw8iWqDoe7jSPTbeK4T5IebqhwWg8bCXDUCA6iMNHOXzy74enRuoPXUVl+zM64d5ISwHDN8O59TZrqU6MSzPeYWm+hCeB+MhuulubiNlwLe+UkKQLTh8CqvNBX/6DdWPuYvEDjW/gK644Bh9TcpWH6x0oP8SkihZKSrXBNF3eenYhU4ph7kwkxxX86HE24aasU7c="
           skip_cleanup: true
           on:
             tags: true
@@ -115,7 +102,7 @@ jobs:
         - provider: puppetforge
           user: simp
           password:
-            secure: "nzHOVbiSeIzHo/c2CavI6pRq2Q/rcd+Dr1VDDR5wyMl3w2gfQK2sCoU/QolAZZ7bWwycm+9QKtH8r1/4WAyazJbakiw0oeeS27MTMwHlZJdKfUML0j2+F+9e0EcsuRnes4CMZaKKM6yYixP+j6uhVA3tnJfLldYx0QNH4vNznCb4CMuJkSHfFBO79F0kcRX9LIH7kJfG911GXdeBK08ILm254s2ENVffub0L7UblpwyVV5Cezku6yFOLk07XwjAzEhka2Br1sS0kRUVqYqkcoU4ZRSK/6ZcQKW9zY1jzAqDhj5ZYP44kTHWH5XOpTuhOUuwaHiZ1zUrleHD1S7UkLW8VVgJI1xykP6R48U6q7FcjUX2gEmoHxR5Hkj6/nuFgzxFdeCAoFJ8SPuGl5TAdIUC3lUaZDH4RNBvXbk0AvYOfwF1i53t7XsMPhpZvj7KgWX1ZiEhb4dTY+F+rOCytD5uSdOGTSSdeoo00cEfjxkrNHpolll0y2lkE6AsnWOLhC9Z1Fy1CrygPe9ubFK6TX1cKluE4KES4bJKohz7+YJ5NXRAc+98zx1YUC+YUQCoTcsgmfOwb0r2Le8w9e1EfZcjns3hJn+ypecJNBRofOIXNsK+/v5iaPs5pDao/o3dqt37raTja18qRdaVDmsP/aiul7/TEoqoua0tb8IJ3Xh8="
+            secure: "NR5lPHTfp142XIW5nowolBMFitPaaXpLiO9IvNXU3u00cZCOQmdU8fKWZPqKcUf8izV8EK9p5KCOSd956XxwrCyuwNEq6Z26WAydU6MN8qMKW7ucfm+xcURWQPKQ19MX5pNSaLOXemFvva2kuZF1rkwCYoSHJeBXDfLusBau56b9cIbX8BxNfkqPVzbNu1LioQkXTJ8Qt0u/hmRZy4593E6O5I6Hblh2lPKugNv+LpsUqwCGll1hvnTu0SJJEPZBYlKuC34qfsnqErT+eSOjLNGhxkPy3JVfwP4GRQbw2rFWNMzaPC/i6LGuB9GMPuUNjJHpZyl2+k33f9vFwfZiWoqIwJTRQTnXsbSa/amgtlaFX//43n9NMMPrI9WryoiYHTWQGiDxNuzqN6qjtthUlNfPBovsaqSsmcW9XELhsMxoo/t1G6LQWqEiCq5FB/bsnEig24CJeRELHL42A3bii+VWiBl/kgMEd/ju3J0VIqbLKIJcPQWhcomW5YGMf8Q9+FNZPyA4i3ebwwehh+etfND6+d3DOeXE84ZGLtJppELRwbgvJO/JWE/qxCdNSO4Nh3No+rRqXal3IESQBkfawuQoLIMBod7MCrRzo5d4J1asyoFJU+FMLRYjCcgaMUudUNViux6g86Cfav9rTDmhs7zdIZxaCOSNgLv9gfNu6AY="
           on:
             tags: true
             condition: '($SKIP_FORGE_PUBLISH != true)'
