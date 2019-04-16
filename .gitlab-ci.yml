@@ -172,13 +172,6 @@ pup5.5.10-fips:
   script:
     - 'BEAKER_fips=yes bundle exec rake beaker:suites'
 
-pup5.5.10-netconsole:
-  <<: *pup_5_5_10
-  <<: *acceptance_base
-  script:
-    - 'bundle exec rake spec_clean'
-    - 'bundle exec rake beaker:suites[netconsole]'
-
 pup5.5.10-oel-combined-x64:
   <<: *pup_5_5_10
   <<: *acceptance_base
