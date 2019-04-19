@@ -1,3 +1,7 @@
+* Fri Apr 12 2019 Joseph Sharkey <shark.bruhaha@gmail.com> - 6.4.2
+- Removed out of date doc/
+- Updated tests for pup6 support and removed pup4 support
+
 * Tue Mar 19 2019 Liz Nemsick <lnemsick.simp@gmail.com> - 6.4.2
 - Use simplib::nets2ddq in lieu of simplib's deprecated Puppet 3 nets2ddq
 - Use Puppet Integer instead of simplib's deprecated Puppet 3 to_integer
