@@ -67,8 +67,6 @@ EOM
 ---
 version: 5
 hierarchy:
-  - name: Hostname
-    path: "%{facts.hostname}.yaml"
   - name: SIMP Compliance Engine
     lookup_key: compliance_markup::enforcement
     options:
