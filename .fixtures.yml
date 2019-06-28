@@ -18,6 +18,7 @@ fixtures:
     vox_selinux:
       repo: https://github.com/simp/pupmod-voxpupuli-selinux
       branch: simp-master
+    rsyslog: https://github.com/simp/pupmod-simp-rsyslog
     simplib: https://github.com/simp/pupmod-simp-simplib
     simp_options: https://github.com/simp/pupmod-simp-simp_options
     stdlib: https://github.com/simp/puppetlabs-stdlib

@@ -8,6 +8,15 @@ FileUtils.rm_rf(v1_profiles) if File.directory?(v1_profiles)
 # reporting work.
 describe 'compliance_markup', type: :class do
 
+  # Add any defined types that are necessary for full evaluation here
+  let(:required_defined_types){<<-EOM
+      stunnel::connection{ 'test':
+        accept  => 0,
+        connect => [0,1024],
+      }
+    EOM
+  }
+
   compliance_profiles = [
     'disa_stig',
     'nist_800_53:rev4'
@@ -19,6 +28,7 @@ describe 'compliance_markup', type: :class do
   # defaults
   expected_classes = [
     'stunnel',
+    'simp_options'
   ]
 
   allowed_failures = {
@@ -37,6 +47,7 @@ describe 'compliance_markup', type: :class do
           }
 
           let(:pre_condition) {%(
+            #{required_defined_types}
             #{expected_classes.map{|c| %{include #{c}}}.join("\n")}
           )}
 
