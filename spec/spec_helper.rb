@@ -69,6 +69,8 @@ version: 5
 hierarchy:
   - name: SIMP Compliance Engine
     lookup_key: compliance_markup::enforcement
+    options:
+      enabled_sce_versions: [2]
 <% if custom_hieradata -%>
   - name: Custom Test Hieradata
     path: "<%= custom_hieradata %>.yaml"
