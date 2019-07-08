@@ -13,15 +13,6 @@ describe 'compliance_markup', type: :class do
     'nist_800_53:rev4'
   ]
 
-  # Add any defined types that are necessary for full evaluation here
-  let(:required_defined_types){<<-EOM
-      stunnel::connection{ 'test':
-        accept  => 0,
-        connect => [0,1024]
-      }
-    EOM
-  }
-
   # A list of classes that we expect to be included for compliance
   #
   # This needs to be well defined since we can also manipulate defined type
@@ -31,12 +22,19 @@ describe 'compliance_markup', type: :class do
   ]
 
   allowed_failures = {
-    'documented_missing_parameters' => [],
+    'documented_missing_parameters' => [
+    ] + expected_classes.map{|c| Regexp.new("^(?!#{c}(::.*)?)")},
     'documented_missing_resources' => [
-      Regexp.new('^simp_options($|::.*)'),
-      Regexp.new('^selinux($|::.*)'),
-      Regexp.new('^logrotate($|::.*)')
-    ]
+    ] + expected_classes.map{|c| Regexp.new("^(?!#{c}(::.*)?)")}
+  }
+
+  # Add any defined types that are necessary for full evaluation here
+  let(:required_defined_types){<<-EOM
+    stunnel::connection{ 'test':
+      accept  => 0,
+      connect => [0,1024]
+    }
+    EOM
   }
 
   on_supported_os.each do |os, os_facts|
