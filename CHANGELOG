@@ -1,3 +1,6 @@
+* Fri Aug 02 2019 Robert Vincent <pillarsdotnet@gmail.com> - 6.5.1
+- Support puppetlabs/concat 6.x.
+
 * Tue Jun 04 2019 Steven Pritchard <steven.pritchard@onyxpoint.com> - 6.5.0
 - Add v2 compliance_markup data
 
