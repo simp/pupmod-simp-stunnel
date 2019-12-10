@@ -1,4 +1,4 @@
-# Set up a stunnel connection for the service ``$name``
+# @summary Set up a stunnel connection for the service ``$name``
 #
 # NOTE: Since many of the parameters here may need to be modified on a
 # case-by-base basis, this defined type uses capabilities presented by the
@@ -214,10 +214,10 @@ define stunnel::connection (
   Optional[Stdlib::Absolutepath]              $app_pki_key             = simplib::dlookup('stunnel::connection', 'app_pki_key', $name, { 'default_value' => undef }),
   Optional[Stdlib::Absolutepath]              $app_pki_cert            = simplib::dlookup('stunnel::connection', 'app_pki_cert', $name, { 'default_value' => undef }),
   Stdlib::Absolutepath                        $app_pki_cacert          = simplib::dlookup('stunnel::connection', 'app_pki_cacert', $name, { 'default_value' => '/etc/pki/simp_apps/stunnel/x509/cacerts/cacerts.pem' }),
-  Stdlib::Absolutepath                        $app_pki_crl             = simplib::dlookup('stunnel::connection', 'app_pki_crl', $name, { 'default_value' => '/etc/pki/simp_apps/stunnel/x509/crl' }),
+  Optional[Stdlib::Absolutepath]              $app_pki_crl             = simplib::dlookup('stunnel::connection', 'app_pki_crl', $name, { 'default_value' => undef }),
   Array[String]                               $openssl_cipher_suite    = simplib::dlookup('stunnel::connection', 'openssl_cipher_suite', $name, { 'default_value' => ['HIGH','-SSLv2'] }),
   Optional[String]                            $curve                   = simplib::dlookup('stunnel::connection', 'curve', $name, { 'default_value' => undef }),
-  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::connection', 'ssl_version', $name, { 'default_value' => undef }),
+  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::connection', 'ssl_version', $name, { 'default_value' => 'TLSv1.2'}),
   Array[String]                               $options                 = simplib::dlookup('stunnel::connection', 'options', $name, { 'default_value' => [] }),
   Integer                                     $verify                  = simplib::dlookup('stunnel::connection', 'verify', $name, { 'default_value' => 2 }),
   Optional[Simplib::URI]                      $ocsp                    = simplib::dlookup('stunnel::connection', 'ocsp', $name, { 'default_value' => undef }),
@@ -252,22 +252,22 @@ define stunnel::connection (
 
   stunnel::instance::reserve_port { $_dport: }
 
-  include '::stunnel::monolithic'
+  include 'stunnel::monolithic'
 
   # Validation for RHEL6/7 Options. Defaulting to 7.
   if ($facts['os']['name'] in ['RedHat','CentOS','OracleLinux']) and ($facts['os']['release']['major'] < '7') {
-    if $::stunnel::fips {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1']) }
+    if $stunnel::fips {
+      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
     }
     else {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1']) }
+      if $ssl_version { simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2']) }
     }
     if $protocol {
       simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','smtp'])
     }
   }
   else {
-    if $::stunnel::fips {
+    if $stunnel::fips {
       if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
     }
     else {
@@ -284,25 +284,25 @@ define stunnel::connection (
     $_app_pki_key = $app_pki_key
   }
   else {
-    $_app_pki_key = $::stunnel::app_pki_key
+    $_app_pki_key = $stunnel::app_pki_key
   }
   if $app_pki_cert {
     $_app_pki_cert = $app_pki_cert
   }
   else {
-    $_app_pki_cert = $::stunnel::app_pki_cert
+    $_app_pki_cert = $stunnel::app_pki_cert
   }
   if $app_pki_cacert {
     $_app_pki_cacert = $app_pki_cacert
   }
   else {
-    $_app_pki_cacert = $::stunnel::app_pki_cacert
+    $_app_pki_cacert = $stunnel::app_pki_cacert
   }
   if $app_pki_crl {
     $_app_pki_crl = $app_pki_crl
   }
   else {
-    $_app_pki_crl = $::stunnel::app_pki_crl
+    $_app_pki_crl = $stunnel::app_pki_crl
   }
 
   concat::fragment { "stunnel_connection_${name}":
@@ -315,7 +315,7 @@ define stunnel::connection (
   #
   # This is only enabled if the system is a server.
   if $firewall and !$client {
-    include '::iptables'
+    include 'iptables'
 
     iptables::listen::tcp_stateful { "allow_stunnel_${name}":
       trusted_nets => $trusted_nets,
@@ -324,7 +324,7 @@ define stunnel::connection (
   }
 
   if !$client and $tcpwrappers {
-    include '::tcpwrappers'
+    include 'tcpwrappers'
 
     tcpwrappers::allow { "allow_stunnel_${name}":
       svc     => $name,

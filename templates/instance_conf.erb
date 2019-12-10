@@ -83,7 +83,11 @@
   stunnel_conf << "key = #{@app_pki_key}"
   stunnel_conf << "cert = #{@app_pki_cert}"
   stunnel_conf << "CAfile = #{@app_pki_cacert}"
-  stunnel_conf << "CRLpath = #{@app_pki_crl}"
+
+  if @app_pki_crl
+    stunnel_conf << "CRLpath = #{@app_pki_crl}"
+  end
+
   stunnel_conf << "ciphers = #{@openssl_cipher_suite.join(':')}"
 
   if @curve

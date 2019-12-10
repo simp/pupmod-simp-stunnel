@@ -1,6 +1,6 @@
 {
   "name": "simp-stunnel",
-  "version": "6.5.1",
+  "version": "6.6.0",
   "author": "SIMP Team",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",
@@ -30,7 +30,7 @@
     },
     {
       "name": "simp/iptables",
-      "version_requirement": ">= 6.0.0 < 7.0.0"
+      "version_requirement": ">= 6.4.0 < 7.0.0"
     },
     {
       "name": "simp/pki",
@@ -38,7 +38,7 @@
     },
     {
       "name": "simp/simplib",
-      "version_requirement": ">= 3.12.0 < 4.0.0"
+      "version_requirement": ">= 3.12.0 < 5.0.0"
     },
     {
       "name": "simp/tcpwrappers",
@@ -49,15 +49,17 @@
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "6",
-        "7"
+        "8",
+        "7",
+        "6"
       ]
     },
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "6",
-        "7"
+        "8",
+        "7",
+        "6"
       ]
     },
     {

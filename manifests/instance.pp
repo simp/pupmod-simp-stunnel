@@ -1,4 +1,4 @@
-# Set up a stunnel connection with a unique configuration and service
+# @summary Set up a stunnel connection with a unique configuration and service
 #
 # NOTE: Since many of the parameters here may need to be modified on a
 # case-by-base basis, this defined type uses capabilities presented by the
@@ -225,7 +225,7 @@ define stunnel::instance(
   Stdlib::Absolutepath                        $app_pki_cert            = simplib::dlookup('stunnel::instance', 'app_pki_cert', $name, { 'default_value' => "${app_pki_dir}/public/${facts['fqdn']}.pub" }),
   Stdlib::Absolutepath                        $app_pki_ca_dir          = simplib::dlookup('stunnel::instance', 'app_pki_ca_dir', $name, { 'default_value' => "${app_pki_dir}/cacerts" }),
   Stdlib::Absolutepath                        $app_pki_cacert          = simplib::dlookup('stunnel::instance', 'app_pki_cacert', $name, { 'default_value' => "${app_pki_dir}/cacerts/cacerts.pem" }),
-  Stdlib::Absolutepath                        $app_pki_crl             = simplib::dlookup('stunnel::instance', 'app_pki_crl', $name, { 'default_value' => "${app_pki_dir}/crl" }),
+  Optional[Stdlib::Absolutepath]              $app_pki_crl             = simplib::dlookup('stunnel::instance', 'app_pki_crl', $name, { 'default_value' => undef }),
   Optional[Stdlib::Absolutepath]              $chroot                  = simplib::dlookup('stunnel::instance', 'chroot', $name, { 'default_value' => undef }),
   Optional[Enum['zlib','rle']]                $compression             = simplib::dlookup('stunnel::instance', 'compression', $name, { 'default_value' => undef }),
   Optional[String]                            $curve                   = simplib::dlookup('stunnel::instance', 'curve', $name, { 'default_value' => undef }),
@@ -265,7 +265,7 @@ define stunnel::instance(
   Integer                                     $gid                     = simplib::dlookup('stunnel::instance', 'gid', $name, { 'default_value' =>                                                                                                        $uid }),
   Optional[String]                            $sni                     = simplib::dlookup('stunnel::instance', 'sni', $name, { 'default_value' => undef }),
   Array[String]                               $socket_options          = simplib::dlookup('stunnel::instance', 'socket_options', $name, { 'default_value' => [] }),
-  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::instance', 'ssl_version', $name, { 'default_value' => undef }),
+  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::instance', 'ssl_version', $name, { 'default_value' => 'TLSv1.2'}),
   Optional[Integer]                           $stack                   = simplib::dlookup('stunnel::instance', 'stack', $name, { 'default_value' => undef }),
   String                                      $stunnel_debug           = simplib::dlookup('stunnel::instance', 'stunnel_debug', $name, { 'default_value' => 'err' }),
   Boolean                                     $syslog                  = simplib::dlookup('stunnel::instance', 'syslog', $name, { 'default_value' => simplib::lookup('simp_options::syslog', { 'default_value' => false }) }),
@@ -284,17 +284,17 @@ define stunnel::instance(
 
   stunnel::instance::reserve_port { $_dport: }
 
-  if $haveged { include '::haveged' }
+  if $haveged { include 'haveged' }
 
-  include '::stunnel'
+  include 'stunnel'
 
   # Validation for RHEL6/7 Options. Defaulting to 7.
-  if ($facts['os']['name'] in ['Red Hat','CentOS']) and ($facts['os']['release']['major'] < '7') {
+  if ($facts['os']['name'] in ['RedHat','CentOS','OracleLinux']) and ($facts['os']['release']['major'] < '7') {
     if $fips {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1']) }
+      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
     }
     else {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1']) }
+      if $ssl_version { simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2']) }
     }
     if $protocol {
       simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','smtp'])
@@ -502,7 +502,7 @@ define stunnel::instance(
   #
   # This is only enabled if the system is a server.
   if $firewall and !$client {
-    include '::iptables'
+    include 'iptables'
 
     iptables::listen::tcp_stateful { "allow_stunnel_${_safe_name}":
       trusted_nets => $trusted_nets,
@@ -511,7 +511,7 @@ define stunnel::instance(
   }
 
   if !$client and $tcpwrappers {
-    include '::tcpwrappers'
+    include 'tcpwrappers'
 
     tcpwrappers::allow { "allow_stunnel_${_safe_name}":
       pattern => simplib::nets2ddq($trusted_nets),
@@ -546,7 +546,7 @@ define stunnel::instance(
   service { "stunnel_managed_by_puppet_${_safe_name}":
     ensure  => 'running',
     enable  => true,
-    require => [
+    subscribe => [
       File[$_service_file],
       File["/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf"]
     ] + $_stunnel_piddir

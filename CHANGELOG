@@ -1,4 +1,20 @@
-* Fri Aug 02 2019 Robert Vincent <pillarsdotnet@gmail.com> - 6.5.1
+* Tue Dec 10 2019 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.6.0
+- Add support for EL8
+- Added REFERENCE.md
+- Updated README.md
+- Set default for stunnel::connection::ssl_version to TLSv1.2 for EL8
+  compatibility
+- Set default for stunnel::instance::ssl_version to TLSv1.2 for EL8
+  compatibility
+- Add an stunnel::instance_purge class to remedy the 'floating services' issue
+- Set the stunnel::connection::app_pki_crl parameter to ``undef`` by default due
+  to issues with pointing the setting to an absent directory in EL8
+- Set the stunnel::instance::app_pki_crl parameter to ``undef`` by default due
+  to issues with pointing the setting to an absent directory in EL8
+- Update valid ssl_version entries
+- Update acceptance tests to pass data between all combinations of nodes
+
+* Fri Aug 02 2019 Robert Vincent <pillarsdotnet@gmail.com> - 6.6.0
 - Support puppetlabs/concat 6.x.
 
 * Tue Jun 04 2019 Steven Pritchard <steven.pritchard@onyxpoint.com> - 6.5.0

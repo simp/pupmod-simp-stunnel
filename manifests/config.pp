@@ -114,19 +114,19 @@
 # @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 class stunnel::config (
-  Variant[Enum['simp'],Boolean]  $pki                     = $::stunnel::pki,
-  Stdlib::Absolutepath           $app_pki_dir             = $::stunnel::app_pki_dir,
-  String                         $app_pki_external_source = $::stunnel::app_pki_external_source,
-  Stdlib::Absolutepath           $app_pki_key             = $::stunnel::app_pki_key,
-  Stdlib::Absolutepath           $app_pki_cert            = $::stunnel::app_pki_cert,
-  Stdlib::Absolutepath           $app_pki_ca_dir          = $::stunnel::app_pki_ca_dir,
-  Stdlib::Absolutepath           $app_pki_crl             = $::stunnel::app_pki_crl,
+  Variant[Enum['simp'],Boolean]  $pki                     = $stunnel::pki,
+  Stdlib::Absolutepath           $app_pki_dir             = $stunnel::app_pki_dir,
+  String                         $app_pki_external_source = $stunnel::app_pki_external_source,
+  Stdlib::Absolutepath           $app_pki_key             = $stunnel::app_pki_key,
+  Stdlib::Absolutepath           $app_pki_cert            = $stunnel::app_pki_cert,
+  Stdlib::Absolutepath           $app_pki_ca_dir          = $stunnel::app_pki_ca_dir,
+  Optional[Stdlib::Absolutepath] $app_pki_crl             = $stunnel::app_pki_crl,
   Stdlib::Absolutepath           $chroot                  = '/var/stunnel',
   Optional[Stdlib::Absolutepath] $pid                     = undef,
-  String                         $setuid                  = $::stunnel::setuid,
-  String                         $setgid                  = $::stunnel::setgid,
-  Integer                        $uid                     = $::stunnel::uid,
-  Integer                        $gid                     = $::stunnel::gid,
+  String                         $setuid                  = $stunnel::setuid,
+  String                         $setgid                  = $stunnel::setgid,
+  Integer                        $uid                     = $stunnel::uid,
+  Integer                        $gid                     = $stunnel::gid,
   String                         $stunnel_debug           = 'err',
   Optional[Enum['zlib','rle']]   $compression             = undef,
   Optional[String]               $egd                     = undef,
@@ -137,11 +137,11 @@ class stunnel::config (
   Optional[Stdlib::Absolutepath] $rnd_file                = undef,
   Boolean                        $rnd_overwrite           = true,
   Array[String]                  $socket_options          = [],
-  Boolean                        $syslog                  = $::stunnel::syslog,
-  Boolean                        $fips                    = $::stunnel::fips
+  Boolean                        $syslog                  = $stunnel::syslog,
+  Boolean                        $fips                    = $stunnel::fips
 ) inherits stunnel {
 
-  include '::stunnel::monolithic'
+  include 'stunnel::monolithic'
 
   ensure_resource('stunnel::account', $setuid,
     {

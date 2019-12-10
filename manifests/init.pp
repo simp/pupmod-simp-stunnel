@@ -1,4 +1,4 @@
-# Set up stunnel
+# @summary Set up stunnel
 #
 # @param pki
 #   * If 'simp', include SIMP's pki module and use pki::copy to manage
@@ -65,41 +65,39 @@
 #     fips option in that version of stunnel.
 #
 # @param haveged
-#  Include the SIMP ``haveged`` module to assist with entropy generation
+#   Include the SIMP ``haveged`` module to assist with entropy generation
+#
+# @param pki
+#   Whether or not to use the SIMP PKI subsystem
+#
+# @param purge_instance_resources
+#   Enable purging of stunnel instance resources that are no longer managed
+#
+#   * It is **highly** recommended that you leave this enabled
 #
 # @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 class stunnel (
-  Stdlib::Absolutepath          $app_pki_dir             = '/etc/pki/simp_apps/stunnel/x509',
-  String                        $app_pki_external_source = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }),
-  Stdlib::Absolutepath          $app_pki_key             = "${app_pki_dir}/private/${facts['fqdn']}.pem",
-  Stdlib::Absolutepath          $app_pki_cert            = "${app_pki_dir}/public/${facts['fqdn']}.pub",
-  Stdlib::Absolutepath          $app_pki_ca_dir          = "${app_pki_dir}/cacerts",
-  Stdlib::Absolutepath          $app_pki_crl             = "${app_pki_dir}/crl",
-  String                        $setuid                  = 'stunnel',
-  String                        $setgid                  = 'stunnel',
-  Integer                       $uid                     = 600,
-  Integer                       $gid                     = $uid,
-  Boolean                       $syslog                  = simplib::lookup('simp_options::syslog', { 'default_value'  => false }),
-  Boolean                       $fips                    = simplib::lookup('simp_options::fips', { 'default_value'    => pick($facts['fips_enabled'], false) }),
-  Boolean                       $haveged                 = simplib::lookup('simp_options::haveged', { 'default_value' => false }),
-  Variant[Enum['simp'],Boolean] $pki                     = simplib::lookup('simp_options::pki', { 'default_value'     => false })
+  Stdlib::Absolutepath           $app_pki_dir              = '/etc/pki/simp_apps/stunnel/x509',
+  String                         $app_pki_external_source  = simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }),
+  Stdlib::Absolutepath           $app_pki_key              = "${app_pki_dir}/private/${facts['fqdn']}.pem",
+  Stdlib::Absolutepath           $app_pki_cert             = "${app_pki_dir}/public/${facts['fqdn']}.pub",
+  Stdlib::Absolutepath           $app_pki_ca_dir           = "${app_pki_dir}/cacerts",
+  Optional[Stdlib::Absolutepath] $app_pki_crl              = undef,
+  String                         $setuid                   = 'stunnel',
+  String                         $setgid                   = 'stunnel',
+  Integer                        $uid                      = 600,
+  Integer                        $gid                      = $uid,
+  Boolean                        $syslog                   = simplib::lookup('simp_options::syslog', { 'default_value' => false }),
+  Boolean                        $fips                     = simplib::lookup('simp_options::fips', { 'default_value' => pick($facts['fips_enabled'], false) }),
+  Boolean                        $haveged                  = simplib::lookup('simp_options::haveged', { 'default_value' => false }),
+  Variant[Enum['simp'],Boolean]  $pki                      = simplib::lookup('simp_options::pki', { 'default_value' => false }),
+  Boolean                        $purge_instance_resources = true
 ) {
 
-  contain '::stunnel::install'
+  contain 'stunnel::install'
 
-  # This is present to ensure that any 'stunnel::instance' resources are
-  # appropriately purged prior to running in legacy mode or creating additional
-  # instances
-  #
-  # The native type has an 'autobefore' that will do the right thing
-  stunnel_instance_purge { 'stunnel_managed_by_puppet':
-    # Update this list if stunnel::instance drops additional files that need to
-    # be purged
-    dirs => [
-      '/etc/stunnel',
-      '/etc/rc.d/init.d',
-      '/etc/systemd/system'
-    ]
+  if $purge_instance_resources {
+    include 'stunnel::instance_purge'
   }
 }
