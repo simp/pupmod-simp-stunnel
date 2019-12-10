@@ -20,7 +20,7 @@ describe 'instance connectivity' do
         hosts.each do |client|
 
           server_fqdn = fact_on(server, 'fqdn')
-          client_ip = fact_on(client, 'ipaddress_eth1')
+          client_ip = fact_on(client, 'networking.interfaces').values[1]['ip']
 
           hieradata = {
             'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
