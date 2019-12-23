@@ -7,9 +7,11 @@ describe 'connection' do
   hosts.each do |host|
 
     let(:hieradata) {{
+      'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
+      'simp_options::firewall'     => true,
       'simp_options::pki'          => true,
       'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
-      'simp_options::trusted_nets' => ['ANY']
+      'simp_options::trusted_nets' => ['ALL']
     }}
     let(:base_manifest) { <<-EOF
         stunnel::connection { 'nfs':

@@ -15,7 +15,7 @@ class stunnel::install (
 ){
   assert_private()
 
-  if $::stunnel::haveged { include '::haveged' }
+  if $stunnel::haveged { include 'haveged' }
 
   package { 'stunnel': ensure => $version }
 

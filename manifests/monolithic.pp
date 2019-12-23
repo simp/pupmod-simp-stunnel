@@ -5,14 +5,14 @@
 class stunnel::monolithic {
   assert_private()
 
-  include '::stunnel'
+  include 'stunnel'
 
-  contain '::stunnel::config'
-  contain '::stunnel::service'
+  contain 'stunnel::config'
+  contain 'stunnel::service'
 
   Class['stunnel::config'] ~> Class['stunnel::service']
 
-  if $::stunnel::haveged {
+  if $stunnel::haveged {
     Class['haveged'] ~> Class['stunnel::service']
   }
 }

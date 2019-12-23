@@ -38,7 +38,6 @@ can be used independently:
   [simp/simp_options](https://github.com/simp/pupmod-simp-simp_options) for
   details.
 
-
 ## Module Description
 
 This module sets up [stunnel](https://www.stunnel.org/index.html) and allows
@@ -111,7 +110,7 @@ stunnel::connection { 'my_service':
 
 ## Reference
 
-Please see the ``puppet strings`` [generated documentation](https://github.com/simp/pupmod-simp-stunnel/tree/master/doc) for a full reference.
+Please see [REFERENCE.md](./REFERENCE.md) for a full reference.
 
 ## Limitations
 
@@ -122,5 +121,5 @@ operating systems have not been tested and results cannot be guaranteed.
 
 Please read our [Contribution Guide](https://simp.readthedocs.io/en/stable/contributors_guide/index.html).
 
-Visit the project homepage on [GitHub](https://simp-project.com)
-and look at our issues on  [JIRA](https://simp-project.atlassian.net/).
+Visit the [project homepage](https://simp-project.com) and look at our issues on
+[JIRA](https://simp-project.atlassian.net/).

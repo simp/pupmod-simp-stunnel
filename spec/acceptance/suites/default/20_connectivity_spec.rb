@@ -9,68 +9,72 @@ describe 'instance connectivity' do
       skip('You need at least two hosts in your nodeset to run this test')
     end
   else
-    let(:manifest) { <<-EOF
-      stunnel::instance { 'mysvc':
-        client  => false,
-        connect => [1234],
-        accept  => 12345
-      }
-
-      stunnel::instance { 'mysvc-client':
-        client  => true,
-        connect => ['#{server_fqdn}:12345'],
-        accept  => 1235
-      }
-      EOF
-    }
-
-    let(:hieradata) {{
-      'simp_options::pki'          => true,
-      'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
-      'simp_options::trusted_nets' => [client_fqdn]
-    }}
-
-    server = hosts[0]
-    client = hosts[1]
-
-    let(:server_fqdn) { fact_on(server, 'fqdn') }
-    let(:client_fqdn) { fact_on(client, 'fqdn') }
-
-    context 'set up a bi-directional connection set' do
+    context 'system prep' do
       hosts.each do |host|
-
-        context "on #{host}" do
-          # FIXME: Need to disable firewalld by default in base OEL box in the future
-          # Account for this now by stopping the service
-          it 'should disable firewalld if necessary' do
-            if fact_on(host, 'operatingsystem').strip == 'OracleLinux' and fact_on(host, 'operatingsystemmajrelease').strip == '7'
-              on(host, 'puppet resource service firewalld ensure=stopped enable=false')
-            end
-          end
-
-          it 'should apply with no errors' do
-            set_hieradata_on(host, hieradata)
-            apply_manifest_on(host, manifest)
-          end
-
-          it 'should be idempotent' do
-            apply_manifest_on(host, manifest, catch_changes: true)
-          end
-
-          it 'should set up netcat to listen' do
-            host.install_package('nc')
-            on(host, 'nc -k --listen 1234 > /tmp/ncout.txt 2>&1 &')
-          end
-        end
+        install_package(host, 'nc')
       end
     end
 
-    context 'test a passed message' do
-      it 'should send from the client' do
-        on(client, %(/bin/echo "#{client_fqdn}" | nc localhost 1235))
-        output = on(server, 'tail -n1 /tmp/ncout.txt').stdout.strip
+    context 'set up a bi-directional connection set' do
+      hosts.each do |server|
+        hosts.each do |client|
 
-        expect(output).to eq client_fqdn
+          server_fqdn = fact_on(server, 'fqdn')
+          client_ip = fact_on(client, 'networking.interfaces').values[1]['ip']
+
+          hieradata = {
+            'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
+            'simp_options::firewall'     => true,
+            'simp_options::pki'          => true,
+            'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
+            'simp_options::trusted_nets' => [client_ip]
+          }
+
+          manifest = <<-EOF
+            stunnel::instance { 'mysvc':
+              client  => false,
+              connect => [1234],
+              accept  => 12345
+            }
+
+            stunnel::instance { 'mysvc-client':
+              client  => true,
+              connect => ['#{server_fqdn}:12345'],
+              accept  => 1235,
+              require => Stunnel::Instance['mysvc']
+            }
+          EOF
+
+          context "with server #{server} and client #{client}" do
+            [server, client].each do |host|
+              it "should clean up #{host}" do
+                on(host, 'pkill -f nc', :accept_all_exit_codes => true)
+              end
+
+              it "should apply on #{host} with no errors" do
+                set_hieradata_on(host, hieradata)
+                apply_manifest_on(host, manifest)
+              end
+
+              it "should be idempotent on #{host}" do
+                apply_manifest_on(host, manifest, catch_changes: true)
+              end
+            end
+
+            it "should set up netcat to listen on #{server}" do
+              on(server, 'nc -k -l 1234 > /tmp/ncout.txt 2>&1 &')
+            end
+
+            it "should send successfully from #{client}" do
+              on(client, %(/bin/echo "#{client_ip}" | nc localhost 1235))
+            end
+
+            it "should be received successfully on #{server}" do
+              output = on(server, 'tail -n1 /tmp/ncout.txt').stdout.strip
+              expect(output).to eq client_ip
+            end
+          end
+        end
       end
     end
   end
