@@ -32,9 +32,7 @@ sslVersion = TLSv1.2
 verify = 2
 delay = no
             EOM
-            unless facts[:os][:release][:major] < '7'
-              expected  += "renegotiation = yes\nreset = yes\n"
-            end
+            expected  += "renegotiation = yes\nreset = yes\n"
             is_expected.to create_concat__fragment("stunnel_connection_#{title}").with_content(expected)
           end
 
@@ -115,17 +113,13 @@ delay = no
 
           it { is_expected.to compile.with_all_deps }
 
-          if os_facts[:os][:release][:major] < '7'
-            it { is_expected.to create_concat__fragment("stunnel_connection_#{title}").with_content(/session = 20/) }
-          else
-            [ /sni = test.sni.server/,
-              /sessionCacheTimeout = 20/,
-              /sessionCacheSize = 1000/,
-              /renegotiation = yes/,
-              /reset = yes/
-            ].each do |exp_regex|
-              it { is_expected.to create_concat__fragment("stunnel_connection_#{title}").with_content(exp_regex) }
-            end
+          [ /sni = test.sni.server/,
+            /sessionCacheTimeout = 20/,
+            /sessionCacheSize = 1000/,
+            /renegotiation = yes/,
+            /reset = yes/
+          ].each do |exp_regex|
+            it { is_expected.to create_concat__fragment("stunnel_connection_#{title}").with_content(exp_regex) }
           end
 
           [ /curve = prime256v1/,

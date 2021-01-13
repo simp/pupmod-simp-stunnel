@@ -31,7 +31,7 @@ describe 'connection' do
     # older init script may still be running. This will cause the new systemd
     # unit to fail to start, citing the port already being in use.
     context 'with an existing stunnel process on el7' do
-      if fact_on(host, 'operatingsystemmajrelease').to_s >= '7' && fact_on(host, 'operatingsystem') != 'OracleLinux'
+      if fact_on(host, 'operatingsystem') != 'OracleLinux'
         let(:hostname) { fact_on(host, 'hostname') }
         let(:minion_stunnel_conf) { <<-EOF
             debug = err
@@ -89,11 +89,7 @@ describe 'connection' do
       end
 
       it 'should be running stunnel in one monolithic process' do
-        if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
-          on(host, 'systemctl status stunnel')
-        else
-          on(host, 'service stunnel status')
-        end
+        on(host, 'systemctl status stunnel')
       end
 
       [20490,30490].each do |port|
@@ -127,11 +123,7 @@ describe 'connection' do
         end
 
         it 'should be running stunnel in one monolithic process' do
-          if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
-            on(host, 'systemctl status stunnel')
-          else
-            on(host, 'service stunnel status')
-          end
+          on(host, 'systemctl status stunnel')
         end
 
         [20490,30490].each do |port|
@@ -165,11 +157,7 @@ describe 'connection' do
         end
 
         it 'should be running stunnel in one monolithic process' do
-          if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
-            on(host, 'systemctl status stunnel')
-          else
-            on(host, 'service stunnel status')
-          end
+          on(host, 'systemctl status stunnel')
         end
 
         [20490,30490].each do |port|
@@ -204,11 +192,7 @@ describe 'connection' do
         end
 
         it 'should be running stunnel in one monolithic process' do
-          if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
-            on(host, 'systemctl status stunnel')
-          else
-            on(host, 'service stunnel status')
-          end
+          on(host, 'systemctl status stunnel')
         end
 
         [20490,30490].each do |port|
@@ -239,11 +223,7 @@ describe 'connection' do
         end
 
         it 'should be running stunnel in one monolithic process' do
-          if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
-            on(host, 'systemctl status stunnel')
-          else
-            on(host, 'service stunnel status')
-          end
+          on(host, 'systemctl status stunnel')
         end
 
         [20490,30490].each do |port|

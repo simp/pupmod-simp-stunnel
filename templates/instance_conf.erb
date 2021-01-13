@@ -41,7 +41,7 @@
     end
   end
 
-  if ['RedHat','CentOS','OracleLinux'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'].to_s >= "7")
+  if ['RedHat','CentOS','OracleLinux'].include?(@facts['os']['name'])
     stunnel_conf << "fips = #{bool_translate[(@facts['fips_enabled'] || @fips)]}"
   end
 
@@ -74,10 +74,8 @@
   stunnel_conf << "client = #{bool_translate[@client]}"
   stunnel_conf << "failover = #{@failover}"
 
-  if @facts['os']['release']['major'] > '6'
-    if @sni
-      stunnel_conf << "sni = #{@sni}"
-    end
+  if @sni
+    stunnel_conf << "sni = #{@sni}"
   end
 
   stunnel_conf << "key = #{@app_pki_key}"
@@ -148,13 +146,8 @@
     stunnel_conf << "retry = #{bool_translate[@retry]}"
   end
 
-  if @facts['os']['release']['major'] < '7'
-    if @session_cache_timeout
-      stunnel_conf << "session = #{@session_cache_timeout}"
-    end
-  end
 
-  if ['RedHat','CentOS','OracleLinux'].include?(@facts['operatingsystem']) && (@facts['operatingsystemmajrelease'] > '6')
+  if ['RedHat','CentOS','OracleLinux'].include?(@facts['os']['name'])
     stunnel_conf << "renegotiation = #{bool_translate[@renegotiation]}"
     stunnel_conf << "reset = #{bool_translate[@reset]}"
 

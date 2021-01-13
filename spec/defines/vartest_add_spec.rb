@@ -375,19 +375,8 @@ describe 'stunnel::connection' do
         let(:facts){ facts }
         it_behaves_like "a fact set vartest add"
 
-        if facts[:operatingsystemmajrelease] == '6'
-          variable_test(
-            'nfs',
-            :session_cache_timeout,
-            12345,
-            { :params => {
-                :connect => [2049],
-                :client => false,
-                :accept => 20490
-            },
-            :key_str => 'session'
-          })
-        elsif facts[:operatingsystemmajrelease] == '7'
+        # TODO: Should these (or additional) tests cover EL8?
+        if facts[:operatingsystemmajrelease] == '7'
           ['foo','foo:bar'].each do |sni_opts|
             variable_test(
               'nfs',

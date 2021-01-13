@@ -46,15 +46,9 @@ describe 'instance' do
 
 
       it 'should be running stunnel, stunnel_managed_by_puppet_nfs, and stunnel_managed_by_puppet_chroot' do
-        if fact_on(host, 'operatingsystemmajrelease').to_s >= '7'
-          on(host, 'systemctl status stunnel')
-          on(host, 'systemctl status stunnel_managed_by_puppet_nfs')
-          on(host, 'systemctl status stunnel_managed_by_puppet_chroot')
-        else
-          on(host, 'service stunnel status')
-          on(host, 'service stunnel_managed_by_puppet_nfs status')
-          on(host, 'service stunnel_managed_by_puppet_chroot status')
-        end
+        on(host, 'systemctl status stunnel')
+        on(host, 'systemctl status stunnel_managed_by_puppet_nfs')
+        on(host, 'systemctl status stunnel_managed_by_puppet_chroot')
       end
 
       [20490,30490,40490].each do |port|
