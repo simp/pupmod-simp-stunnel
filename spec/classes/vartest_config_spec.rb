@@ -27,9 +27,13 @@ end
 
 describe 'stunnel::config' do
   context 'supported operating systems' do
-    on_supported_os({:selinux_mode => :disabled}).each do |os, facts|
+    on_supported_os.each do |os, os_facts|
       context "on #{os}" do
-        let(:facts){ facts }
+        let(:facts){
+          os_facts.merge({
+            :selinux_current_mode => 'disabled'
+          })
+        }
 
         it { is_expected.to compile.with_all_deps }
 

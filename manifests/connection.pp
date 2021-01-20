@@ -160,8 +160,6 @@
 # @param session_cache_timeout
 #   The number of seconds to keep cached SSL sessions
 #
-#   * Corresponds to the ``session_timeout`` variable in EL 6
-#
 # @param stack
 #   Thread stack size in **bytes**
 #
