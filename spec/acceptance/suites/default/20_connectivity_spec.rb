@@ -20,14 +20,14 @@ describe 'instance connectivity' do
         hosts.each do |client|
 
           server_fqdn = fact_on(server, 'fqdn')
-          client_ip = fact_on(client, 'networking.interfaces').values[1]['ip']
 
           hieradata = {
             'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
+            'iptables::precise_match'    => true,
             'simp_options::firewall'     => true,
             'simp_options::pki'          => true,
             'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
-            'simp_options::trusted_nets' => [client_ip]
+            'simp_options::trusted_nets' => [client.ip]
           }
 
           manifest = <<-EOF
@@ -66,12 +66,12 @@ describe 'instance connectivity' do
             end
 
             it "should send successfully from #{client}" do
-              on(client, %(/bin/echo "#{client_ip}" | nc localhost 1235))
+              on(client, %(/bin/echo "#{client.ip}" | nc localhost 1235))
             end
 
             it "should be received successfully on #{server}" do
               output = on(server, 'tail -n1 /tmp/ncout.txt').stdout.strip
-              expect(output).to eq client_ip
+              expect(output).to eq client.ip
             end
           end
         end

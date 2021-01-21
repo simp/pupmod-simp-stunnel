@@ -134,9 +134,6 @@
 #   * We don't enable FIPS mode by default since we want to be able to use
 #     TLS1.2
 #
-#   * **NOTE:** This has no effect on EL < 7 due to stunnel not accepting the
-#     fips option in that version of stunnel
-#
 # @param openssl_cipher_suite
 #   OpenSSL compatible array of ciphers to allow on the system
 #
@@ -288,30 +285,17 @@ define stunnel::instance(
 
   include 'stunnel'
 
-  # Validation for RHEL6/7 Options. Defaulting to 7.
-  if ($facts['os']['name'] in ['RedHat','CentOS','OracleLinux']) and ($facts['os']['release']['major'] < '7') {
-    if $fips {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
-    }
-    else {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2']) }
-    }
-    if $protocol {
-      simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','smtp'])
-    }
+  # Validation for RHEL Options
+  if $fips {
+    if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
   }
   else {
-    if $fips {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
+    if $ssl_version {
+      simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
     }
-    else {
-      if $ssl_version {
-        simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
-      }
-    }
-    if $protocol {
-      simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
-    }
+  }
+  if $protocol {
+    simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
   }
 
   ensure_resource('stunnel::account', $setuid,

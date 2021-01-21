@@ -39,38 +39,24 @@ describe 'stunnel::config' do
         }
 
         context 'with default parameters (chrooted) and selinux off' do
+          let(:service_file) { File.read('spec/expected/connection/chroot-systemd.txt') }
+
           it_should_behave_like "a chrooted and non-chrooted configuration"
 
           # Specific to chrooting
-          if os_facts[:operatingsystemmajrelease] >= '7'
-            # Fips should be disabled with default params for el 7 systems
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
-                chroot = /var/stunnel
-                setgid = stunnel
-                setuid = stunnel
-                debug = err
-                syslog = no
-                foreground = yes
-                pid = /var/run/stunnel/stunnel.pid
-                engine = auto
-                fips = no
-                RNDoverwrite = yes
-              EOM
-            )}
-          else
-            # Fips should not exist on an el 6 system
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
-                chroot = /var/stunnel
-                setgid = stunnel
-                setuid = stunnel
-                debug = err
-                syslog = no
-                pid = /var/run/stunnel/stunnel.pid
-                engine = auto
-                RNDoverwrite = yes
-              EOM
-            )}
-          end
+          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
+              chroot = /var/stunnel
+              setgid = stunnel
+              setuid = stunnel
+              debug = err
+              syslog = no
+              foreground = yes
+              pid = /var/run/stunnel/stunnel.pid
+              engine = auto
+              fips = no
+              RNDoverwrite = yes
+            EOM
+          )}
 
           it { is_expected.to contain_file('/var/stunnel') }
           it { is_expected.to contain_file('/var/stunnel/etc') }
@@ -82,21 +68,13 @@ describe 'stunnel::config' do
           it { is_expected.to contain_file('/var/stunnel/var/run/stunnel') }
           it { is_expected.to contain_file('/var/stunnel/etc/pki') }
           it { is_expected.to contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
-
-          if os_facts[:operatingsystemmajrelease].to_i >= 7
-            let(:service_file) { File.read('spec/expected/connection/chroot-systemd.txt') }
-            it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
-                                  .that_notifies('Exec[stunnel daemon reload]')
-                                  .with_content(service_file) }
-            it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel').with_ensure('absent')}
-            it { is_expected.to contain_service('stunnel')
-                                  .that_requires(['File[/etc/systemd/system/stunnel.service]','File[/etc/rc.d/init.d/stunnel]']) }
-            it { is_expected.to contain_exec('stunnel daemon reload') }
-          else
-            let(:service_file) { File.read('spec/expected/connection/chroot-init.txt') }
-            it { is_expected.to create_file('/etc/rc.d/init.d/stunnel').with_content(service_file) }
-            it { is_expected.to contain_service('stunnel').that_requires('File[/etc/rc.d/init.d/stunnel]') }
-          end
+          it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
+                                .that_notifies('Exec[stunnel daemon reload]')
+                                .with_content(service_file) }
+          it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel').with_ensure('absent')}
+          it { is_expected.to contain_service('stunnel')
+                                .that_requires(['File[/etc/systemd/system/stunnel.service]','File[/etc/rc.d/init.d/stunnel]']) }
+          it { is_expected.to contain_exec('stunnel daemon reload') }
         end
 
         context 'with parameters chroot set to /' do
@@ -118,33 +96,19 @@ describe 'stunnel::config' do
 
           it_should_behave_like "a chrooted and non-chrooted configuration"
 
-          if os_facts[:operatingsystemmajrelease] >= '7'
-            # Fips should be disabled
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
-                setgid = stunnel
-                setuid = stunnel
-                debug = err
-                syslog = no
-                foreground = yes
-                pid = /var/run/stunnel/stunnel.pid
-                engine = auto
-                fips = no
-                RNDoverwrite = yes
-              EOM
-            )}
-          else
-            # Fips should not exist on an el 6 system
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
-                setgid = stunnel
-                setuid = stunnel
-                debug = err
-                syslog = no
-                pid = /var/run/stunnel/stunnel.pid
-                engine = auto
-                RNDoverwrite = yes
-              EOM
-            )}
-          end
+          # Fips should be disabled
+          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
+              setgid = stunnel
+              setuid = stunnel
+              debug = err
+              syslog = no
+              foreground = yes
+              pid = /var/run/stunnel/stunnel.pid
+              engine = auto
+              fips = no
+              RNDoverwrite = yes
+            EOM
+          )}
           it { is_expected.to_not contain_file('/var/stunnel') }
           it { is_expected.to_not contain_file('/var/stunnel/etc') }
           it { is_expected.to_not contain_file('/var/stunnel/etc/resolv.conf') }
@@ -156,19 +120,13 @@ describe 'stunnel::config' do
           it { is_expected.to_not contain_file('/var/stunnel/etc/pki') }
           it { is_expected.to_not contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
 
-          if os_facts[:operatingsystemmajrelease].to_i >= 7
-            let(:service_file) { File.read('spec/expected/connection/nonchroot-systemd.txt') }
-            it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
-                                   .that_notifies('Exec[stunnel daemon reload]')
-                                   .with_content(service_file) }
-            it { is_expected.to contain_service('stunnel')
-                                  .that_requires('File[/etc/systemd/system/stunnel.service]') }
-            it { is_expected.to contain_exec('stunnel daemon reload') }
-          else
-            let(:service_file) { File.read('spec/expected/connection/nonchroot-init.txt') }
-            it { is_expected.to create_file('/etc/rc.d/init.d/stunnel').with_content(service_file) }
-            it { is_expected.to contain_service('stunnel').that_requires('File[/etc/rc.d/init.d/stunnel]') }
-          end
+          let(:service_file) { File.read('spec/expected/connection/nonchroot-systemd.txt') }
+          it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
+                                 .that_notifies('Exec[stunnel daemon reload]')
+                                 .with_content(service_file) }
+          it { is_expected.to contain_service('stunnel')
+                                .that_requires('File[/etc/systemd/system/stunnel.service]') }
+          it { is_expected.to contain_exec('stunnel daemon reload') }
         end
         context 'with pki = simp, syslog = true, and fips = true' do
           let(:params) {{
@@ -181,13 +139,7 @@ describe 'stunnel::config' do
           it { is_expected.to create_pki__copy('stunnel') }
           # Make sure syslog = yes in stunnel.conf
           it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(/syslog = yes/) }
-          # Fips should be enabled on el 7 systems
-          if os_facts[:operatingsystemmajrelease] >= '7'
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(/fips = yes/) }
-          # Fips should not exist on an el 6 system
-          else
-            it { is_expected.to contain_concat__fragment('0_stunnel_global').without_content(/fips/) }
-          end
+          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(/fips = yes/) }
         end
 
         context 'with pid specified' do
@@ -200,15 +152,9 @@ describe 'stunnel::config' do
           # stunnel::config::pid: /var/opt/run/stunnel.pid
           let(:hieradata) { 'pid' }
           it { is_expected.to compile.with_all_deps }
-          if os_facts[:operatingsystemmajrelease].to_i >= 7
-            let(:service_file) { File.read('spec/expected/connection/chroot-systemd-pid.txt') }
-            it { is_expected.to contain_file('/etc/systemd/system/stunnel.service')
-                                  .with_content(service_file) }
-          else
-            let(:service_file) { File.read('spec/expected/connection/chroot-init-pid.txt') }
-            it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel')
-                                  .with_content(service_file) }
-          end
+          let(:service_file) { File.read('spec/expected/connection/chroot-systemd-pid.txt') }
+          it { is_expected.to contain_file('/etc/systemd/system/stunnel.service')
+                                .with_content(service_file) }
         end
       end
     end

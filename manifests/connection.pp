@@ -95,12 +95,6 @@
 # @param verify
 #   Level of mutual authentication to perform
 #
-#   * RHEL 6 Options:
-#       * level 1 - verify peer certificate if present
-#       * level 2 - verify peer certificate
-#       * level 3 - verify peer with locally installed certificate
-#       * default - no verify
-#
 #   * RHEL 7 Options:
 #       * level 0 - Request and ignore peer certificate.
 #       * level 1 - Verify peer certificate if present.
@@ -123,7 +117,6 @@
 # @param protocol
 #   The application protocol to negotiate SSL.
 #
-#   * RHEL/CentOS 6:  [cifs|connect|imap|nntp|pgsql|pop3|smtp]
 #   * RHEL/CentOS 7+: [cifs|connect|imap|nntp|pgsql|pop3|proxy|smtp]
 #
 # @param protocol_authentication
@@ -166,8 +159,6 @@
 #
 # @param session_cache_timeout
 #   The number of seconds to keep cached SSL sessions
-#
-#   * Corresponds to the ``session_timeout`` variable in EL 6
 #
 # @param stack
 #   Thread stack size in **bytes**
@@ -254,30 +245,17 @@ define stunnel::connection (
 
   include 'stunnel::monolithic'
 
-  # Validation for RHEL6/7 Options. Defaulting to 7.
-  if ($facts['os']['name'] in ['RedHat','CentOS','OracleLinux']) and ($facts['os']['release']['major'] < '7') {
-    if $stunnel::fips {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
-    }
-    else {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2']) }
-    }
-    if $protocol {
-      simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','smtp'])
-    }
+  # Validation for RHEL Options
+  if $stunnel::fips {
+    if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
   }
   else {
-    if $stunnel::fips {
-      if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
+    if $ssl_version {
+      simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
     }
-    else {
-      if $ssl_version {
-        simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
-      }
-    }
-    if $protocol {
-      simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
-    }
+  }
+  if $protocol {
+    simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
   }
 
   if $app_pki_key {
