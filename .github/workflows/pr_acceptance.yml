@@ -1,0 +1,60 @@
+# Run all tests as GitHub Actions
+name: Unit Tests
+on:
+  push:
+    branches:
+      # A test branch for seeing if your tests will pass in your personal fork
+      - test_me_github
+    pull_request_target:
+      types: [opened, reopened, synchronize]
+
+jobs:
+  acceptance:
+    runs-on:
+      - ubuntu-latest
+    strategy:
+      matrix:
+        ruby:
+          - 2.6
+      fail-fast: false
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: ensure entropy
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y rng-tools
+          sudo systemctl start rng-tools
+      - name: install podman
+        run: |
+          set -x
+          sudo apt-get remove -y podman docker-ce docker docker-engine docker.io containerd runc ||:
+          curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_$( lsb_release -rs )/Release.key | sudo apt-key add -
+          echo  "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_$( lsb_release -rs )/ /" | sudo tee /etc/apt/sources.list.d/podman.list /dev/null
+          sudo apt-get update
+          sudo apt-get install -y podman
+          sudo apt autoremove -y
+          sudo systemctl start podman
+      - name: configure podman
+        run: |
+          sudo systemctl stop podman
+          sudo mkdir /etc/systemd/system/podman.service.d
+          echo -e "[Service]\nExecStart=\nExecStart=/usr/bin/podman \$LOGGING system service -t 0 tcp:localhost:8484" | sudo tee -a /etc/systemd/system/podman.service.d/override.conf > /dev/null
+          sudo systemctl daemon-reload
+          sudo systemctl start podman.service
+          sudo podman --url tcp://localhost:8484 ps
+      - name: install bundler
+        run: |
+          gem install bundler
+          bundle update
+      - name: beaker
+        continue-on-error: true
+        env:
+          DOCKER_HOST: 'tcp://localhost:8484'
+          CONTAINER_HOST: 'tcp://localhost:8484'
+        run: |
+          bundle exec rake beaker:suites[default,docker]

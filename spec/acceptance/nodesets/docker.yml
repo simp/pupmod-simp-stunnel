@@ -1,0 +1,28 @@
+HOSTS:
+  el7.test.net:
+    roles:
+      - server-el7
+      - default
+    platform:   el-7-x86_64
+    hypervisor: docker
+    image: simpproject/simp_beaker_el7
+    docker_cmd: '["/sbin/init"]'
+
+  el8.test.net:
+    roles:
+      - server-el8
+    platform:   el-8-x86_64
+    hypervisor: docker
+    image: simpproject/simp_beaker_el8
+    docker_cmd: '["/sbin/init"]'
+
+CONFIG:
+  log_level: verbose
+  type: aio
+<% if ENV['BEAKER_PUPPET_ENVIRONMENT'] -%>
+  puppet_environment: <%= ENV['BEAKER_PUPPET_ENVIRONMENT'] %>
+<% end -%>
+  ssh:
+    password: root
+    auth_methods:
+      - password

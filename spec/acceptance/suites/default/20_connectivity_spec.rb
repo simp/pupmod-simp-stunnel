@@ -66,7 +66,7 @@ describe 'instance connectivity' do
             end
 
             it "should send successfully from #{client}" do
-              on(client, %(/bin/echo "#{client.ip}" | nc localhost 1235))
+              on(client, %(/bin/echo "#{client.ip}" | nc -w1 localhost 1235))
             end
 
             it "should be received successfully on #{server}" do
