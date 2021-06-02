@@ -8,6 +8,7 @@ describe 'connection' do
 
     let(:hieradata) {{
       'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
+      'simp_options::haveged'      => true,
       'simp_options::firewall'     => true,
       'simp_options::pki'          => true,
       'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
