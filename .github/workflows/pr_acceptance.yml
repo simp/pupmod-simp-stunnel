@@ -5,8 +5,8 @@ on:
     branches:
       # A test branch for seeing if your tests will pass in your personal fork
       - test_me_github
-    pull_request_target:
-      types: [opened, reopened, synchronize]
+  pull_request:
+    types: [opened, reopened, synchronize]
 
 jobs:
   acceptance:
