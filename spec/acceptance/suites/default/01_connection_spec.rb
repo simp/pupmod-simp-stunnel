@@ -8,6 +8,7 @@ describe 'connection' do
 
     let(:hieradata) {{
       'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
+      'simp_options::haveged'      => true,
       'simp_options::firewall'     => true,
       'simp_options::pki'          => true,
       'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
@@ -79,7 +80,8 @@ describe 'connection' do
     # does not test stunnel itself.
     context 'with selinux on' do
       it 'should apply with no errors' do
-        install_package(host, 'epel-release')
+        enable_epel_on(host)
+
         set_hieradata_on(host,hieradata)
         apply_manifest_on(host,base_manifest, catch_failures: true)
       end

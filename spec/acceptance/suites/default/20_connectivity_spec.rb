@@ -24,6 +24,7 @@ describe 'instance connectivity' do
           hieradata = {
             'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
             'iptables::precise_match'    => true,
+            'simp_options::haveged'      => true,
             'simp_options::firewall'     => true,
             'simp_options::pki'          => true,
             'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
@@ -66,7 +67,7 @@ describe 'instance connectivity' do
             end
 
             it "should send successfully from #{client}" do
-              on(client, %(/bin/echo "#{client.ip}" | nc localhost 1235))
+              on(client, %(/bin/echo "#{client.ip}" | nc -w1 localhost 1235))
             end
 
             it "should be received successfully on #{server}" do
