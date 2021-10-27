@@ -6,6 +6,7 @@ describe 'stunnel::instance' do
       let(:title) { 'nfs' }
       let(:facts) {
         os_facts.merge(
+          haveged__rngd_enabled: false,
           selinux_current_mode: 'enabled',
           selinux_enforced: true
         )
