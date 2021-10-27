@@ -51,8 +51,7 @@ describe 'stunnel::instance' do
             dports:       [params[:accept].to_s.split(':')[-1]]
           )
         }
-        it { is_expected.to create_tcpwrappers__allow('allow_stunnel_nfs') \
-          .with_pattern(['any']) }
+        it { is_expected.to create_tcpwrappers__allow('allow_stunnel_nfs').with_pattern(['ALL']) }
         it { is_expected.to create_pki__copy('stunnel_nfs') }
         it { is_expected.to contain_class('stunnel::install') }
       end

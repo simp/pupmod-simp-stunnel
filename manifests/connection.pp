@@ -306,7 +306,8 @@ define stunnel::connection (
 
     tcpwrappers::allow { "allow_stunnel_${name}":
       svc     => $name,
-      pattern => simplib::nets2ddq($trusted_nets)
+      # Needed to work around a bug in the version of stunnel shipped with EL7.9
+      pattern => 'ALL'
     }
   }
 }

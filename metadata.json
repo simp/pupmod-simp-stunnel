@@ -1,6 +1,6 @@
 {
   "name": "simp-stunnel",
-  "version": "6.7.0",
+  "version": "6.7.1",
   "author": "SIMP Team",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",

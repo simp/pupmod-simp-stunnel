@@ -66,7 +66,7 @@ delay = no
             :trusted_nets => ['any']
           }}
           it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_tcpwrappers__allow("allow_stunnel_#{title}").with_pattern(['any']) }
+          it { is_expected.to create_tcpwrappers__allow("allow_stunnel_#{title}").with_pattern(['ALL']) }
         end
 
         context 'setting ocsp options' do
