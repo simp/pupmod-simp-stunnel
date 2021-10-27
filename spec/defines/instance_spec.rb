@@ -65,6 +65,7 @@ describe 'stunnel::instance' do
         }}
         let(:facts) {
           os_facts.merge(
+            haveged__rngd_enabled: false,
             selinux_current_mode: 'disabled',
             selinux_enforced: false
           )
@@ -94,6 +95,7 @@ describe 'stunnel::instance' do
         }}
         let(:facts) {
           os_facts.merge(
+              haveged__rngd_enabled: false,
             selinux_current_mode: 'enforcing',
             selinux_enforced: true
           )
@@ -155,7 +157,12 @@ describe 'stunnel::instance' do
           connect: [2049],
           accept:  20490,
         }}
-        let(:facts) { os_facts.merge(selinux_enforced: false) }
+        let(:facts) {
+          os_facts.merge(
+            haveged__rngd_enabled: false,
+            selinux_enforced: false
+          )
+        }
 
         it { is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service') \
           .without_content(/system_u:object_r:stunnel_var_run_t/)}
@@ -180,7 +187,12 @@ describe 'stunnel::instance' do
           connect: [2049],
           accept:  20490,
         }}
-        let(:facts) { os_facts.merge(init_systems: ['rc']) }
+        let(:facts) {
+          os_facts.merge(
+            haveged__rngd_enabled: false,
+            init_systems: ['rc']
+          )
+        }
         it { is_expected.to compile.and_raise_error(/Init systems.*not supported/) }
       end
 
