@@ -1,8 +1,9 @@
 * Wed Oct 27 2021 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.7.1
-  - Fixed
-    - Set all tcpwrappers connections to allow 'ALL' to work around a bug in the
-      version of stunnel that ships with EL7.9 where a tcpwrappers deny will
-      cause 100% CPU usage and hung process
+- Fixed
+  - Set all tcpwrappers connections to allow 'ALL' to work around a bug in the
+    version of stunnel that ships with EL7.9 where a tcpwrappers deny will
+    cause 100% CPU usage and hung process
+
 * Thu Jun 17 2021 Chris Tessmer <chris.tessmer@onyxpoint.com> - 6.7.0
 - Removed support for Puppet 5
 - Ensured support for Puppet 7 in requirements and stdlib
