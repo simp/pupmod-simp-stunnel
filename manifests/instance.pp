@@ -498,7 +498,8 @@ define stunnel::instance(
     include 'tcpwrappers'
 
     tcpwrappers::allow { "allow_stunnel_${_safe_name}":
-      pattern => simplib::nets2ddq($trusted_nets),
+      # Needed to work around a bug in the version of stunnel shipped with EL7.9
+      pattern => 'ALL',
       svc     => $_safe_name
     }
   }
