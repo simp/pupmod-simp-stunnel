@@ -44,7 +44,7 @@ if has_variable?('setgid')
     end
   end
 
-  if ['RedHat','CentOS','OracleLinux'].include?(@facts['os']['name'])
+  if ['RedHat','CentOS','OracleLinux','Rocky'].include?(@facts['os']['name'])
     stunnel_conf << "fips = #{bool_translate[(@facts['fips_enabled'] || @fips)]}"
   end
 
@@ -150,7 +150,7 @@ else
     stunnel_conf << "retry = #{bool_translate[@retry]}"
   end
 
-  if ['RedHat','CentOS','OracleLinux'].include?(@facts['os']['name'])
+  if ['RedHat','CentOS','OracleLinux','Rocky'].include?(@facts['os']['name'])
     stunnel_conf << "renegotiation = #{bool_translate[@renegotiation]}"
     stunnel_conf << "reset = #{bool_translate[@reset]}"
 
