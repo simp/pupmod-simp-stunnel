@@ -1,3 +1,6 @@
+* Mon Jul 24 2023 Chris Tessmer <chris.tessmer@onyxpoint.com> - 6.8.0
+- Add RockyLinux 8 support
+
 * Wed Oct 27 2021 Trevor Vaughan <tvaughan@onyxpoint.com> - 6.7.1
 - Fixed
   - Set all tcpwrappers connections to allow 'ALL' to work around a bug in the
