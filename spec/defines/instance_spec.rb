@@ -1,15 +1,30 @@
 require 'spec_helper'
 
 describe 'stunnel::instance' do
+  def mock_selinux_false_facts(os_facts)
+    os_facts[:selinux] = false
+    os_facts[:os][:selinux][:config_mode] = 'disabled'
+    os_facts[:os][:selinux][:current_mode] = 'disabled'
+    os_facts[:os][:selinux][:enabled] = false
+    os_facts[:os][:selinux][:enforced] = false
+    os_facts
+  end
+
+  def mock_selinux_enforcing_facts(os_facts)
+    os_facts[:selinux] = true
+    os_facts[:os][:selinux][:config_mode] = 'enforcing'
+    os_facts[:os][:selinux][:config_policy] = 'targeted'
+    os_facts[:os][:selinux][:current_mode] = 'enforcing'
+    os_facts[:os][:selinux][:enabled] = true
+    os_facts[:os][:selinux][:enforced] = true
+    os_facts
+  end
+
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:title) { 'nfs' }
       let(:facts) {
-        os_facts.merge(
-          haveged__rngd_enabled: false,
-          selinux_current_mode: 'enabled',
-          selinux_enforced: true
-        )
+        mock_selinux_enforcing_facts(os_facts.merge(haveged__rngd_enabled: false))
       }
 
       context 'with default parameters' do
@@ -64,11 +79,7 @@ describe 'stunnel::instance' do
           pki:     true
         }}
         let(:facts) {
-          os_facts.merge(
-            haveged__rngd_enabled: false,
-            selinux_current_mode: 'disabled',
-            selinux_enforced: false
-          )
+          mock_selinux_false_facts(os_facts.merge(haveged__rngd_enabled: false))
         }
         let(:service_file) { File.read('spec/expected/instance/chroot-systemd.txt') }
 
@@ -94,11 +105,7 @@ describe 'stunnel::instance' do
           chroot:  '/var/stunnel_sel'
         }}
         let(:facts) {
-          os_facts.merge(
-              haveged__rngd_enabled: false,
-            selinux_current_mode: 'enforcing',
-            selinux_enforced: true
-          )
+          mock_selinux_enforcing_facts(os_facts.merge(haveged__rngd_enabled: false))
         }
         let(:service_file) { File.read('spec/expected/instance/chroot-sel-systemd.txt') }
 
@@ -158,10 +165,7 @@ describe 'stunnel::instance' do
           accept:  20490,
         }}
         let(:facts) {
-          os_facts.merge(
-            haveged__rngd_enabled: false,
-            selinux_enforced: false
-          )
+          mock_selinux_false_facts(os_facts.merge(haveged__rngd_enabled: false))
         }
 
         it { is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service') \
