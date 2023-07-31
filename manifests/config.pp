@@ -151,7 +151,7 @@ class stunnel::config (
     }
   )
 
-  if $facts['selinux_current_mode'] and $facts['selinux_current_mode'] != 'disabled' {
+  if $facts['os']['selinux']['current_mode'] and $facts['os']['selinux']['current_mode'] != 'disabled' {
     $_chroot = undef
   }
   else {
