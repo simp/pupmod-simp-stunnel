@@ -1,5 +1,25 @@
 require 'spec_helper'
 
+def mock_selinux_false_facts(os_facts)
+  os_facts[:selinux] = false
+  os_facts[:os][:selinux][:config_mode] = 'disabled'
+  os_facts[:os][:selinux][:current_mode] = 'disabled'
+  os_facts[:os][:selinux][:enabled] = false
+  os_facts[:os][:selinux][:enforced] = false
+  os_facts
+end
+
+def mock_selinux_enforcing_facts(os_facts)
+  os_facts[:selinux] = true
+  os_facts[:os][:selinux][:config_mode] = 'enforcing'
+  os_facts[:os][:selinux][:config_policy] = 'targeted'
+  os_facts[:os][:selinux][:current_mode] = 'enforcing'
+  os_facts[:os][:selinux][:enabled] = true
+  os_facts[:os][:selinux][:enforced] = true
+  os_facts
+end
+
+
 def variable_test(key,val,opts={})
   opts[:key_str] ||= key.to_s
   opts[:val_str] ||= val.to_s
@@ -30,9 +50,7 @@ describe 'stunnel::config' do
     on_supported_os.each do |os, os_facts|
       context "on #{os}" do
         let(:facts){
-          os_facts.merge({
-            :selinux_current_mode => 'disabled'
-          })
+          mock_selinux_false_facts(os_facts)
         }
 
         it { is_expected.to compile.with_all_deps }
