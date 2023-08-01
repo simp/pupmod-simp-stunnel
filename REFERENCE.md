@@ -7,18 +7,18 @@
 ### Classes
 
 * [`stunnel`](#stunnel): Set up stunnel
-* [`stunnel::config`](#stunnelconfig): Global stunnel options
-* [`stunnel::install`](#stunnelinstall): **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) Defined Type**  Install the Stunnel components
-* [`stunnel::instance_purge`](#stunnelinstance_purge): Purge `stunnel::instance` resources that were previously managed by this module
-* [`stunnel::monolithic`](#stunnelmonolithic): **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**  Prevent global connection and configurat
-* [`stunnel::service`](#stunnelservice): Manage the Stunnel Service
+* [`stunnel::config`](#stunnel--config): Global stunnel options
+* [`stunnel::install`](#stunnel--install): **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) Defined Type**  Install the Stunnel components
+* [`stunnel::instance_purge`](#stunnel--instance_purge): Purge `stunnel::instance` resources that were previously managed by this module
+* [`stunnel::monolithic`](#stunnel--monolithic): **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**  Prevent global connection and configurat
+* [`stunnel::service`](#stunnel--service): Manage the Stunnel Service
 
 ### Defined types
 
-* [`stunnel::account`](#stunnelaccount): **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS** A define for setting up stunnel service u
-* [`stunnel::connection`](#stunnelconnection): Set up a stunnel connection for the service ``$name``
-* [`stunnel::instance`](#stunnelinstance): Set up a stunnel connection with a unique configuration and service
-* [`stunnel::instance::reserve_port`](#stunnelinstancereserve_port): **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) DEFINED TYPE**  This is a 'canary' defined type t
+* [`stunnel::account`](#stunnel--account): **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS** A define for setting up stunnel service u
+* [`stunnel::connection`](#stunnel--connection): Set up a stunnel connection for the service ``$name``
+* [`stunnel::instance`](#stunnel--instance): Set up a stunnel connection with a unique configuration and service
+* [`stunnel::instance::reserve_port`](#stunnel--instance--reserve_port): **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) DEFINED TYPE**  This is a 'canary' defined type t
 
 ### Resource types
 
@@ -26,8 +26,8 @@
 
 ### Data types
 
-* [`Stunnel::Connect`](#stunnelconnect): Valid entries for an stunnel ``connect`` entry
-* [`Stunnel::OcspFlags`](#stunnelocspflags): Valid stunnel OCSP flag options
+* [`Stunnel::Connect`](#Stunnel--Connect): Valid entries for an stunnel ``connect`` entry
+* [`Stunnel::OcspFlags`](#Stunnel--OcspFlags): Valid stunnel OCSP flag options
 
 ## Classes
 
@@ -39,24 +39,24 @@ Set up stunnel
 
 The following parameters are available in the `stunnel` class:
 
-* [`pki`](#pki)
-* [`app_pki_external_source`](#app_pki_external_source)
-* [`app_pki_dir`](#app_pki_dir)
-* [`app_pki_key`](#app_pki_key)
-* [`app_pki_cert`](#app_pki_cert)
-* [`app_pki_ca_dir`](#app_pki_ca_dir)
-* [`app_pki_crl`](#app_pki_crl)
-* [`setuid`](#setuid)
-* [`setgid`](#setgid)
-* [`uid`](#uid)
-* [`gid`](#gid)
-* [`syslog`](#syslog)
-* [`fips`](#fips)
-* [`haveged`](#haveged)
-* [`pki`](#pki)
-* [`purge_instance_resources`](#purge_instance_resources)
+* [`pki`](#-stunnel--pki)
+* [`app_pki_external_source`](#-stunnel--app_pki_external_source)
+* [`app_pki_dir`](#-stunnel--app_pki_dir)
+* [`app_pki_key`](#-stunnel--app_pki_key)
+* [`app_pki_cert`](#-stunnel--app_pki_cert)
+* [`app_pki_ca_dir`](#-stunnel--app_pki_ca_dir)
+* [`app_pki_crl`](#-stunnel--app_pki_crl)
+* [`setuid`](#-stunnel--setuid)
+* [`setgid`](#-stunnel--setgid)
+* [`uid`](#-stunnel--uid)
+* [`gid`](#-stunnel--gid)
+* [`syslog`](#-stunnel--syslog)
+* [`fips`](#-stunnel--fips)
+* [`haveged`](#-stunnel--haveged)
+* [`pki`](#-stunnel--pki)
+* [`purge_instance_resources`](#-stunnel--purge_instance_resources)
 
-##### <a name="pki"></a>`pki`
+##### <a name="-stunnel--pki"></a>`pki`
 
 Data type: `Variant[Enum['simp'],Boolean]`
 
@@ -74,7 +74,7 @@ Data type: `Variant[Enum['simp'],Boolean]`
 
 Default value: `simplib::lookup('simp_options::pki', { 'default_value' => false })`
 
-##### <a name="app_pki_external_source"></a>`app_pki_external_source`
+##### <a name="-stunnel--app_pki_external_source"></a>`app_pki_external_source`
 
 Data type: `String`
 
@@ -85,7 +85,7 @@ Data type: `String`
 
 Default value: `simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' })`
 
-##### <a name="app_pki_dir"></a>`app_pki_dir`
+##### <a name="-stunnel--app_pki_dir"></a>`app_pki_dir`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -98,7 +98,7 @@ $app_pki_crl. It defaults to /etc/pki/simp_apps/stunnel/x509.
 
 Default value: `'/etc/pki/simp_apps/stunnel/x509'`
 
-##### <a name="app_pki_key"></a>`app_pki_key`
+##### <a name="-stunnel--app_pki_key"></a>`app_pki_key`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -106,7 +106,7 @@ Path and name of the private SSL key file
 
 Default value: `"${app_pki_dir}/private/${facts['fqdn']}.pem"`
 
-##### <a name="app_pki_cert"></a>`app_pki_cert`
+##### <a name="-stunnel--app_pki_cert"></a>`app_pki_cert`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -114,7 +114,7 @@ Path and name of the public SSL certificate
 
 Default value: `"${app_pki_dir}/public/${facts['fqdn']}.pub"`
 
-##### <a name="app_pki_ca_dir"></a>`app_pki_ca_dir`
+##### <a name="-stunnel--app_pki_ca_dir"></a>`app_pki_ca_dir`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -125,16 +125,16 @@ versions of the CA certificates
 
 Default value: `"${app_pki_dir}/cacerts"`
 
-##### <a name="app_pki_crl"></a>`app_pki_crl`
+##### <a name="-stunnel--app_pki_crl"></a>`app_pki_crl`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
 Directory external from the stunnel chroot to copy the Certificate
 Revocation List from.
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="setuid"></a>`setuid`
+##### <a name="-stunnel--setuid"></a>`setuid`
 
 Data type: `String`
 
@@ -142,7 +142,7 @@ The user stunnel should run as
 
 Default value: `'stunnel'`
 
-##### <a name="setgid"></a>`setgid`
+##### <a name="-stunnel--setgid"></a>`setgid`
 
 Data type: `String`
 
@@ -150,7 +150,7 @@ The group stunnel should run as
 
 Default value: `'stunnel'`
 
-##### <a name="uid"></a>`uid`
+##### <a name="-stunnel--uid"></a>`uid`
 
 Data type: `Integer`
 
@@ -158,7 +158,7 @@ The user id of the stunnel user
 
 Default value: `600`
 
-##### <a name="gid"></a>`gid`
+##### <a name="-stunnel--gid"></a>`gid`
 
 Data type: `Integer`
 
@@ -166,7 +166,7 @@ The group id of the stunnel group
 
 Default value: `$uid`
 
-##### <a name="syslog"></a>`syslog`
+##### <a name="-stunnel--syslog"></a>`syslog`
 
 Data type: `Boolean`
 
@@ -174,7 +174,7 @@ Whether or not to log to syslog
 
 Default value: `simplib::lookup('simp_options::syslog', { 'default_value' => false })`
 
-##### <a name="fips"></a>`fips`
+##### <a name="-stunnel--fips"></a>`fips`
 
 Data type: `Boolean`
 
@@ -185,7 +185,7 @@ Set the fips global option
 
 Default value: `simplib::lookup('simp_options::fips', { 'default_value' => pick($facts['fips_enabled'], false) })`
 
-##### <a name="haveged"></a>`haveged`
+##### <a name="-stunnel--haveged"></a>`haveged`
 
 Data type: `Boolean`
 
@@ -193,13 +193,13 @@ Include the SIMP ``haveged`` module to assist with entropy generation
 
 Default value: `simplib::lookup('simp_options::haveged', { 'default_value' => false })`
 
-##### <a name="pki"></a>`pki`
+##### <a name="-stunnel--pki"></a>`pki`
 
 Whether or not to use the SIMP PKI subsystem
 
 Default value: `simplib::lookup('simp_options::pki', { 'default_value' => false })`
 
-##### <a name="purge_instance_resources"></a>`purge_instance_resources`
+##### <a name="-stunnel--purge_instance_resources"></a>`purge_instance_resources`
 
 Data type: `Boolean`
 
@@ -207,9 +207,9 @@ Enable purging of stunnel instance resources that are no longer managed
 
 * It is **highly** recommended that you leave this enabled
 
-Default value: ``true``
+Default value: `true`
 
-### <a name="stunnelconfig"></a>`stunnel::config`
+### <a name="stunnel--config"></a>`stunnel::config`
 
 Global stunnel options
 
@@ -217,33 +217,33 @@ Global stunnel options
 
 The following parameters are available in the `stunnel::config` class:
 
-* [`chroot`](#chroot)
-* [`pki`](#pki)
-* [`app_pki_external_source`](#app_pki_external_source)
-* [`app_pki_dir`](#app_pki_dir)
-* [`app_pki_key`](#app_pki_key)
-* [`app_pki_cert`](#app_pki_cert)
-* [`app_pki_ca_dir`](#app_pki_ca_dir)
-* [`app_pki_crl`](#app_pki_crl)
-* [`pid`](#pid)
-* [`setuid`](#setuid)
-* [`setgid`](#setgid)
-* [`uid`](#uid)
-* [`gid`](#gid)
-* [`stunnel_debug`](#stunnel_debug)
-* [`syslog`](#syslog)
-* [`compression`](#compression)
-* [`egd`](#egd)
-* [`engine`](#engine)
-* [`engine_ctrl`](#engine_ctrl)
-* [`fips`](#fips)
-* [`output`](#output)
-* [`rnd_bytes`](#rnd_bytes)
-* [`rnd_file`](#rnd_file)
-* [`rnd_overwrite`](#rnd_overwrite)
-* [`socket_options`](#socket_options)
+* [`chroot`](#-stunnel--config--chroot)
+* [`pki`](#-stunnel--config--pki)
+* [`app_pki_external_source`](#-stunnel--config--app_pki_external_source)
+* [`app_pki_dir`](#-stunnel--config--app_pki_dir)
+* [`app_pki_key`](#-stunnel--config--app_pki_key)
+* [`app_pki_cert`](#-stunnel--config--app_pki_cert)
+* [`app_pki_ca_dir`](#-stunnel--config--app_pki_ca_dir)
+* [`app_pki_crl`](#-stunnel--config--app_pki_crl)
+* [`pid`](#-stunnel--config--pid)
+* [`setuid`](#-stunnel--config--setuid)
+* [`setgid`](#-stunnel--config--setgid)
+* [`uid`](#-stunnel--config--uid)
+* [`gid`](#-stunnel--config--gid)
+* [`stunnel_debug`](#-stunnel--config--stunnel_debug)
+* [`syslog`](#-stunnel--config--syslog)
+* [`compression`](#-stunnel--config--compression)
+* [`egd`](#-stunnel--config--egd)
+* [`engine`](#-stunnel--config--engine)
+* [`engine_ctrl`](#-stunnel--config--engine_ctrl)
+* [`fips`](#-stunnel--config--fips)
+* [`output`](#-stunnel--config--output)
+* [`rnd_bytes`](#-stunnel--config--rnd_bytes)
+* [`rnd_file`](#-stunnel--config--rnd_file)
+* [`rnd_overwrite`](#-stunnel--config--rnd_overwrite)
+* [`socket_options`](#-stunnel--config--socket_options)
 
-##### <a name="chroot"></a>`chroot`
+##### <a name="-stunnel--config--chroot"></a>`chroot`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -255,7 +255,7 @@ set to `undef`. This option only affects `stunnel::connection`.
 
 Default value: `'/var/stunnel'`
 
-##### <a name="pki"></a>`pki`
+##### <a name="-stunnel--config--pki"></a>`pki`
 
 Data type: `Variant[Enum['simp'],Boolean]`
 
@@ -273,7 +273,7 @@ Data type: `Variant[Enum['simp'],Boolean]`
 
 Default value: `$stunnel::pki`
 
-##### <a name="app_pki_external_source"></a>`app_pki_external_source`
+##### <a name="-stunnel--config--app_pki_external_source"></a>`app_pki_external_source`
 
 Data type: `String`
 
@@ -284,7 +284,7 @@ Data type: `String`
 
 Default value: `$stunnel::app_pki_external_source`
 
-##### <a name="app_pki_dir"></a>`app_pki_dir`
+##### <a name="-stunnel--config--app_pki_dir"></a>`app_pki_dir`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -297,7 +297,7 @@ The source of certs in the chroot, and the basepath of ``$app_pki_key``,
 
 Default value: `$stunnel::app_pki_dir`
 
-##### <a name="app_pki_key"></a>`app_pki_key`
+##### <a name="-stunnel--config--app_pki_key"></a>`app_pki_key`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -305,7 +305,7 @@ Path and name of the private SSL key file
 
 Default value: `$stunnel::app_pki_key`
 
-##### <a name="app_pki_cert"></a>`app_pki_cert`
+##### <a name="-stunnel--config--app_pki_cert"></a>`app_pki_cert`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -313,7 +313,7 @@ Path and name of the public SSL certificate
 
 Default value: `$stunnel::app_pki_cert`
 
-##### <a name="app_pki_ca_dir"></a>`app_pki_ca_dir`
+##### <a name="-stunnel--config--app_pki_ca_dir"></a>`app_pki_ca_dir`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -325,7 +325,7 @@ versions of the CA certificates
 
 Default value: `$stunnel::app_pki_ca_dir`
 
-##### <a name="app_pki_crl"></a>`app_pki_crl`
+##### <a name="-stunnel--config--app_pki_crl"></a>`app_pki_crl`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -334,7 +334,7 @@ from an external source
 
 Default value: `$stunnel::app_pki_crl`
 
-##### <a name="pid"></a>`pid`
+##### <a name="-stunnel--config--pid"></a>`pid`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -343,9 +343,9 @@ The PID file
 * Relative to the chroot jail!
 * Let the startup script handle it by default
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="setuid"></a>`setuid`
+##### <a name="-stunnel--config--setuid"></a>`setuid`
 
 Data type: `String`
 
@@ -353,7 +353,7 @@ The user stunnel should run as
 
 Default value: `$stunnel::setuid`
 
-##### <a name="setgid"></a>`setgid`
+##### <a name="-stunnel--config--setgid"></a>`setgid`
 
 Data type: `String`
 
@@ -361,7 +361,7 @@ The group stunnel should run as
 
 Default value: `$stunnel::setgid`
 
-##### <a name="uid"></a>`uid`
+##### <a name="-stunnel--config--uid"></a>`uid`
 
 Data type: `Integer`
 
@@ -369,7 +369,7 @@ The UID of the stunnel user
 
 Default value: `$stunnel::uid`
 
-##### <a name="gid"></a>`gid`
+##### <a name="-stunnel--config--gid"></a>`gid`
 
 Data type: `Integer`
 
@@ -377,7 +377,7 @@ The GID of the stunnel user
 
 Default value: `$stunnel::gid`
 
-##### <a name="stunnel_debug"></a>`stunnel_debug`
+##### <a name="-stunnel--config--stunnel_debug"></a>`stunnel_debug`
 
 Data type: `String`
 
@@ -385,7 +385,7 @@ The debug level for logging
 
 Default value: `'err'`
 
-##### <a name="syslog"></a>`syslog`
+##### <a name="-stunnel--config--syslog"></a>`syslog`
 
 Data type: `Boolean`
 
@@ -393,24 +393,24 @@ Enable logging to syslog
 
 Default value: `$stunnel::syslog`
 
-##### <a name="compression"></a>`compression`
+##### <a name="-stunnel--config--compression"></a>`compression`
 
 Data type: `Optional[Enum['zlib','rle']]`
 
 The compression type to use for this service
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="egd"></a>`egd`
+##### <a name="-stunnel--config--egd"></a>`egd`
 
 Data type: `Optional[String]`
 
 The path to the Entropy Gathering Daemon socket used to feed the OpenSSL
 Random Number Generator
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="engine"></a>`engine`
+##### <a name="-stunnel--config--engine"></a>`engine`
 
 Data type: `String`
 
@@ -418,15 +418,15 @@ If ``$egd`` is set, sets the Hardware Engine to be used
 
 Default value: `'auto'`
 
-##### <a name="engine_ctrl"></a>`engine_ctrl`
+##### <a name="-stunnel--config--engine_ctrl"></a>`engine_ctrl`
 
 Data type: `Optional[String]`
 
 If ``$egd`` is set, sets the Hardware Engine Control parameters
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="fips"></a>`fips`
+##### <a name="-stunnel--config--fips"></a>`fips`
 
 Data type: `Boolean`
 
@@ -440,39 +440,39 @@ Set the ``fips`` global option
 
 Default value: `$stunnel::fips`
 
-##### <a name="output"></a>`output`
+##### <a name="-stunnel--config--output"></a>`output`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
 The path to a log output file to use
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="rnd_bytes"></a>`rnd_bytes`
+##### <a name="-stunnel--config--rnd_bytes"></a>`rnd_bytes`
 
 Data type: `Optional[Integer]`
 
 The number of bytes to read from the random seed file
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="rnd_file"></a>`rnd_file`
+##### <a name="-stunnel--config--rnd_file"></a>`rnd_file`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
 The path to the random seed data file
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="rnd_overwrite"></a>`rnd_overwrite`
+##### <a name="-stunnel--config--rnd_overwrite"></a>`rnd_overwrite`
 
 Data type: `Boolean`
 
 Overwrite the random seed file with new random data
 
-Default value: ``true``
+Default value: `true`
 
-##### <a name="socket_options"></a>`socket_options`
+##### <a name="-stunnel--config--socket_options"></a>`socket_options`
 
 Data type: `Array[String]`
 
@@ -480,7 +480,7 @@ Data type: `Array[String]`
 
 Default value: `[]`
 
-### <a name="stunnelinstall"></a>`stunnel::install`
+### <a name="stunnel--install"></a>`stunnel::install`
 
 **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) Defined Type**
 
@@ -490,9 +490,9 @@ Install the Stunnel components
 
 The following parameters are available in the `stunnel::install` class:
 
-* [`version`](#version)
+* [`version`](#-stunnel--install--version)
 
-##### <a name="version"></a>`version`
+##### <a name="-stunnel--install--version"></a>`version`
 
 Data type: `Variant[String, Integer]`
 
@@ -503,7 +503,7 @@ The version of stunnel to install
 
 Default value: `simplib::lookup('simp_options::package_ensure', { 'default_value' => 'installed' })`
 
-### <a name="stunnelinstance_purge"></a>`stunnel::instance_purge`
+### <a name="stunnel--instance_purge"></a>`stunnel::instance_purge`
 
 The native type has an `autobefore` that will ensure ordering.
 
@@ -516,33 +516,37 @@ may not function properly.
 
 The following parameters are available in the `stunnel::instance_purge` class:
 
-* [`purge_dirs`](#purge_dirs)
+* [`purge_dirs`](#-stunnel--instance_purge--purge_dirs)
 
-##### <a name="purge_dirs"></a>`purge_dirs`
+##### <a name="-stunnel--instance_purge--purge_dirs"></a>`purge_dirs`
 
 Data type: `Array[Stdlib::Absolutepath]`
 
 The directories to search for files to purge
 
-Default value: `[ '/etc/stunnel',
+Default value:
+
+```puppet
+[ '/etc/stunnel',
                                               '/etc/rc.d/init.d',
                                               '/etc/systemd/system'
-                                            ]`
+                                            ]
+```
 
-### <a name="stunnelmonolithic"></a>`stunnel::monolithic`
+### <a name="stunnel--monolithic"></a>`stunnel::monolithic`
 
 **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**
 
 Prevent global connection and configuration from being instantiated when only
 stunnel::instance resources are required.
 
-### <a name="stunnelservice"></a>`stunnel::service`
+### <a name="stunnel--service"></a>`stunnel::service`
 
 Manage the Stunnel Service
 
 ## Defined types
 
-### <a name="stunnelaccount"></a>`stunnel::account`
+### <a name="stunnel--account"></a>`stunnel::account`
 
 **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) CLASS**
 A define for setting up stunnel service users and groups
@@ -554,18 +558,18 @@ successfully be spawned via a define.
 
 The following parameters are available in the `stunnel::account` defined type:
 
-* [`name`](#name)
-* [`groupname`](#groupname)
-* [`uid`](#uid)
-* [`gid`](#gid)
-* [`home`](#home)
-* [`shell`](#shell)
+* [`name`](#-stunnel--account--name)
+* [`groupname`](#-stunnel--account--groupname)
+* [`uid`](#-stunnel--account--uid)
+* [`gid`](#-stunnel--account--gid)
+* [`home`](#-stunnel--account--home)
+* [`shell`](#-stunnel--account--shell)
 
-##### <a name="name"></a>`name`
+##### <a name="-stunnel--account--name"></a>`name`
 
 The user name for the account
 
-##### <a name="groupname"></a>`groupname`
+##### <a name="-stunnel--account--groupname"></a>`groupname`
 
 Data type: `String`
 
@@ -573,7 +577,7 @@ The group name for the account
 
 Default value: `$name`
 
-##### <a name="uid"></a>`uid`
+##### <a name="-stunnel--account--uid"></a>`uid`
 
 Data type: `Integer`
 
@@ -581,7 +585,7 @@ The UID of the user
 
 Default value: `600`
 
-##### <a name="gid"></a>`gid`
+##### <a name="-stunnel--account--gid"></a>`gid`
 
 Data type: `Integer`
 
@@ -589,7 +593,7 @@ The GID of the user
 
 Default value: `600`
 
-##### <a name="home"></a>`home`
+##### <a name="-stunnel--account--home"></a>`home`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -597,7 +601,7 @@ The home directory of the user
 
 Default value: `'/var/run/stunnel'`
 
-##### <a name="shell"></a>`shell`
+##### <a name="-stunnel--account--shell"></a>`shell`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -605,7 +609,7 @@ The shell for the user
 
 Default value: `'/sbin/nologin'`
 
-### <a name="stunnelconnection"></a>`stunnel::connection`
+### <a name="stunnel--connection"></a>`stunnel::connection`
 
 NOTE: Since many of the parameters here may need to be modified on a
 case-by-base basis, this defined type uses capabilities presented by the
@@ -644,55 +648,55 @@ stunnel::connection ('rsync':
 
 The following parameters are available in the `stunnel::connection` defined type:
 
-* [`name`](#name)
-* [`connect`](#connect)
-* [`accept`](#accept)
-* [`client`](#client)
-* [`failover`](#failover)
-* [`sni`](#sni)
-* [`app_pki_key`](#app_pki_key)
-* [`app_pki_cert`](#app_pki_cert)
-* [`app_pki_cacert`](#app_pki_cacert)
-* [`app_pki_crl`](#app_pki_crl)
-* [`openssl_cipher_suite`](#openssl_cipher_suite)
-* [`curve`](#curve)
-* [`ssl_version`](#ssl_version)
-* [`options`](#options)
-* [`verify`](#verify)
-* [`ocsp`](#ocsp)
-* [`ocsp_flags`](#ocsp_flags)
-* [`local`](#local)
-* [`protocol`](#protocol)
-* [`protocol_authentication`](#protocol_authentication)
-* [`protocol_host`](#protocol_host)
-* [`protocol_password`](#protocol_password)
-* [`protocol_username`](#protocol_username)
-* [`delay`](#delay)
-* [`engine_num`](#engine_num)
-* [`pty`](#pty)
-* [`renegotiation`](#renegotiation)
-* [`reset`](#reset)
-* [`retry`](#retry)
-* [`session_cache_size`](#session_cache_size)
-* [`session_cache_timeout`](#session_cache_timeout)
-* [`stack`](#stack)
-* [`timeout_busy`](#timeout_busy)
-* [`timeout_close`](#timeout_close)
-* [`timeout_connect`](#timeout_connect)
-* [`timeout_idle`](#timeout_idle)
-* [`trusted_nets`](#trusted_nets)
-* [`firewall`](#firewall)
-* [`tcpwrappers`](#tcpwrappers)
-* [`exec`](#exec)
-* [`execargs`](#execargs)
+* [`name`](#-stunnel--connection--name)
+* [`connect`](#-stunnel--connection--connect)
+* [`accept`](#-stunnel--connection--accept)
+* [`client`](#-stunnel--connection--client)
+* [`failover`](#-stunnel--connection--failover)
+* [`sni`](#-stunnel--connection--sni)
+* [`app_pki_key`](#-stunnel--connection--app_pki_key)
+* [`app_pki_cert`](#-stunnel--connection--app_pki_cert)
+* [`app_pki_cacert`](#-stunnel--connection--app_pki_cacert)
+* [`app_pki_crl`](#-stunnel--connection--app_pki_crl)
+* [`openssl_cipher_suite`](#-stunnel--connection--openssl_cipher_suite)
+* [`curve`](#-stunnel--connection--curve)
+* [`ssl_version`](#-stunnel--connection--ssl_version)
+* [`options`](#-stunnel--connection--options)
+* [`verify`](#-stunnel--connection--verify)
+* [`ocsp`](#-stunnel--connection--ocsp)
+* [`ocsp_flags`](#-stunnel--connection--ocsp_flags)
+* [`local`](#-stunnel--connection--local)
+* [`protocol`](#-stunnel--connection--protocol)
+* [`protocol_authentication`](#-stunnel--connection--protocol_authentication)
+* [`protocol_host`](#-stunnel--connection--protocol_host)
+* [`protocol_password`](#-stunnel--connection--protocol_password)
+* [`protocol_username`](#-stunnel--connection--protocol_username)
+* [`delay`](#-stunnel--connection--delay)
+* [`engine_num`](#-stunnel--connection--engine_num)
+* [`pty`](#-stunnel--connection--pty)
+* [`renegotiation`](#-stunnel--connection--renegotiation)
+* [`reset`](#-stunnel--connection--reset)
+* [`retry`](#-stunnel--connection--retry)
+* [`session_cache_size`](#-stunnel--connection--session_cache_size)
+* [`session_cache_timeout`](#-stunnel--connection--session_cache_timeout)
+* [`stack`](#-stunnel--connection--stack)
+* [`timeout_busy`](#-stunnel--connection--timeout_busy)
+* [`timeout_close`](#-stunnel--connection--timeout_close)
+* [`timeout_connect`](#-stunnel--connection--timeout_connect)
+* [`timeout_idle`](#-stunnel--connection--timeout_idle)
+* [`trusted_nets`](#-stunnel--connection--trusted_nets)
+* [`firewall`](#-stunnel--connection--firewall)
+* [`tcpwrappers`](#-stunnel--connection--tcpwrappers)
+* [`exec`](#-stunnel--connection--exec)
+* [`execargs`](#-stunnel--connection--execargs)
 
-##### <a name="name"></a>`name`
+##### <a name="-stunnel--connection--name"></a>`name`
 
 Data type: `String`
 
 The service name
 
-##### <a name="connect"></a>`connect`
+##### <a name="-stunnel--connection--connect"></a>`connect`
 
 Data type: `Stunnel::Connect`
 
@@ -708,7 +712,7 @@ Address and port to which to **forward** connections
     * ['my.server:3000']
     * ['3000']
 
-##### <a name="accept"></a>`accept`
+##### <a name="-stunnel--connection--accept"></a>`accept`
 
 Data type: `Variant[Simplib::Port, Simplib::Host::Port]`
 
@@ -722,15 +726,15 @@ Address and port upon which to **accept** connections
     * '1.2.3.4:3000'
     * '3000'
 
-##### <a name="client"></a>`client`
+##### <a name="-stunnel--connection--client"></a>`client`
 
 Data type: `Boolean`
 
 Indicates that this connection is a client connection
 
-Default value: ``true``
+Default value: `true`
 
-##### <a name="failover"></a>`failover`
+##### <a name="-stunnel--connection--failover"></a>`failover`
 
 Data type: `Enum['rr','prio']`
 
@@ -738,7 +742,7 @@ The failover strategy for multiple connect targets
 
 Default value: `simplib::dlookup('stunnel::connection', 'failover', $name, { 'default_value' => 'rr' })`
 
-##### <a name="sni"></a>`sni`
+##### <a name="-stunnel--connection--sni"></a>`sni`
 
 Data type: `Optional[String]`
 
@@ -748,7 +752,7 @@ This option is only valid on EL 7+
 
 Default value: `simplib::dlookup('stunnel::connection', 'sni', $name, { 'default_value' => undef })`
 
-##### <a name="app_pki_key"></a>`app_pki_key`
+##### <a name="-stunnel--connection--app_pki_key"></a>`app_pki_key`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -756,7 +760,7 @@ Path and name of the private SSL key file
 
 Default value: `simplib::dlookup('stunnel::connection', 'app_pki_key', $name, { 'default_value' => undef })`
 
-##### <a name="app_pki_cert"></a>`app_pki_cert`
+##### <a name="-stunnel--connection--app_pki_cert"></a>`app_pki_cert`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -764,7 +768,7 @@ Path and name of the public SSL certificate
 
 Default value: `simplib::dlookup('stunnel::connection', 'app_pki_cert', $name, { 'default_value' => undef })`
 
-##### <a name="app_pki_cacert"></a>`app_pki_cacert`
+##### <a name="-stunnel--connection--app_pki_cacert"></a>`app_pki_cacert`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -775,7 +779,7 @@ to be a directory
 
 Default value: `simplib::dlookup('stunnel::connection', 'app_pki_cacert', $name, { 'default_value' => '/etc/pki/simp_apps/stunnel/x509/cacerts/cacerts.pem' })`
 
-##### <a name="app_pki_crl"></a>`app_pki_crl`
+##### <a name="-stunnel--connection--app_pki_crl"></a>`app_pki_crl`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -783,7 +787,7 @@ Path to the OpenSSL compatible CRL directory
 
 Default value: `simplib::dlookup('stunnel::connection', 'app_pki_crl', $name, { 'default_value' => undef })`
 
-##### <a name="openssl_cipher_suite"></a>`openssl_cipher_suite`
+##### <a name="-stunnel--connection--openssl_cipher_suite"></a>`openssl_cipher_suite`
 
 Data type: `Array[String]`
 
@@ -791,7 +795,7 @@ OpenSSL compatible array of ciphers to allow on the system
 
 Default value: `simplib::dlookup('stunnel::connection', 'openssl_cipher_suite', $name, { 'default_value' => ['HIGH','-SSLv2'] })`
 
-##### <a name="curve"></a>`curve`
+##### <a name="-stunnel--connection--curve"></a>`curve`
 
 Data type: `Optional[String]`
 
@@ -800,7 +804,7 @@ The ECDH curve name to use. To get a list of supported curves use:
 
 Default value: `simplib::dlookup('stunnel::connection', 'curve', $name, { 'default_value' => undef })`
 
-##### <a name="ssl_version"></a>`ssl_version`
+##### <a name="-stunnel--connection--ssl_version"></a>`ssl_version`
 
 Data type: `Optional[String]`
 
@@ -811,7 +815,7 @@ Dictate the SSL version that can be used on the system
 
 Default value: `simplib::dlookup('stunnel::connection', 'ssl_version', $name, { 'default_value' => 'TLSv1.2'})`
 
-##### <a name="options"></a>`options`
+##### <a name="-stunnel--connection--options"></a>`options`
 
 Data type: `Array[String]`
 
@@ -819,7 +823,7 @@ The OpenSSL library options
 
 Default value: `simplib::dlookup('stunnel::connection', 'options', $name, { 'default_value' => [] })`
 
-##### <a name="verify"></a>`verify`
+##### <a name="-stunnel--connection--verify"></a>`verify`
 
 Data type: `Integer`
 
@@ -835,7 +839,7 @@ Level of mutual authentication to perform
 
 Default value: `simplib::dlookup('stunnel::connection', 'verify', $name, { 'default_value' => 2 })`
 
-##### <a name="ocsp"></a>`ocsp`
+##### <a name="-stunnel--connection--ocsp"></a>`ocsp`
 
 Data type: `Optional[Simplib::URI]`
 
@@ -843,7 +847,7 @@ The OCSP responder to use for certificate validation
 
 Default value: `simplib::dlookup('stunnel::connection', 'ocsp', $name, { 'default_value' => undef })`
 
-##### <a name="ocsp_flags"></a>`ocsp_flags`
+##### <a name="-stunnel--connection--ocsp_flags"></a>`ocsp_flags`
 
 Data type: `Stunnel::OcspFlags`
 
@@ -851,7 +855,7 @@ The OCSP server flags
 
 Default value: `simplib::dlookup('stunnel::connection', 'ocsp_flags', $name, { 'default_value' => [] })`
 
-##### <a name="local"></a>`local`
+##### <a name="-stunnel--connection--local"></a>`local`
 
 Data type: `Optional[String]`
 
@@ -861,7 +865,7 @@ By default, stunnel binds to all interfaces
 
 Default value: `simplib::dlookup('stunnel::connection', 'local', $name, { 'default_value' => undef })`
 
-##### <a name="protocol"></a>`protocol`
+##### <a name="-stunnel--connection--protocol"></a>`protocol`
 
 Data type: `Optional[String]`
 
@@ -871,7 +875,7 @@ The application protocol to negotiate SSL.
 
 Default value: `simplib::dlookup('stunnel::connection', 'protocol', $name, { 'default_value' => undef })`
 
-##### <a name="protocol_authentication"></a>`protocol_authentication`
+##### <a name="-stunnel--connection--protocol_authentication"></a>`protocol_authentication`
 
 Data type: `Optional[Enum['basic','NTLM']]`
 
@@ -879,7 +883,7 @@ Authentication type for protocol negotiations
 
 Default value: `simplib::dlookup('stunnel::connection', 'protocol_authentication', $name, { 'default_value' => undef })`
 
-##### <a name="protocol_host"></a>`protocol_host`
+##### <a name="-stunnel--connection--protocol_host"></a>`protocol_host`
 
 Data type: `Optional[String]`
 
@@ -887,7 +891,7 @@ The destination address for protocol negotiations
 
 Default value: `simplib::dlookup('stunnel::connection', 'protocol_host', $name, { 'default_value' => undef })`
 
-##### <a name="protocol_password"></a>`protocol_password`
+##### <a name="-stunnel--connection--protocol_password"></a>`protocol_password`
 
 Data type: `Optional[String]`
 
@@ -895,7 +899,7 @@ The password for protocol negotiations
 
 Default value: `simplib::dlookup('stunnel::connection', 'protocol_password', $name, { 'default_value' => undef })`
 
-##### <a name="protocol_username"></a>`protocol_username`
+##### <a name="-stunnel--connection--protocol_username"></a>`protocol_username`
 
 Data type: `Optional[String]`
 
@@ -903,7 +907,7 @@ The username for protocol negotiations
 
 Default value: `simplib::dlookup('stunnel::connection', 'protocol_username', $name, { 'default_value' => undef })`
 
-##### <a name="delay"></a>`delay`
+##### <a name="-stunnel--connection--delay"></a>`delay`
 
 Data type: `Boolean`
 
@@ -911,7 +915,7 @@ Delay DNS lookup for ``connect`` option
 
 Default value: `simplib::dlookup('stunnel::connection', 'delay', $name, { 'default_value' => false })`
 
-##### <a name="engine_num"></a>`engine_num`
+##### <a name="-stunnel--connection--engine_num"></a>`engine_num`
 
 Data type: `Optional[Integer]`
 
@@ -919,7 +923,7 @@ The engine number from which to read the private key
 
 Default value: `simplib::dlookup('stunnel::connection', 'engine_num', $name, { 'default_value' => undef })`
 
-##### <a name="pty"></a>`pty`
+##### <a name="-stunnel--connection--pty"></a>`pty`
 
 Data type: `Boolean`
 
@@ -928,7 +932,7 @@ using the ``exec`` option
 
 Default value: `simplib::dlookup('stunnel::connection', 'pty', $name, { 'default_value' => false })`
 
-##### <a name="renegotiation"></a>`renegotiation`
+##### <a name="-stunnel--connection--renegotiation"></a>`renegotiation`
 
 Data type: `Boolean`
 
@@ -936,7 +940,7 @@ Support SSL renegotiation
 
 Default value: `simplib::dlookup('stunnel::connection', 'renegotiation', $name, { 'default_value' => true })`
 
-##### <a name="reset"></a>`reset`
+##### <a name="-stunnel--connection--reset"></a>`reset`
 
 Data type: `Boolean`
 
@@ -944,7 +948,7 @@ Attempt to use TCP ``RST`` flag to indicate an error
 
 Default value: `simplib::dlookup('stunnel::connection', 'reset', $name, { 'default_value' => true })`
 
-##### <a name="retry"></a>`retry`
+##### <a name="-stunnel--connection--retry"></a>`retry`
 
 Data type: `Boolean`
 
@@ -952,7 +956,7 @@ Reconnect a ``connect+exec`` session after it has been disconnected
 
 Default value: `simplib::dlookup('stunnel::connection', 'retry', $name, { 'default_value' => false })`
 
-##### <a name="session_cache_size"></a>`session_cache_size`
+##### <a name="-stunnel--connection--session_cache_size"></a>`session_cache_size`
 
 Data type: `Optional[Integer]`
 
@@ -964,7 +968,7 @@ The maximum number of internal session cache entries
 
 Default value: `simplib::dlookup('stunnel::connection', 'session_cache_size', $name, { 'default_value' => undef })`
 
-##### <a name="session_cache_timeout"></a>`session_cache_timeout`
+##### <a name="-stunnel--connection--session_cache_timeout"></a>`session_cache_timeout`
 
 Data type: `Optional[Integer]`
 
@@ -972,7 +976,7 @@ The number of seconds to keep cached SSL sessions
 
 Default value: `simplib::dlookup('stunnel::connection', 'session_cache_timeout', $name, { 'default_value' => undef })`
 
-##### <a name="stack"></a>`stack`
+##### <a name="-stunnel--connection--stack"></a>`stack`
 
 Data type: `Optional[Integer]`
 
@@ -980,7 +984,7 @@ Thread stack size in **bytes**
 
 Default value: `simplib::dlookup('stunnel::connection', 'stack', $name, { 'default_value' => undef })`
 
-##### <a name="timeout_busy"></a>`timeout_busy`
+##### <a name="-stunnel--connection--timeout_busy"></a>`timeout_busy`
 
 Data type: `Optional[Integer]`
 
@@ -988,7 +992,7 @@ Time to wait for expected data in **seconds**
 
 Default value: `simplib::dlookup('stunnel::connection', 'timeout_busy', $name, { 'default_value' => undef })`
 
-##### <a name="timeout_close"></a>`timeout_close`
+##### <a name="-stunnel--connection--timeout_close"></a>`timeout_close`
 
 Data type: `Optional[Integer]`
 
@@ -996,7 +1000,7 @@ Time to wait for close notify in **seconds**
 
 Default value: `simplib::dlookup('stunnel::connection', 'timeout_close', $name, { 'default_value' => undef })`
 
-##### <a name="timeout_connect"></a>`timeout_connect`
+##### <a name="-stunnel--connection--timeout_connect"></a>`timeout_connect`
 
 Data type: `Optional[Integer]`
 
@@ -1004,7 +1008,7 @@ Time to wait for a remote host connection in **seconds**
 
 Default value: `simplib::dlookup('stunnel::connection', 'timeout_connect', $name, { 'default_value' => undef })`
 
-##### <a name="timeout_idle"></a>`timeout_idle`
+##### <a name="-stunnel--connection--timeout_idle"></a>`timeout_idle`
 
 Data type: `Optional[Integer]`
 
@@ -1012,7 +1016,7 @@ Time to keep an idle connection in **seconds**
 
 Default value: `simplib::dlookup('stunnel::connection', 'timeout_idle', $name, { 'default_value' => undef })`
 
-##### <a name="trusted_nets"></a>`trusted_nets`
+##### <a name="-stunnel--connection--trusted_nets"></a>`trusted_nets`
 
 Data type: `Simplib::Netlist`
 
@@ -1023,7 +1027,7 @@ connection
 
 Default value: `pick(simplib::dlookup('stunnel::connection', 'trusted_nets', $name, {'default_value' => undef }), simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }))`
 
-##### <a name="firewall"></a>`firewall`
+##### <a name="-stunnel--connection--firewall"></a>`firewall`
 
 Data type: `Boolean`
 
@@ -1031,7 +1035,7 @@ Include the SIMP ``iptables`` module to manage the firewall
 
 Default value: `pick(simplib::dlookup('stunnel::connection', 'firewall', $name, {'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false }))`
 
-##### <a name="tcpwrappers"></a>`tcpwrappers`
+##### <a name="-stunnel--connection--tcpwrappers"></a>`tcpwrappers`
 
 Data type: `Boolean`
 
@@ -1039,7 +1043,7 @@ Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
 
 Default value: `pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, {'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))`
 
-##### <a name="exec"></a>`exec`
+##### <a name="-stunnel--connection--exec"></a>`exec`
 
 Data type: `Optional[String]`
 
@@ -1047,7 +1051,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::connection', 'exec', $name, { 'default_value' => undef })`
 
-##### <a name="execargs"></a>`execargs`
+##### <a name="-stunnel--connection--execargs"></a>`execargs`
 
 Data type: `Array[String]`
 
@@ -1055,7 +1059,7 @@ Data type: `Array[String]`
 
 Default value: `simplib::dlookup('stunnel::connection', 'execargs', $name, { 'default_value' => [] })`
 
-### <a name="stunnelinstance"></a>`stunnel::instance`
+### <a name="stunnel--instance"></a>`stunnel::instance`
 
 NOTE: Since many of the parameters here may need to be modified on a
 case-by-base basis, this defined type uses capabilities presented by the
@@ -1102,81 +1106,81 @@ stunnel::instance {'rsync':
 
 The following parameters are available in the `stunnel::instance` defined type:
 
-* [`name`](#name)
-* [`connect`](#connect)
-* [`accept`](#accept)
-* [`trusted_nets`](#trusted_nets)
-* [`haveged`](#haveged)
-* [`firewall`](#firewall)
-* [`tcpwrappers`](#tcpwrappers)
-* [`pki`](#pki)
-* [`app_pki_external_source`](#app_pki_external_source)
-* [`app_pki_dir`](#app_pki_dir)
-* [`app_pki_key`](#app_pki_key)
-* [`app_pki_cert`](#app_pki_cert)
-* [`app_pki_ca_dir`](#app_pki_ca_dir)
-* [`app_pki_cacert`](#app_pki_cacert)
-* [`app_pki_crl`](#app_pki_crl)
-* [`chroot`](#chroot)
-* [`client`](#client)
-* [`fips`](#fips)
-* [`openssl_cipher_suite`](#openssl_cipher_suite)
-* [`ssl_version`](#ssl_version)
-* [`options`](#options)
-* [`uid`](#uid)
-* [`gid`](#gid)
-* [`pid`](#pid)
-* [`systemd_wantedby`](#systemd_wantedby)
-* [`systemd_requiredby`](#systemd_requiredby)
-* [`client`](#client)
-* [`compression`](#compression)
-* [`curve`](#curve)
-* [`delay`](#delay)
-* [`egd`](#egd)
-* [`engine`](#engine)
-* [`engine_ctrl`](#engine_ctrl)
-* [`engine_num`](#engine_num)
-* [`exec`](#exec)
-* [`execargs`](#execargs)
-* [`failover`](#failover)
-* [`local`](#local)
-* [`ocsp`](#ocsp)
-* [`ocsp_flags`](#ocsp_flags)
-* [`output`](#output)
-* [`protocol`](#protocol)
-* [`protocol_host`](#protocol_host)
-* [`protocol_username`](#protocol_username)
-* [`protocol_password`](#protocol_password)
-* [`protocol_authentication`](#protocol_authentication)
-* [`pty`](#pty)
-* [`renegotiation`](#renegotiation)
-* [`reset`](#reset)
-* [`retry`](#retry)
-* [`rnd_bytes`](#rnd_bytes)
-* [`rnd_file`](#rnd_file)
-* [`rnd_overwrite`](#rnd_overwrite)
-* [`session_cache_size`](#session_cache_size)
-* [`session_cache_timeout`](#session_cache_timeout)
-* [`setuid`](#setuid)
-* [`setgid`](#setgid)
-* [`sni`](#sni)
-* [`socket_options`](#socket_options)
-* [`stack`](#stack)
-* [`stunnel_debug`](#stunnel_debug)
-* [`syslog`](#syslog)
-* [`timeout_busy`](#timeout_busy)
-* [`timeout_close`](#timeout_close)
-* [`timeout_connect`](#timeout_connect)
-* [`timeout_idle`](#timeout_idle)
-* [`verify`](#verify)
+* [`name`](#-stunnel--instance--name)
+* [`connect`](#-stunnel--instance--connect)
+* [`accept`](#-stunnel--instance--accept)
+* [`trusted_nets`](#-stunnel--instance--trusted_nets)
+* [`haveged`](#-stunnel--instance--haveged)
+* [`firewall`](#-stunnel--instance--firewall)
+* [`tcpwrappers`](#-stunnel--instance--tcpwrappers)
+* [`pki`](#-stunnel--instance--pki)
+* [`app_pki_external_source`](#-stunnel--instance--app_pki_external_source)
+* [`app_pki_dir`](#-stunnel--instance--app_pki_dir)
+* [`app_pki_key`](#-stunnel--instance--app_pki_key)
+* [`app_pki_cert`](#-stunnel--instance--app_pki_cert)
+* [`app_pki_ca_dir`](#-stunnel--instance--app_pki_ca_dir)
+* [`app_pki_cacert`](#-stunnel--instance--app_pki_cacert)
+* [`app_pki_crl`](#-stunnel--instance--app_pki_crl)
+* [`chroot`](#-stunnel--instance--chroot)
+* [`client`](#-stunnel--instance--client)
+* [`fips`](#-stunnel--instance--fips)
+* [`openssl_cipher_suite`](#-stunnel--instance--openssl_cipher_suite)
+* [`ssl_version`](#-stunnel--instance--ssl_version)
+* [`options`](#-stunnel--instance--options)
+* [`uid`](#-stunnel--instance--uid)
+* [`gid`](#-stunnel--instance--gid)
+* [`pid`](#-stunnel--instance--pid)
+* [`systemd_wantedby`](#-stunnel--instance--systemd_wantedby)
+* [`systemd_requiredby`](#-stunnel--instance--systemd_requiredby)
+* [`client`](#-stunnel--instance--client)
+* [`compression`](#-stunnel--instance--compression)
+* [`curve`](#-stunnel--instance--curve)
+* [`delay`](#-stunnel--instance--delay)
+* [`egd`](#-stunnel--instance--egd)
+* [`engine`](#-stunnel--instance--engine)
+* [`engine_ctrl`](#-stunnel--instance--engine_ctrl)
+* [`engine_num`](#-stunnel--instance--engine_num)
+* [`exec`](#-stunnel--instance--exec)
+* [`execargs`](#-stunnel--instance--execargs)
+* [`failover`](#-stunnel--instance--failover)
+* [`local`](#-stunnel--instance--local)
+* [`ocsp`](#-stunnel--instance--ocsp)
+* [`ocsp_flags`](#-stunnel--instance--ocsp_flags)
+* [`output`](#-stunnel--instance--output)
+* [`protocol`](#-stunnel--instance--protocol)
+* [`protocol_host`](#-stunnel--instance--protocol_host)
+* [`protocol_username`](#-stunnel--instance--protocol_username)
+* [`protocol_password`](#-stunnel--instance--protocol_password)
+* [`protocol_authentication`](#-stunnel--instance--protocol_authentication)
+* [`pty`](#-stunnel--instance--pty)
+* [`renegotiation`](#-stunnel--instance--renegotiation)
+* [`reset`](#-stunnel--instance--reset)
+* [`retry`](#-stunnel--instance--retry)
+* [`rnd_bytes`](#-stunnel--instance--rnd_bytes)
+* [`rnd_file`](#-stunnel--instance--rnd_file)
+* [`rnd_overwrite`](#-stunnel--instance--rnd_overwrite)
+* [`session_cache_size`](#-stunnel--instance--session_cache_size)
+* [`session_cache_timeout`](#-stunnel--instance--session_cache_timeout)
+* [`setuid`](#-stunnel--instance--setuid)
+* [`setgid`](#-stunnel--instance--setgid)
+* [`sni`](#-stunnel--instance--sni)
+* [`socket_options`](#-stunnel--instance--socket_options)
+* [`stack`](#-stunnel--instance--stack)
+* [`stunnel_debug`](#-stunnel--instance--stunnel_debug)
+* [`syslog`](#-stunnel--instance--syslog)
+* [`timeout_busy`](#-stunnel--instance--timeout_busy)
+* [`timeout_close`](#-stunnel--instance--timeout_close)
+* [`timeout_connect`](#-stunnel--instance--timeout_connect)
+* [`timeout_idle`](#-stunnel--instance--timeout_idle)
+* [`verify`](#-stunnel--instance--verify)
 
-##### <a name="name"></a>`name`
+##### <a name="-stunnel--instance--name"></a>`name`
 
 Data type: `String`
 
 The name of the stunnel process.
 
-##### <a name="connect"></a>`connect`
+##### <a name="-stunnel--instance--connect"></a>`connect`
 
 Data type: `Stunnel::Connect`
 
@@ -1192,7 +1196,7 @@ Address and port to which to **forward** connections
     * ['my.server:3000']
     * ['3000']
 
-##### <a name="accept"></a>`accept`
+##### <a name="-stunnel--instance--accept"></a>`accept`
 
 Data type: `Variant[Simplib::Port, Simplib::Host::Port]`
 
@@ -1206,7 +1210,7 @@ Address and port upon which to **accept** connections
     * '1.2.3.4:3000'
     * '3000'
 
-##### <a name="trusted_nets"></a>`trusted_nets`
+##### <a name="-stunnel--instance--trusted_nets"></a>`trusted_nets`
 
 Data type: `Simplib::Netlist`
 
@@ -1217,7 +1221,7 @@ connection
 
 Default value: `simplib::dlookup('stunnel::instance', 'trusted_nets', $name, { 'default_value' => simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }) })`
 
-##### <a name="haveged"></a>`haveged`
+##### <a name="-stunnel--instance--haveged"></a>`haveged`
 
 Data type: `Boolean`
 
@@ -1225,7 +1229,7 @@ Include ``haveged`` support when setting up stunnel (highly recommended)
 
 Default value: `simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => simplib::lookup('simp_options::haveged', { 'default_value' => true }) })`
 
-##### <a name="firewall"></a>`firewall`
+##### <a name="-stunnel--instance--firewall"></a>`firewall`
 
 Data type: `Boolean`
 
@@ -1233,7 +1237,7 @@ Include the SIMP ``iptables`` module to manage the firewall
 
 Default value: `simplib::dlookup('stunnel::instance', 'firewall', $name, { 'default_value' => simplib::lookup('simp_options::firewall', { 'default_value' => false }) })`
 
-##### <a name="tcpwrappers"></a>`tcpwrappers`
+##### <a name="-stunnel--instance--tcpwrappers"></a>`tcpwrappers`
 
 Data type: `Boolean`
 
@@ -1241,7 +1245,7 @@ Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
 
 Default value: `simplib::dlookup('stunnel::instance', 'tcpwrappers', $name, { 'default_value' => simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }) })`
 
-##### <a name="pki"></a>`pki`
+##### <a name="-stunnel--instance--pki"></a>`pki`
 
 Data type: `Variant[Enum['simp'],Boolean]`
 
@@ -1259,7 +1263,7 @@ Data type: `Variant[Enum['simp'],Boolean]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'pki', $name, { 'default_value' => simplib::lookup('simp_options::pki', { 'default_value' => false }) })`
 
-##### <a name="app_pki_external_source"></a>`app_pki_external_source`
+##### <a name="-stunnel--instance--app_pki_external_source"></a>`app_pki_external_source`
 
 Data type: `String`
 
@@ -1270,7 +1274,7 @@ Data type: `String`
 
 Default value: `simplib::dlookup('stunnel::instance', 'app_pki_external_source', $name, { 'default_value' => simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }) })`
 
-##### <a name="app_pki_dir"></a>`app_pki_dir`
+##### <a name="-stunnel--instance--app_pki_dir"></a>`app_pki_dir`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -1283,7 +1287,7 @@ The source of certs in the chroot, and the basepath of ``$app_pki_key``,
 
 Default value: `simplib::dlookup('stunnel::instance', 'app_pki_dir', $name, { 'default_value' => "/etc/pki/simp_apps/stunnel_${name}/x509" })`
 
-##### <a name="app_pki_key"></a>`app_pki_key`
+##### <a name="-stunnel--instance--app_pki_key"></a>`app_pki_key`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -1291,7 +1295,7 @@ Path and name of the private SSL key file
 
 Default value: `simplib::dlookup('stunnel::instance', 'app_pki_key', $name, { 'default_value' => "${app_pki_dir}/private/${facts['fqdn']}.pem" })`
 
-##### <a name="app_pki_cert"></a>`app_pki_cert`
+##### <a name="-stunnel--instance--app_pki_cert"></a>`app_pki_cert`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -1299,7 +1303,7 @@ Path and name of the public SSL certificate
 
 Default value: `simplib::dlookup('stunnel::instance', 'app_pki_cert', $name, { 'default_value' => "${app_pki_dir}/public/${facts['fqdn']}.pub" })`
 
-##### <a name="app_pki_ca_dir"></a>`app_pki_ca_dir`
+##### <a name="-stunnel--instance--app_pki_ca_dir"></a>`app_pki_ca_dir`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -1311,7 +1315,7 @@ certificates in from an external source
 
 Default value: `simplib::dlookup('stunnel::instance', 'app_pki_ca_dir', $name, { 'default_value' => "${app_pki_dir}/cacerts" })`
 
-##### <a name="app_pki_cacert"></a>`app_pki_cacert`
+##### <a name="-stunnel--instance--app_pki_cacert"></a>`app_pki_cacert`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -1319,7 +1323,7 @@ The path to the full CA certificate for the Stunnel connections
 
 Default value: `simplib::dlookup('stunnel::instance', 'app_pki_cacert', $name, { 'default_value' => "${app_pki_dir}/cacerts/cacerts.pem" })`
 
-##### <a name="app_pki_crl"></a>`app_pki_crl`
+##### <a name="-stunnel--instance--app_pki_crl"></a>`app_pki_crl`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -1328,7 +1332,7 @@ from an external source
 
 Default value: `simplib::dlookup('stunnel::instance', 'app_pki_crl', $name, { 'default_value' => undef })`
 
-##### <a name="chroot"></a>`chroot`
+##### <a name="-stunnel--instance--chroot"></a>`chroot`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -1339,15 +1343,15 @@ it will default to `/var/stunnel_<local bind port>`.
 
 Default value: `simplib::dlookup('stunnel::instance', 'chroot', $name, { 'default_value' => undef })`
 
-##### <a name="client"></a>`client`
+##### <a name="-stunnel--instance--client"></a>`client`
 
 Data type: `Boolean`
 
 Indicates that this connection is a client connection
 
-Default value: ``true``
+Default value: `true`
 
-##### <a name="fips"></a>`fips`
+##### <a name="-stunnel--instance--fips"></a>`fips`
 
 Data type: `Boolean`
 
@@ -1358,7 +1362,7 @@ Set the ``fips`` global option
 
 Default value: `simplib::dlookup('stunnel::instance', 'fips', $name, { 'default_value' => simplib::lookup('simp_options::fips', { 'default_value' => pick($facts['fips_enabled'], false) }) })`
 
-##### <a name="openssl_cipher_suite"></a>`openssl_cipher_suite`
+##### <a name="-stunnel--instance--openssl_cipher_suite"></a>`openssl_cipher_suite`
 
 Data type: `Array[String]`
 
@@ -1366,7 +1370,7 @@ OpenSSL compatible array of ciphers to allow on the system
 
 Default value: `simplib::dlookup('stunnel::instance', 'openssl_cipher_suite', $name, { 'default_value' => ['HIGH','-SSLv2'] })`
 
-##### <a name="ssl_version"></a>`ssl_version`
+##### <a name="-stunnel--instance--ssl_version"></a>`ssl_version`
 
 Data type: `Optional[String]`
 
@@ -1377,7 +1381,7 @@ Dictate the SSL version that can be used on the system
 
 Default value: `simplib::dlookup('stunnel::instance', 'ssl_version', $name, { 'default_value' => 'TLSv1.2'})`
 
-##### <a name="options"></a>`options`
+##### <a name="-stunnel--instance--options"></a>`options`
 
 Data type: `Array[String]`
 
@@ -1385,7 +1389,7 @@ The OpenSSL library options
 
 Default value: `simplib::dlookup('stunnel::instance', 'options', $name, { 'default_value' => [] })`
 
-##### <a name="uid"></a>`uid`
+##### <a name="-stunnel--instance--uid"></a>`uid`
 
 Data type: `Integer`
 
@@ -1393,7 +1397,7 @@ The user id of the stunnel user
 
 Default value: `simplib::dlookup('stunnel::instance', 'uid', $name, { 'default_value' => 600 })`
 
-##### <a name="gid"></a>`gid`
+##### <a name="-stunnel--instance--gid"></a>`gid`
 
 Data type: `Integer`
 
@@ -1401,7 +1405,7 @@ The group id of the stunnel group
 
 Default value: `simplib::dlookup('stunnel::instance', 'gid', $name, { 'default_value' =>                                                                                                        $uid })`
 
-##### <a name="pid"></a>`pid`
+##### <a name="-stunnel--instance--pid"></a>`pid`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -1409,7 +1413,7 @@ Leave undef if no PID is desired. Default on systemd systems.
 
 Default value: `simplib::dlookup('stunnel::instance', 'pid', $name, { 'default_value' => undef })`
 
-##### <a name="systemd_wantedby"></a>`systemd_wantedby`
+##### <a name="-stunnel--instance--systemd_wantedby"></a>`systemd_wantedby`
 
 Data type: `Optional[Array[String]]`
 
@@ -1417,7 +1421,7 @@ Systemd services or targets that want stunnel
 
 Default value: `simplib::dlookup('stunnel::instance', 'systemd_wantedby', $name, { 'default_value' => undef })`
 
-##### <a name="systemd_requiredby"></a>`systemd_requiredby`
+##### <a name="-stunnel--instance--systemd_requiredby"></a>`systemd_requiredby`
 
 Data type: `Optional[Array[String]]`
 
@@ -1425,13 +1429,13 @@ Systemd services or targets that require stunnel
 
 Default value: `simplib::dlookup('stunnel::instance', 'systemd_requiredby', $name, { 'default_value' => undef })`
 
-##### <a name="client"></a>`client`
+##### <a name="-stunnel--instance--client"></a>`client`
 
 
 
-Default value: ``true``
+Default value: `true`
 
-##### <a name="compression"></a>`compression`
+##### <a name="-stunnel--instance--compression"></a>`compression`
 
 Data type: `Optional[Enum['zlib','rle']]`
 
@@ -1439,7 +1443,7 @@ Data type: `Optional[Enum['zlib','rle']]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'compression', $name, { 'default_value' => undef })`
 
-##### <a name="curve"></a>`curve`
+##### <a name="-stunnel--instance--curve"></a>`curve`
 
 Data type: `Optional[String]`
 
@@ -1447,7 +1451,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'curve', $name, { 'default_value' => undef })`
 
-##### <a name="delay"></a>`delay`
+##### <a name="-stunnel--instance--delay"></a>`delay`
 
 Data type: `Boolean`
 
@@ -1455,7 +1459,7 @@ Data type: `Boolean`
 
 Default value: `simplib::dlookup('stunnel::instance', 'delay', $name, { 'default_value' => false })`
 
-##### <a name="egd"></a>`egd`
+##### <a name="-stunnel--instance--egd"></a>`egd`
 
 Data type: `Optional[String]`
 
@@ -1463,7 +1467,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'egd', $name, { 'default_value' => undef })`
 
-##### <a name="engine"></a>`engine`
+##### <a name="-stunnel--instance--engine"></a>`engine`
 
 Data type: `String`
 
@@ -1471,7 +1475,7 @@ Data type: `String`
 
 Default value: `simplib::dlookup('stunnel::instance', 'engine', $name, { 'default_value' => 'auto' })`
 
-##### <a name="engine_ctrl"></a>`engine_ctrl`
+##### <a name="-stunnel--instance--engine_ctrl"></a>`engine_ctrl`
 
 Data type: `Optional[String]`
 
@@ -1479,7 +1483,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'engine_ctrl', $name, { 'default_value' => undef })`
 
-##### <a name="engine_num"></a>`engine_num`
+##### <a name="-stunnel--instance--engine_num"></a>`engine_num`
 
 Data type: `Optional[Integer]`
 
@@ -1487,7 +1491,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'engine_num', $name, { 'default_value' => undef })`
 
-##### <a name="exec"></a>`exec`
+##### <a name="-stunnel--instance--exec"></a>`exec`
 
 Data type: `Optional[String]`
 
@@ -1495,7 +1499,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'exec', $name, { 'default_value' => undef })`
 
-##### <a name="execargs"></a>`execargs`
+##### <a name="-stunnel--instance--execargs"></a>`execargs`
 
 Data type: `Array[String]`
 
@@ -1503,7 +1507,7 @@ Data type: `Array[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'execargs', $name, { 'default_value' => [] })`
 
-##### <a name="failover"></a>`failover`
+##### <a name="-stunnel--instance--failover"></a>`failover`
 
 Data type: `Enum['rr','prio']`
 
@@ -1511,7 +1515,7 @@ Data type: `Enum['rr','prio']`
 
 Default value: `simplib::dlookup('stunnel::instance', 'failover', $name, { 'default_value' => 'rr' })`
 
-##### <a name="local"></a>`local`
+##### <a name="-stunnel--instance--local"></a>`local`
 
 Data type: `Optional[String]`
 
@@ -1519,7 +1523,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'local', $name, { 'default_value' => undef })`
 
-##### <a name="ocsp"></a>`ocsp`
+##### <a name="-stunnel--instance--ocsp"></a>`ocsp`
 
 Data type: `Optional[Simplib::URI]`
 
@@ -1527,7 +1531,7 @@ Data type: `Optional[Simplib::URI]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'ocsp', $name, { 'default_value' => undef })`
 
-##### <a name="ocsp_flags"></a>`ocsp_flags`
+##### <a name="-stunnel--instance--ocsp_flags"></a>`ocsp_flags`
 
 Data type: `Stunnel::OcspFlags`
 
@@ -1535,7 +1539,7 @@ Data type: `Stunnel::OcspFlags`
 
 Default value: `simplib::dlookup('stunnel::instance', 'ocsp_flags', $name, { 'default_value' => [] })`
 
-##### <a name="output"></a>`output`
+##### <a name="-stunnel--instance--output"></a>`output`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -1543,7 +1547,7 @@ Data type: `Optional[Stdlib::Absolutepath]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'output', $name, { 'default_value' => undef })`
 
-##### <a name="protocol"></a>`protocol`
+##### <a name="-stunnel--instance--protocol"></a>`protocol`
 
 Data type: `Optional[String]`
 
@@ -1551,7 +1555,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'protocol', $name, { 'default_value' => undef })`
 
-##### <a name="protocol_host"></a>`protocol_host`
+##### <a name="-stunnel--instance--protocol_host"></a>`protocol_host`
 
 Data type: `Optional[String]`
 
@@ -1559,7 +1563,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'protocol_host', $name, { 'default_value' => undef })`
 
-##### <a name="protocol_username"></a>`protocol_username`
+##### <a name="-stunnel--instance--protocol_username"></a>`protocol_username`
 
 Data type: `Optional[String]`
 
@@ -1567,7 +1571,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'protocol_username', $name, { 'default_value' => undef })`
 
-##### <a name="protocol_password"></a>`protocol_password`
+##### <a name="-stunnel--instance--protocol_password"></a>`protocol_password`
 
 Data type: `Optional[String]`
 
@@ -1575,7 +1579,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'protocol_password', $name, { 'default_value' => undef })`
 
-##### <a name="protocol_authentication"></a>`protocol_authentication`
+##### <a name="-stunnel--instance--protocol_authentication"></a>`protocol_authentication`
 
 Data type: `Optional[Enum['basic','NTLM']]`
 
@@ -1583,7 +1587,7 @@ Data type: `Optional[Enum['basic','NTLM']]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'protocol_authentication', $name, { 'default_value' => undef })`
 
-##### <a name="pty"></a>`pty`
+##### <a name="-stunnel--instance--pty"></a>`pty`
 
 Data type: `Boolean`
 
@@ -1591,7 +1595,7 @@ Data type: `Boolean`
 
 Default value: `simplib::dlookup('stunnel::instance', 'pty', $name, { 'default_value' => false })`
 
-##### <a name="renegotiation"></a>`renegotiation`
+##### <a name="-stunnel--instance--renegotiation"></a>`renegotiation`
 
 Data type: `Boolean`
 
@@ -1599,7 +1603,7 @@ Data type: `Boolean`
 
 Default value: `simplib::dlookup('stunnel::instance', 'renegotiation', $name, { 'default_value' => true })`
 
-##### <a name="reset"></a>`reset`
+##### <a name="-stunnel--instance--reset"></a>`reset`
 
 Data type: `Boolean`
 
@@ -1607,7 +1611,7 @@ Data type: `Boolean`
 
 Default value: `simplib::dlookup('stunnel::instance', 'reset', $name, { 'default_value' => true })`
 
-##### <a name="retry"></a>`retry`
+##### <a name="-stunnel--instance--retry"></a>`retry`
 
 Data type: `Boolean`
 
@@ -1615,7 +1619,7 @@ Data type: `Boolean`
 
 Default value: `simplib::dlookup('stunnel::instance', 'retry', $name, { 'default_value' => false })`
 
-##### <a name="rnd_bytes"></a>`rnd_bytes`
+##### <a name="-stunnel--instance--rnd_bytes"></a>`rnd_bytes`
 
 Data type: `Optional[Integer]`
 
@@ -1623,7 +1627,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'rnd_bytes', $name, { 'default_value' => undef })`
 
-##### <a name="rnd_file"></a>`rnd_file`
+##### <a name="-stunnel--instance--rnd_file"></a>`rnd_file`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -1631,7 +1635,7 @@ Data type: `Optional[Stdlib::Absolutepath]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'rnd_file', $name, { 'default_value' => undef })`
 
-##### <a name="rnd_overwrite"></a>`rnd_overwrite`
+##### <a name="-stunnel--instance--rnd_overwrite"></a>`rnd_overwrite`
 
 Data type: `Boolean`
 
@@ -1639,7 +1643,7 @@ Data type: `Boolean`
 
 Default value: `simplib::dlookup('stunnel::instance', 'rnd_overwrite', $name, { 'default_value' => true })`
 
-##### <a name="session_cache_size"></a>`session_cache_size`
+##### <a name="-stunnel--instance--session_cache_size"></a>`session_cache_size`
 
 Data type: `Optional[Integer]`
 
@@ -1647,7 +1651,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'session_cache_size', $name, { 'default_value' => undef })`
 
-##### <a name="session_cache_timeout"></a>`session_cache_timeout`
+##### <a name="-stunnel--instance--session_cache_timeout"></a>`session_cache_timeout`
 
 Data type: `Optional[Integer]`
 
@@ -1655,7 +1659,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'session_cache_timeout', $name, { 'default_value' => undef })`
 
-##### <a name="setuid"></a>`setuid`
+##### <a name="-stunnel--instance--setuid"></a>`setuid`
 
 Data type: `String`
 
@@ -1663,7 +1667,7 @@ Data type: `String`
 
 Default value: `simplib::dlookup('stunnel::instance', 'setuid', $name, { 'default_value' => 'stunnel' })`
 
-##### <a name="setgid"></a>`setgid`
+##### <a name="-stunnel--instance--setgid"></a>`setgid`
 
 Data type: `String`
 
@@ -1671,7 +1675,7 @@ Data type: `String`
 
 Default value: `simplib::dlookup('stunnel::instance', 'setgid', $name, { 'default_value' => 'stunnel' })`
 
-##### <a name="sni"></a>`sni`
+##### <a name="-stunnel--instance--sni"></a>`sni`
 
 Data type: `Optional[String]`
 
@@ -1679,7 +1683,7 @@ Data type: `Optional[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'sni', $name, { 'default_value' => undef })`
 
-##### <a name="socket_options"></a>`socket_options`
+##### <a name="-stunnel--instance--socket_options"></a>`socket_options`
 
 Data type: `Array[String]`
 
@@ -1687,7 +1691,7 @@ Data type: `Array[String]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'socket_options', $name, { 'default_value' => [] })`
 
-##### <a name="stack"></a>`stack`
+##### <a name="-stunnel--instance--stack"></a>`stack`
 
 Data type: `Optional[Integer]`
 
@@ -1695,7 +1699,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'stack', $name, { 'default_value' => undef })`
 
-##### <a name="stunnel_debug"></a>`stunnel_debug`
+##### <a name="-stunnel--instance--stunnel_debug"></a>`stunnel_debug`
 
 Data type: `String`
 
@@ -1703,7 +1707,7 @@ Data type: `String`
 
 Default value: `simplib::dlookup('stunnel::instance', 'stunnel_debug', $name, { 'default_value' => 'err' })`
 
-##### <a name="syslog"></a>`syslog`
+##### <a name="-stunnel--instance--syslog"></a>`syslog`
 
 Data type: `Boolean`
 
@@ -1711,7 +1715,7 @@ Data type: `Boolean`
 
 Default value: `simplib::dlookup('stunnel::instance', 'syslog', $name, { 'default_value' => simplib::lookup('simp_options::syslog', { 'default_value' => false }) })`
 
-##### <a name="timeout_busy"></a>`timeout_busy`
+##### <a name="-stunnel--instance--timeout_busy"></a>`timeout_busy`
 
 Data type: `Optional[Integer]`
 
@@ -1719,7 +1723,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'timeout_busy', $name, { 'default_value' => undef })`
 
-##### <a name="timeout_close"></a>`timeout_close`
+##### <a name="-stunnel--instance--timeout_close"></a>`timeout_close`
 
 Data type: `Optional[Integer]`
 
@@ -1727,7 +1731,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'timeout_close', $name, { 'default_value' => undef })`
 
-##### <a name="timeout_connect"></a>`timeout_connect`
+##### <a name="-stunnel--instance--timeout_connect"></a>`timeout_connect`
 
 Data type: `Optional[Integer]`
 
@@ -1735,7 +1739,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'timeout_connect', $name, { 'default_value' => undef })`
 
-##### <a name="timeout_idle"></a>`timeout_idle`
+##### <a name="-stunnel--instance--timeout_idle"></a>`timeout_idle`
 
 Data type: `Optional[Integer]`
 
@@ -1743,7 +1747,7 @@ Data type: `Optional[Integer]`
 
 Default value: `simplib::dlookup('stunnel::instance', 'timeout_idle', $name, { 'default_value' => undef })`
 
-##### <a name="verify"></a>`verify`
+##### <a name="-stunnel--instance--verify"></a>`verify`
 
 Data type: `Integer`
 
@@ -1751,7 +1755,7 @@ Data type: `Integer`
 
 Default value: `simplib::dlookup('stunnel::instance', 'verify', $name, { 'default_value' => 2 })`
 
-### <a name="stunnelinstancereserve_port"></a>`stunnel::instance::reserve_port`
+### <a name="stunnel--instance--reserve_port"></a>`stunnel::instance::reserve_port`
 
 **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) DEFINED TYPE**
 
@@ -1800,46 +1804,38 @@ The directories from which the files matching "${name}.*" should be purged
 
 The following parameters are available in the `stunnel_instance_purge` type.
 
-* [`name`](#name)
-* [`provider`](#provider)
-* [`verbose`](#verbose)
+* [`name`](#-stunnel_instance_purge--name)
+* [`provider`](#-stunnel_instance_purge--provider)
+* [`verbose`](#-stunnel_instance_purge--verbose)
 
-##### <a name="name"></a>`name`
+##### <a name="-stunnel_instance_purge--name"></a>`name`
 
 namevar
 
 The prefix name of the services to disable and files to remove
 
-##### <a name="provider"></a>`provider`
+##### <a name="-stunnel_instance_purge--provider"></a>`provider`
 
 The specific backend to use for this `stunnel_instance_purge` resource. You will seldom need to specify this --- Puppet
 will usually discover the appropriate provider for your platform.
 
-##### <a name="verbose"></a>`verbose`
+##### <a name="-stunnel_instance_purge--verbose"></a>`verbose`
 
-Valid values: ``true``, ``false``, `yes`, `no`
+Valid values: `true`, `false`, `yes`, `no`
 
 Provide verbose output in the change message regarding services to be purged
 
 ## Data types
 
-### <a name="stunnelconnect"></a>`Stunnel::Connect`
+### <a name="Stunnel--Connect"></a>`Stunnel::Connect`
 
 Valid entries for an stunnel ``connect`` entry
 
-Alias of
+Alias of `Variant[Array[Simplib::Port], Array[Simplib::Netlist::Port], Simplib::Netlist::Port]`
 
-```puppet
-Variant[Array[Simplib::Port], Array[Simplib::Netlist::Port], Simplib::Netlist::Port]
-```
-
-### <a name="stunnelocspflags"></a>`Stunnel::OcspFlags`
+### <a name="Stunnel--OcspFlags"></a>`Stunnel::OcspFlags`
 
 Valid stunnel OCSP flag options
 
-Alias of
-
-```puppet
-Tuple[Pattern[/(?i:NOCERTS|NOINTERN|NOSIGS|NOCHAIN|NOVERIFY|NOEXPLICIT|NOCASIGN|NODELEGATED|NOCHECKS|TRUSTOTHER|RESPID_KEY|NOTIME)/], 0]
-```
+Alias of `Tuple[Pattern[/(?i:NOCERTS|NOINTERN|NOSIGS|NOCHAIN|NOVERIFY|NOEXPLICIT|NOCASIGN|NODELEGATED|NOCHECKS|TRUSTOTHER|RESPID_KEY|NOTIME)/], 0]`
 

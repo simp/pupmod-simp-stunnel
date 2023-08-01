@@ -218,8 +218,8 @@ define stunnel::instance(
   Variant[Enum['simp'],Boolean]               $pki                     = simplib::dlookup('stunnel::instance', 'pki', $name, { 'default_value' => simplib::lookup('simp_options::pki', { 'default_value' => false }) }),
   Stdlib::Absolutepath                        $app_pki_dir             = simplib::dlookup('stunnel::instance', 'app_pki_dir', $name, { 'default_value' => "/etc/pki/simp_apps/stunnel_${name}/x509" }),
   String                                      $app_pki_external_source = simplib::dlookup('stunnel::instance', 'app_pki_external_source', $name, { 'default_value' => simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }) }),
-  Stdlib::Absolutepath                        $app_pki_key             = simplib::dlookup('stunnel::instance', 'app_pki_key', $name, { 'default_value' => "${app_pki_dir}/private/${facts['fqdn']}.pem" }),
-  Stdlib::Absolutepath                        $app_pki_cert            = simplib::dlookup('stunnel::instance', 'app_pki_cert', $name, { 'default_value' => "${app_pki_dir}/public/${facts['fqdn']}.pub" }),
+  Stdlib::Absolutepath                        $app_pki_key             = simplib::dlookup('stunnel::instance', 'app_pki_key', $name, { 'default_value' => "${app_pki_dir}/private/${facts['networking']['fqdn']}.pem" }),
+  Stdlib::Absolutepath                        $app_pki_cert            = simplib::dlookup('stunnel::instance', 'app_pki_cert', $name, { 'default_value' => "${app_pki_dir}/public/${facts['networking']['fqdn']}.pub" }),
   Stdlib::Absolutepath                        $app_pki_ca_dir          = simplib::dlookup('stunnel::instance', 'app_pki_ca_dir', $name, { 'default_value' => "${app_pki_dir}/cacerts" }),
   Stdlib::Absolutepath                        $app_pki_cacert          = simplib::dlookup('stunnel::instance', 'app_pki_cacert', $name, { 'default_value' => "${app_pki_dir}/cacerts/cacerts.pem" }),
   Optional[Stdlib::Absolutepath]              $app_pki_crl             = simplib::dlookup('stunnel::instance', 'app_pki_crl', $name, { 'default_value' => undef }),
@@ -309,7 +309,7 @@ define stunnel::instance(
   if $chroot {
     $_chroot = $chroot
   }
-  elsif $facts['selinux_current_mode'] and $facts['selinux_current_mode'] == 'disabled' {
+  elsif $facts['os']['selinux']['current_mode'] and $facts['os']['selinux']['current_mode'] == 'disabled' {
     $_chroot = "/var/stunnel_${_safe_name}"
   }
   else {
@@ -529,8 +529,8 @@ define stunnel::instance(
   }
 
   service { "stunnel_managed_by_puppet_${_safe_name}":
-    ensure  => 'running',
-    enable  => true,
+    ensure    => 'running',
+    enable    => true,
     subscribe => [
       File[$_service_file],
       File["/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf"]

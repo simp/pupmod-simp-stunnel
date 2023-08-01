@@ -1,6 +1,24 @@
 require 'spec_helper'
 
 describe 'stunnel::config' do
+  def mock_selinux_false_facts(os_facts)
+    os_facts[:selinux] = false
+    os_facts[:os][:selinux][:config_mode] = 'disabled'
+    os_facts[:os][:selinux][:current_mode] = 'disabled'
+    os_facts[:os][:selinux][:enabled] = false
+    os_facts[:os][:selinux][:enforced] = false
+    os_facts
+  end
+
+  def mock_selinux_enforcing_facts(os_facts)
+    os_facts[:selinux] = true
+    os_facts[:os][:selinux][:config_mode] = 'enforcing'
+    os_facts[:os][:selinux][:config_policy] = 'targeted'
+    os_facts[:os][:selinux][:current_mode] = 'enforcing'
+    os_facts[:os][:selinux][:enabled] = true
+    os_facts[:os][:selinux][:enforced] = true
+    os_facts
+  end
 
   shared_examples_for "a chrooted and non-chrooted configuration" do
     # Init
@@ -32,10 +50,7 @@ describe 'stunnel::config' do
     on_supported_os.each do |os, os_facts|
       context "on #{os}" do
         let(:facts) {
-          os_facts.merge(
-            selinux_current_mode: 'disabled',
-            selinux_enforced: false
-          )
+          mock_selinux_false_facts(os_facts)
         }
 
         context 'with default parameters (chrooted) and selinux off' do
@@ -88,10 +103,7 @@ describe 'stunnel::config' do
 
         context 'with selinux = true (non-chrooted)' do
           let(:facts) {
-            os_facts.merge(
-              selinux_current_mode: 'enforced',
-              selinux_enforced: true
-            )
+            mock_selinux_enforcing_facts(os_facts)
           }
 
           it_should_behave_like "a chrooted and non-chrooted configuration"
