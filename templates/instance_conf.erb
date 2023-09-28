@@ -41,7 +41,7 @@
     end
   end
 
-  if ['RedHat','CentOS','OracleLinux','Rocky'].include?(@facts['os']['name'])
+  if @facts['os']['family'] == 'RedHat'
     stunnel_conf << "fips = #{bool_translate[(@facts['fips_enabled'] || @fips)]}"
   end
 
@@ -147,7 +147,7 @@
   end
 
 
-  if ['RedHat','CentOS','OracleLinux','Rocky'].include?(@facts['os']['name'])
+  if @facts['os']['family'] == 'RedHat'
     stunnel_conf << "renegotiation = #{bool_translate[@renegotiation]}"
     stunnel_conf << "reset = #{bool_translate[@reset]}"
 

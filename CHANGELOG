@@ -1,3 +1,9 @@
+* Thu Sep 28 2023 Steven Pritchard <steve@sicura.us> - 6.9.0
+- Add AlmaLinux 8 support
+- Update module dependencies
+- Add Puppet 8 support
+- Drop Puppet 6 support
+
 * Mon Jul 24 2023 Chris Tessmer <chris.tessmer@onyxpoint.com> - 6.8.0
 - Add RockyLinux 8 support
 
