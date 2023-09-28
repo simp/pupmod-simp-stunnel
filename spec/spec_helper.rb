@@ -179,7 +179,7 @@ RSpec.configure do |c|
     end
 
     hiera_version ||= 5
-    data = YAML.load(ERB.new(hiera_config_template(hiera_version.to_i), nil, '-').result(binding))
+    data = YAML.load(ERB.new(hiera_config_template(hiera_version.to_i), trim_mode: '-').result(binding))
 
     File.open(c.hiera_config, 'w') do |f|
       f.write data.to_yaml
