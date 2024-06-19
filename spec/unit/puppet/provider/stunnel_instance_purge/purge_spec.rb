@@ -20,7 +20,7 @@ describe provider_class do
 
   let :provider do
     # Don't hit the local system
-    Puppet::Resource::indirection.stubs(:search).with('Service', {}).returns([])
+    allow(Puppet::Resource::indirection).to receive(:search).with('Service', {}).and_return([])
 
     provider_class.new(resource)
   end
@@ -39,7 +39,7 @@ describe provider_class do
     context 'with additional services' do
       let :provider do
         # Don't hit the local system
-        Puppet::Resource::indirection.stubs(:search).with('Service', {}).returns([
+        allow(Puppet::Resource::indirection).to receive(:search).with('Service', {}).and_return([
           Puppet::Resource.new(:service, 'test_should_be_purged'),
           Puppet::Resource.new(:service, 'should_not_be_purged')
         ])
