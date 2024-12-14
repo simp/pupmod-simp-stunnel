@@ -11,16 +11,16 @@ describe provider_class do
   let :resource do
     Puppet::Type::Stunnel_instance_purge.new(
       {
-        :name    => 'test',
-        :dirs    => ['/foo'],
-        :verbose => verbose
-      }
+        name: 'test',
+        dirs: ['/foo'],
+        verbose: verbose
+      },
     )
   end
 
   let :provider do
     # Don't hit the local system
-    allow(Puppet::Resource::indirection).to receive(:search).with('Service', {}).and_return([])
+    allow(Puppet::Resource.indirection).to receive(:search).with('Service', {}).and_return([])
 
     provider_class.new(resource)
   end
@@ -39,15 +39,15 @@ describe provider_class do
     context 'with additional services' do
       let :provider do
         # Don't hit the local system
-        allow(Puppet::Resource::indirection).to receive(:search).with('Service', {}).and_return([
-          Puppet::Resource.new(:service, 'test_should_be_purged'),
-          Puppet::Resource.new(:service, 'should_not_be_purged')
-        ])
+        allow(Puppet::Resource.indirection).to receive(:search).with('Service', {}).and_return([
+                                                                                                 Puppet::Resource.new(:service, 'test_should_be_purged'),
+                                                                                                 Puppet::Resource.new(:service, 'should_not_be_purged'),
+                                                                                               ])
 
         provider_class.new(resource)
       end
 
-      it 'should purge rogue services' do
+      it 'purges rogue services' do
         expect(provider.dirs).to eq(%(Purged '1' Services))
       end
 
@@ -56,7 +56,7 @@ describe provider_class do
           true
         end
 
-        it 'should purge rogue services and dislay their names' do
+        it 'purges rogue services and dislay their names' do
           expect(provider.dirs).to eq(%(Purged Services: 'test_should_be_purged'))
         end
       end
