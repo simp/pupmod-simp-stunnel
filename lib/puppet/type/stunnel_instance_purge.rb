@@ -26,21 +26,21 @@ Puppet::Type.newtype(:stunnel_instance_purge) do
       WARNING: BE VERY CAREFUL THAT ${namevar} IS PRECISE
   EOM
 
-  newparam(:name, :namevar => true) do
+  newparam(:name, namevar: true) do
     desc 'The prefix name of the services to disable and files to remove'
   end
 
-  newparam(:verbose, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+  newparam(:verbose, boolean: true, parent: Puppet::Parameter::Boolean) do
     desc 'Provide verbose output in the change message regarding services to be purged'
   end
 
-  newproperty(:dirs, :array_matching => :all) do
+  newproperty(:dirs, array_matching: :all) do
     desc 'The directories from which the files matching "${name}.*" should be purged'
 
     # Must be an absolute path
-    newvalues(/^\//)
+    newvalues(%r{^/})
 
-    def change_to_s(from, to)
+    def change_to_s(_from, _to)
       to_purge = provider.change_to_s
 
       to_purge
@@ -51,8 +51,8 @@ Puppet::Type.newtype(:stunnel_instance_purge) do
     # We find all of the relevant stunnel instances and tack on things that
     # match 'stunnel' to eliminate all possibility of conflicts on service
     # restarts
-    catalog.resources.find_all do |r|
-      r.is_a?(Puppet::Type.type(:service)) && (r[:name] =~ /^(stunnel|#{self[:name]})/)
-    end.map(&:title)
+    catalog.resources.select { |r|
+      r.is_a?(Puppet::Type.type(:service)) && (r[:name] =~ %r{^(stunnel|#{self[:name]})})
+    }.map(&:title)
   end
 end

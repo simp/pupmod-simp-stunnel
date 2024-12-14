@@ -20,7 +20,7 @@ describe 'stunnel::config' do
     os_facts
   end
 
-  shared_examples_for "a chrooted and non-chrooted configuration" do
+  shared_examples_for 'a chrooted and non-chrooted configuration' do
     # Init
     it { is_expected.to create_class('stunnel') }
     it { is_expected.to compile.with_all_deps }
@@ -36,7 +36,7 @@ describe 'stunnel::config' do
 
     # Config
     it { is_expected.to create_class('stunnel::config') }
-    it { is_expected.to_not contain_class('pki') }
+    it { is_expected.not_to contain_class('pki') }
     it { is_expected.to contain_concat('/etc/stunnel/stunnel.conf') }
     it { is_expected.to contain_file('/etc/stunnel').with_owner('root') }
     it { is_expected.to contain_file('/etc/stunnel').with_group('root') }
@@ -49,17 +49,18 @@ describe 'stunnel::config' do
   context 'supported operating systems' do
     on_supported_os.each do |os, os_facts|
       context "on #{os}" do
-        let(:facts) {
+        let(:facts) do
           mock_selinux_false_facts(os_facts)
-        }
+        end
 
         context 'with default parameters (chrooted) and selinux off' do
           let(:service_file) { File.read('spec/expected/connection/chroot-systemd.txt') }
 
-          it_should_behave_like "a chrooted and non-chrooted configuration"
+          it_behaves_like 'a chrooted and non-chrooted configuration'
 
           # Specific to chrooting
-          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
+          it {
+            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(%r{^\s+}, ''),
               chroot = /var/stunnel
               setgid = stunnel
               setuid = stunnel
@@ -71,7 +72,8 @@ describe 'stunnel::config' do
               fips = no
               RNDoverwrite = yes
             EOM
-          )}
+                                                                                    )
+          }
 
           it { is_expected.to contain_file('/var/stunnel') }
           it { is_expected.to contain_file('/var/stunnel/etc') }
@@ -83,33 +85,42 @@ describe 'stunnel::config' do
           it { is_expected.to contain_file('/var/stunnel/var/run/stunnel') }
           it { is_expected.to contain_file('/var/stunnel/etc/pki') }
           it { is_expected.to contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
-          it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
-                                .that_notifies('Exec[stunnel daemon reload]')
-                                .with_content(service_file) }
-          it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel').with_ensure('absent')}
-          it { is_expected.to contain_service('stunnel')
-                                .that_requires(['File[/etc/systemd/system/stunnel.service]','File[/etc/rc.d/init.d/stunnel]']) }
+          it {
+            is_expected.to create_file('/etc/systemd/system/stunnel.service')
+              .that_notifies('Exec[stunnel daemon reload]')
+              .with_content(service_file)
+          }
+          it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel').with_ensure('absent') }
+          it {
+            is_expected.to contain_service('stunnel')
+              .that_requires(['File[/etc/systemd/system/stunnel.service]', 'File[/etc/rc.d/init.d/stunnel]'])
+          }
           it { is_expected.to contain_exec('stunnel daemon reload') }
         end
 
         context 'with parameters chroot set to /' do
-          let(:params) {{
-            chroot:     '/',
-          }}
-          it "is expected to fail" do
-            expect { catalogue }.to raise_error Puppet::Error, /chroot should not be root/
+          let(:params) do
+            {
+              chroot:     '/',
+            }
+          end
+
+          it 'is expected to fail' do
+            expect { catalogue }.to raise_error Puppet::Error, %r{chroot should not be root}
           end
         end
 
         context 'with selinux = true (non-chrooted)' do
-          let(:facts) {
+          let(:facts) do
             mock_selinux_enforcing_facts(os_facts)
-          }
+          end
+          let(:service_file) { File.read('spec/expected/connection/nonchroot-systemd.txt') }
 
-          it_should_behave_like "a chrooted and non-chrooted configuration"
+          it_behaves_like 'a chrooted and non-chrooted configuration'
 
           # Fips should be disabled
-          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(/^\s+/,'')
+          it {
+            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(%r{^\s+}, ''),
               setgid = stunnel
               setuid = stunnel
               debug = err
@@ -120,53 +131,66 @@ describe 'stunnel::config' do
               fips = no
               RNDoverwrite = yes
             EOM
-          )}
-          it { is_expected.to_not contain_file('/var/stunnel') }
-          it { is_expected.to_not contain_file('/var/stunnel/etc') }
-          it { is_expected.to_not contain_file('/var/stunnel/etc/resolv.conf') }
-          it { is_expected.to_not contain_file('/var/stunnel/etc/nsswitch.conf') }
-          it { is_expected.to_not contain_file('/var/stunnel/etc/hosts') }
-          it { is_expected.to_not contain_file('/var/stunnel/var') }
-          it { is_expected.to_not contain_file('/var/stunnel/var/run') }
-          it { is_expected.to_not contain_file('/var/stunnel/var/run/stunnel') }
-          it { is_expected.to_not contain_file('/var/stunnel/etc/pki') }
-          it { is_expected.to_not contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
+                                                                                    )
+          }
+          it { is_expected.not_to contain_file('/var/stunnel') }
+          it { is_expected.not_to contain_file('/var/stunnel/etc') }
+          it { is_expected.not_to contain_file('/var/stunnel/etc/resolv.conf') }
+          it { is_expected.not_to contain_file('/var/stunnel/etc/nsswitch.conf') }
+          it { is_expected.not_to contain_file('/var/stunnel/etc/hosts') }
+          it { is_expected.not_to contain_file('/var/stunnel/var') }
+          it { is_expected.not_to contain_file('/var/stunnel/var/run') }
+          it { is_expected.not_to contain_file('/var/stunnel/var/run/stunnel') }
+          it { is_expected.not_to contain_file('/var/stunnel/etc/pki') }
+          it { is_expected.not_to contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
 
-          let(:service_file) { File.read('spec/expected/connection/nonchroot-systemd.txt') }
-          it { is_expected.to create_file('/etc/systemd/system/stunnel.service')
-                                 .that_notifies('Exec[stunnel daemon reload]')
-                                 .with_content(service_file) }
-          it { is_expected.to contain_service('stunnel')
-                                .that_requires('File[/etc/systemd/system/stunnel.service]') }
+          it {
+            is_expected.to create_file('/etc/systemd/system/stunnel.service')
+              .that_notifies('Exec[stunnel daemon reload]')
+              .with_content(service_file)
+          }
+          it {
+            is_expected.to contain_service('stunnel')
+              .that_requires('File[/etc/systemd/system/stunnel.service]')
+          }
           it { is_expected.to contain_exec('stunnel daemon reload') }
         end
         context 'with pki = simp, syslog = true, and fips = true' do
-          let(:params) {{
-            pki:     'simp',
-            syslog:  true,
-            fips:    true
-          }}
+          let(:params) do
+            {
+              pki:     'simp',
+           syslog:  true,
+           fips:    true
+            }
+          end
+
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_class('pki') }
           it { is_expected.to create_pki__copy('stunnel') }
           # Make sure syslog = yes in stunnel.conf
-          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(/syslog = yes/) }
-          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(/fips = yes/) }
+          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(%r{syslog = yes}) }
+          it { is_expected.to contain_concat__fragment('0_stunnel_global').with_content(%r{fips = yes}) }
         end
 
         context 'with pid specified' do
           # Change a param to force a recompile and full hiera lookup
-          let(:params) {{
-            fips: true
-          }}
+          let(:params) do
+            {
+              fips: true
+            }
+          end
+          let(:service_file) { File.read('spec/expected/connection/chroot-systemd-pid.txt') }
 
           # I have to go to hiera for this...
           # stunnel::config::pid: /var/opt/run/stunnel.pid
           let(:hieradata) { 'pid' }
+
           it { is_expected.to compile.with_all_deps }
-          let(:service_file) { File.read('spec/expected/connection/chroot-systemd-pid.txt') }
-          it { is_expected.to contain_file('/etc/systemd/system/stunnel.service')
-                                .with_content(service_file) }
+
+          it {
+            is_expected.to contain_file('/etc/systemd/system/stunnel.service')
+              .with_content(service_file)
+          }
         end
       end
     end
