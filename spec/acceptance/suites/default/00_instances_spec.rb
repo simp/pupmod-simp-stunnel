@@ -63,7 +63,7 @@ describe 'instance' do
     end
 
     context 'killing one instance should not kill the rest' do
-      it 'has all services running' do
+      it 'has all services running' do # rubocop:disable RSpec/RepeatedExample
         apply_manifest_on(host, manifest, catch_failures: true)
       end
       it 'after killing an instanced stunnel, have the other stunnel still running' do
@@ -81,7 +81,7 @@ describe 'instance' do
           on(host, "netstat -plant | grep `lsof -ti :#{port}` | grep stunnel")
         end
       end
-      it 'restarts all services' do
+      it 'restarts all services' do # rubocop:disable RSpec/RepeatedExample
         apply_manifest_on(host, manifest, catch_failures: true)
       end
       it 'kills the monolithic stunnel and have instances still running' do

@@ -4,21 +4,19 @@ require 'spec_helper'
 provider_class = Puppet::Type.type(:stunnel_instance_purge).provider(:purge)
 
 describe provider_class do
-  let :verbose do
-    false
-  end
+  let(:verbose) { false }
 
-  let :resource do
+  let(:resource) do
     Puppet::Type::Stunnel_instance_purge.new(
       {
         name: 'test',
         dirs: ['/foo'],
-        verbose: verbose
+        verbose: verbose,
       },
     )
   end
 
-  let :provider do
+  let(:provider) do
     # Don't hit the local system
     allow(Puppet::Resource.indirection).to receive(:search).with('Service', {}).and_return([])
 
@@ -26,9 +24,9 @@ describe provider_class do
   end
 
   describe '#dirs' do
-    before(:each) do
-      @catalog = Puppet::Resource::Catalog.new('Stunnel Test', 'production')
-      @catalog.add_resource(resource)
+    let(:catalog) do
+      c = Puppet::Resource::Catalog.new('Stunnel Test', 'production')
+      c.add_resource(resource)
     end
 
     it 'does not have any changes' do
@@ -37,12 +35,14 @@ describe provider_class do
     end
 
     context 'with additional services' do
-      let :provider do
+      let(:provider) do
         # Don't hit the local system
-        allow(Puppet::Resource.indirection).to receive(:search).with('Service', {}).and_return([
-                                                                                                 Puppet::Resource.new(:service, 'test_should_be_purged'),
-                                                                                                 Puppet::Resource.new(:service, 'should_not_be_purged'),
-                                                                                               ])
+        allow(Puppet::Resource.indirection).to receive(:search).with('Service', {}).and_return(
+          [
+            Puppet::Resource.new(:service, 'test_should_be_purged'),
+            Puppet::Resource.new(:service, 'should_not_be_purged'),
+          ],
+        )
 
         provider_class.new(resource)
       end
@@ -52,9 +52,7 @@ describe provider_class do
       end
 
       context 'when verbose' do
-        let :verbose do
-          true
-        end
+        let(:verbose) { true }
 
         it 'purges rogue services and dislay their names' do
           expect(provider.dirs).to eq(%(Purged Services: 'test_should_be_purged'))
