@@ -29,11 +29,11 @@ describe 'compliance_markup', type: :class do
 
   # Add any defined types that are necessary for full evaluation here
   let(:required_defined_types) do
-    <<-EOM
-    stunnel::connection{ 'test':
-      accept  => 0,
-      connect => [0,1024]
-    }
+    <<~EOM
+      stunnel::connection{ 'test':
+        accept  => 0,
+        connect => [0,1024],
+      }
     EOM
   end
 
@@ -42,28 +42,22 @@ describe 'compliance_markup', type: :class do
       compliance_profiles.each do |target_profile|
         context "with compliance profile '#{target_profile}'" do
           let(:facts) do
-            os_facts.merge({
-                             target_compliance_profile: target_profile
-                           })
+            os_facts.merge(target_compliance_profile: target_profile)
           end
           let(:compliance_report) do
-            @compliance_report ||= JSON.parse(
+            JSON.parse(
                 catalogue.resource("File[#{facts[:puppet_vardir]}/compliance_report.json]")[:content],
               )
-
-            @compliance_report
           end
           let(:compliance_profile_data) do
-            @compliance_profile_data ||= compliance_report['compliance_profiles'][target_profile]
-
-            @compliance_profile_data
+            compliance_report['compliance_profiles'][target_profile]
           end
 
           let(:pre_condition) do
             %(
-            #{required_defined_types}
-            #{expected_classes.map { |c| %(include #{c}) }.join("\n")}
-          )
+              #{required_defined_types}
+              #{expected_classes.map { |c| %(include #{c}) }.join("\n")}
+            )
           end
 
           let(:hieradata) { 'compliance-engine' }
