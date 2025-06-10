@@ -28,7 +28,6 @@ group :test do
   gem('pdk', ENV.fetch('PDK_VERSION', ['>= 2.0', '< 4.0']), require: false) if major_puppet_version > 5
   gem 'puppet', puppet_version
   gem 'puppetlabs_spec_helper', '~> 8.0.0'
-  gem 'puppet-lint-trailing_comma-check', require: false
   gem 'puppet-strings'
   gem 'rake'
   gem 'rspec'
