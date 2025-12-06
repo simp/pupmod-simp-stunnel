@@ -24,7 +24,7 @@ describe 'compliance_markup', type: :class do
     'documented_missing_parameters' => [
     ] + expected_classes.map { |c| Regexp.new("^(?!#{c}(::.*)?)") },
     'documented_missing_resources' => [
-    ] + expected_classes.map { |c| Regexp.new("^(?!#{c}(::.*)?)") }
+    ] + expected_classes.map { |c| Regexp.new("^(?!#{c}(::.*)?)") },
   }
 
   # Add any defined types that are necessary for full evaluation here

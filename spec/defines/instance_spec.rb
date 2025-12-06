@@ -160,7 +160,7 @@ describe 'stunnel::instance' do
           <<~EOF
             stunnel::connection { 'test':
               connect => [1234],
-              accept  => 1234
+              accept  => 1234,
             }
           EOF
         end
@@ -177,7 +177,7 @@ describe 'stunnel::instance' do
             <<~EOF
               stunnel::connection { 'conflicting_test':
                 connect => [1234],
-                accept  => #{params[:accept]}
+                accept  => #{params[:accept]},
               }
             EOF
           end

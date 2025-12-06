@@ -12,7 +12,7 @@ describe 'instance connectivity' do
     context 'set up a bi-directional connection set' do
       hosts.each do |server|
         hosts.each do |client|
-          server_fqdn = fact_on(server, 'fqdn')
+          server_fqdn = fact_on(server, 'networking.fqdn')
 
           hieradata = {
             'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
@@ -21,21 +21,21 @@ describe 'instance connectivity' do
             'simp_options::firewall'     => true,
             'simp_options::pki'          => true,
             'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
-            'simp_options::trusted_nets' => [client.ip]
+            'simp_options::trusted_nets' => [client.ip],
           }
 
-          manifest = <<-EOF
+          manifest = <<~EOF
             stunnel::instance { 'mysvc':
               client  => false,
               connect => [1234],
-              accept  => 12345
+              accept  => 12345,
             }
 
             stunnel::instance { 'mysvc-client':
               client  => true,
               connect => ['#{server_fqdn}:12345'],
               accept  => 1235,
-              require => Stunnel::Instance['mysvc']
+              require => Stunnel::Instance['mysvc'],
             }
           EOF
 

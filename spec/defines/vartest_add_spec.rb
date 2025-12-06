@@ -34,7 +34,7 @@ describe 'stunnel::connection' do
       ['127.0.0.1:2049'],
       { params: {
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         val_str: '127.0.0.1:2049' },
     )
@@ -46,7 +46,7 @@ describe 'stunnel::connection' do
       { params: {
         connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
       } },
     )
 
@@ -57,7 +57,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'key' },
     )
@@ -69,7 +69,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'cert' },
     )
@@ -81,7 +81,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'CAfile' },
     )
@@ -93,7 +93,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'CRLpath' },
     )
@@ -105,7 +105,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'ciphers',
         val_str: 'HIGH:FOO' },
@@ -118,7 +118,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'sslVersion' },
     )
@@ -130,7 +130,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         content: %r{\s*options = opt_one\n\s*options = opt_two} },
     )
@@ -142,7 +142,7 @@ describe 'stunnel::connection' do
       { params: {
         connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
       } },
     )
 
@@ -153,7 +153,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'OCSP' },
     )
@@ -166,7 +166,7 @@ describe 'stunnel::connection' do
           connect: [2049],
           client: false,
           accept: 20_490,
-          ocsp: 'http://ocsp.bar.baz'
+          ocsp: 'http://ocsp.bar.baz',
         },
         content: %r{\s*OCSPFlag = NOCERTS\nOCSPFlag = NOINTERN} },
     )
@@ -178,7 +178,7 @@ describe 'stunnel::connection' do
       { params: {
         connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
       } },
     )
 
@@ -189,7 +189,7 @@ describe 'stunnel::connection' do
       { params: {
         connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
       } },
     )
 
@@ -201,7 +201,7 @@ describe 'stunnel::connection' do
           connect: [2049],
           client: false,
           accept: 20_490,
-          protocol: 'connect'
+          protocol: 'connect',
         },
         key_str: 'protocolAuthentication' },
     )
@@ -214,7 +214,7 @@ describe 'stunnel::connection' do
           connect: [2049],
           client: false,
           accept: 20_490,
-          protocol: 'connect'
+          protocol: 'connect',
         },
         key_str: 'protocolHost' },
     )
@@ -227,7 +227,7 @@ describe 'stunnel::connection' do
           connect: [2049],
           client: false,
           accept: 20_490,
-          protocol: 'connect'
+          protocol: 'connect',
         },
         key_str: 'protocolPassword' },
     )
@@ -240,7 +240,7 @@ describe 'stunnel::connection' do
           connect: [2049],
           client: false,
           accept: 20_490,
-          protocol: 'connect'
+          protocol: 'connect',
         },
         key_str: 'protocolUsername' },
     )
@@ -252,7 +252,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         val_str: 'yes' },
     )
@@ -264,7 +264,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'key' },
     )
@@ -302,7 +302,7 @@ describe 'stunnel::connection' do
       { params: {
         connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
       } },
     )
 
@@ -313,7 +313,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'TIMEOUTbusy' },
     )
@@ -325,7 +325,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'TIMEOUTclose' },
     )
@@ -337,7 +337,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'TIMEOUTconnect' },
     )
@@ -349,7 +349,7 @@ describe 'stunnel::connection' do
       { params: {
           connect: [2049],
           client: false,
-          accept: 20_490
+          accept: 20_490,
         },
         key_str: 'TIMEOUTidle' },
     )
@@ -359,9 +359,9 @@ describe 'stunnel::connection' do
       let(:params) do
         {
           trusted_nets: ['1.2.3.4', '5.4.3.2/20'],
-       connect: [2049],
-       client: false,
-       accept: 20_490
+          connect: [2049],
+          client: false,
+          accept: 20_490,
         }
       end
 
@@ -386,7 +386,7 @@ describe 'stunnel::connection' do
               { params: {
                 connect: [2049],
                   client: false,
-                  accept: 20_490
+                  accept: 20_490,
               } },
             )
           end
@@ -398,7 +398,7 @@ describe 'stunnel::connection' do
             { params: {
               connect: [2049],
                 client: false,
-                accept: 20_490
+                accept: 20_490,
             } },
           )
 
@@ -409,7 +409,7 @@ describe 'stunnel::connection' do
             { params: {
                 connect: [2049],
                 client: false,
-                accept: 20_490
+                accept: 20_490,
               },
             key_str: 'engineNum' },
           )
@@ -421,7 +421,7 @@ describe 'stunnel::connection' do
             { params: {
                 connect: [2049],
                 client: false,
-                accept: 20_490
+                accept: 20_490,
               },
             key_str: 'sessionCacheSize' },
           )
@@ -433,7 +433,7 @@ describe 'stunnel::connection' do
             { params: {
                 connect: [2049],
                 client: false,
-                accept: 20_490
+                accept: 20_490,
               },
             key_str: 'sessionCacheTimeout' },
           )
@@ -445,7 +445,7 @@ describe 'stunnel::connection' do
             { params: {
                 connect: [2049],
                 client: false,
-                accept: 20_490
+                accept: 20_490,
               },
             val_str: 'yes' },
           )
@@ -457,7 +457,7 @@ describe 'stunnel::connection' do
             { params: {
                 connect: [2049],
                 client: false,
-                accept: 20_490
+                accept: 20_490,
               },
             val_str: 'yes' },
           )

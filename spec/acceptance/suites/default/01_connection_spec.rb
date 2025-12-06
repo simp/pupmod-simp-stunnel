@@ -7,23 +7,23 @@ describe 'connection' do
   hosts.each do |host|
     let(:hieradata) do
       {
-        'iptables::ports' => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
-     'simp_options::haveged'      => true,
-     'simp_options::firewall'     => true,
-     'simp_options::pki'          => true,
-     'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
-     'simp_options::trusted_nets' => ['ALL']
+        'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
+        'simp_options::haveged'      => true,
+        'simp_options::firewall'     => true,
+        'simp_options::pki'          => true,
+        'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
+        'simp_options::trusted_nets' => ['ALL'],
       }
     end
     let(:base_manifest) do
-      <<-EOF
+      <<~EOF
         stunnel::connection { 'nfs':
           connect => [2049],
           accept  => 20490,
         }
         stunnel::connection { 'rsync':
           connect => [3049],
-          accept  => 30490
+          accept  => 30490,
         }
       EOF
     end
@@ -37,7 +37,7 @@ describe 'connection' do
       if fact_on(host, 'operatingsystem') != 'OracleLinux'
         let(:hostname) { fact_on(host, 'hostname') }
         let(:minion_stunnel_conf) do
-          <<-EOF
+          <<~EOF
             debug = err
             syslog = yes
             pid = /var/run/stunnel/stunnel.pid
@@ -109,7 +109,7 @@ describe 'connection' do
         it 'disables selinux without a reboot' do
           set_hieradata_on(host, hieradata)
 
-          manifest = base_manifest + <<-EOF
+          manifest = base_manifest + <<~EOF
             class { 'selinux': ensure => 'disabled' }
           EOF
           apply_manifest_on(host, manifest, catch_failures: true)
@@ -178,7 +178,7 @@ describe 'connection' do
         it 'reenables selinux without a reboot' do
           set_hieradata_on(host, hieradata)
 
-          manifest = base_manifest + <<-EOF
+          manifest = base_manifest + <<~EOF
             class { 'selinux': ensure => 'enforcing' }
           EOF
           apply_manifest_on(host, manifest, catch_failures: true)

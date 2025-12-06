@@ -60,7 +60,7 @@ describe 'stunnel::config' do
 
           # Specific to chrooting
           it {
-            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(%r{^\s+}, ''),
+            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<~EOM)
               chroot = /var/stunnel
               setgid = stunnel
               setuid = stunnel
@@ -72,7 +72,6 @@ describe 'stunnel::config' do
               fips = no
               RNDoverwrite = yes
             EOM
-                                                                                    )
           }
 
           it { is_expected.to contain_file('/var/stunnel') }
@@ -101,7 +100,7 @@ describe 'stunnel::config' do
         context 'with parameters chroot set to /' do
           let(:params) do
             {
-              chroot:     '/',
+              chroot: '/',
             }
           end
 
@@ -120,7 +119,7 @@ describe 'stunnel::config' do
 
           # Fips should be disabled
           it {
-            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<-EOM.gsub(%r{^\s+}, ''),
+            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<~EOM)
               setgid = stunnel
               setuid = stunnel
               debug = err
@@ -131,7 +130,6 @@ describe 'stunnel::config' do
               fips = no
               RNDoverwrite = yes
             EOM
-                                                                                    )
           }
           it { is_expected.not_to contain_file('/var/stunnel') }
           it { is_expected.not_to contain_file('/var/stunnel/etc') }
@@ -158,9 +156,9 @@ describe 'stunnel::config' do
         context 'with pki = simp, syslog = true, and fips = true' do
           let(:params) do
             {
-              pki:     'simp',
-           syslog:  true,
-           fips:    true
+              pki:    'simp',
+              syslog: true,
+              fips:   true,
             }
           end
 
@@ -176,7 +174,7 @@ describe 'stunnel::config' do
           # Change a param to force a recompile and full hiera lookup
           let(:params) do
             {
-              fips: true
+              fips: true,
             }
           end
           let(:service_file) { File.read('spec/expected/connection/chroot-systemd-pid.txt') }

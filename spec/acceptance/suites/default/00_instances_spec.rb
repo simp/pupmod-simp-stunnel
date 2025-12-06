@@ -5,33 +5,33 @@ test_name 'instance'
 describe 'instance' do
   hosts.each do |host|
     let(:manifest) do
-      <<-EOF
-      stunnel::instance { 'nfs':
-        client  => false,
-        connect => [2049],
-        accept  => 20490,
-      }
-      stunnel::instance { 'chroot':
-        client  => false,
-        connect => [4049],
-        accept  => 40490,
-        chroot  => '/var/stunnel_chroot'
-      }
-      stunnel::connection { 'rsync':
-        client  => false,
-        connect => [3049],
-        accept  => 30490
-      }
+      <<~EOF
+        stunnel::instance { 'nfs':
+          client  => false,
+          connect => [2049],
+          accept  => 20490,
+        }
+        stunnel::instance { 'chroot':
+          client  => false,
+          connect => [4049],
+          accept  => 40490,
+          chroot  => '/var/stunnel_chroot',
+        }
+        stunnel::connection { 'rsync':
+          client  => false,
+          connect => [3049],
+          accept  => 30490,
+        }
       EOF
     end
     let(:hieradata) do
       {
-        'iptables::ports' => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
-     'simp_options::haveged'      => true,
-     'simp_options::firewall'     => true,
-     'simp_options::pki'          => true,
-     'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
-     'simp_options::trusted_nets' => ['ALL']
+        'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
+        'simp_options::haveged'      => true,
+        'simp_options::firewall'     => true,
+        'simp_options::pki'          => true,
+        'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
+        'simp_options::trusted_nets' => ['ALL'],
       }
     end
 
@@ -102,11 +102,11 @@ describe 'instance' do
     end
 
     context 'renaming an stunnel session but keeping the same port' do
-      rename_manifest = <<-EOM
+      rename_manifest = <<~EOM
         stunnel::instance { 'new_test_service':
           client  => false,
           connect => [5049],
-          accept  => 50490
+          accept  => 50490,
         }
       EOM
 

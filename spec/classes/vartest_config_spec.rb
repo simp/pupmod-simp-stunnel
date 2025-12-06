@@ -36,9 +36,9 @@ def variable_test(key, val, opts = {})
     else
 
       it do
-        is_expected.to contain_concat__fragment('0_stunnel_global').with({
-                                                                           'content' => %r{^\s*#{opts[:key_str]} = #{opts[:val_str]}\n}
-                                                                         })
+        is_expected.to contain_concat__fragment('0_stunnel_global').with(
+          'content' => %r{^\s*#{opts[:key_str]} = #{opts[:val_str]}\n},
+        )
       end
     end
   end
@@ -55,9 +55,9 @@ describe 'stunnel::config' do
         it { is_expected.to compile.with_all_deps }
 
         it do
-          is_expected.to contain_concat__fragment('0_stunnel_global').with({
-                                                                             'content' => %r{.*chroot = /var/stunnel\nsetgid = stunnel\nsetuid = stunnel\ndebug = err\n.*}
-                                                                           })
+          is_expected.to contain_concat__fragment('0_stunnel_global').with(
+            'content' => %r{.*chroot = /var/stunnel\nsetgid = stunnel\nsetuid = stunnel\ndebug = err\n.*},
+          )
         end
 
         variable_test(:compression, 'zlib')
