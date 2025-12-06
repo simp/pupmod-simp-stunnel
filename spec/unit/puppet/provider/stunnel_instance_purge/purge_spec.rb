@@ -24,9 +24,11 @@ describe provider_class do
   end
 
   describe '#dirs' do
-    let(:catalog) do
-      c = Puppet::Resource::Catalog.new('Stunnel Test', 'production')
-      c.add_resource(resource)
+    before(:each) do
+      # rubocop:disable RSpec/InstanceVariable
+      @catalog = Puppet::Resource::Catalog.new('Stunnel Test', 'production')
+      @catalog.add_resource(resource)
+      # rubocop:enable RSpec/InstanceVariable
     end
 
     it 'does not have any changes' do
