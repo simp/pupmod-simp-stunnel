@@ -8,6 +8,11 @@ describe 'instance connectivity' do
       skip('You need at least two hosts in your nodeset to run this test')
     end
   else
+    before(:all) do
+      hosts.each do |host|
+        install_package(host, 'nc')
+      end
+    end
 
     context 'set up a bi-directional connection set' do
       hosts.each do |server|

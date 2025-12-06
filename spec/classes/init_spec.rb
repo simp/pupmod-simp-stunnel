@@ -21,9 +21,11 @@ describe 'stunnel' do
         }
         it {
           is_expected.to create_stunnel_instance_purge('stunnel_managed_by_puppet').with_dirs(
-            '/etc/stunnel',
-            '/etc/rc.d/init.d',
-            '/etc/systemd/system',
+            [
+              '/etc/stunnel',
+              '/etc/rc.d/init.d',
+              '/etc/systemd/system',
+            ],
           )
         }
 

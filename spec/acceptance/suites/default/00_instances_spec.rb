@@ -121,7 +121,7 @@ describe 'instance' do
     end
 
     context 'clean up' do
-      it 'stops and clean up stunnel' do
+      it 'stops and cleans up stunnel' do
         [
           'stunnel',
           'stunnel_managed_by_puppet_chroot',
