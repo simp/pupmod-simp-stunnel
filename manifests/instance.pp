@@ -531,6 +531,7 @@ define stunnel::instance(
   service { "stunnel_managed_by_puppet_${_safe_name}":
     ensure    => 'running',
     enable    => true,
+    require   => Stunnel::Account[$setuid],
     subscribe => [
       File[$_service_file],
       File["/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf"]
