@@ -13,12 +13,12 @@
 # @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
 class stunnel::instance_purge (
-  Array[Stdlib::Absolutepath] $purge_dirs = [ '/etc/stunnel',
-                                              '/etc/rc.d/init.d',
-                                              '/etc/systemd/system'
-                                            ]
+  Array[Stdlib::Absolutepath] $purge_dirs = ['/etc/stunnel',
+    '/etc/rc.d/init.d',
+    '/etc/systemd/system',
+  ]
 ) {
   stunnel_instance_purge { 'stunnel_managed_by_puppet':
-    dirs => $purge_dirs
+    dirs => $purge_dirs,
   }
 }

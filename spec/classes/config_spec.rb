@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'support/hiera_data_helper'
 
 describe 'stunnel::config' do
   def mock_selinux_false_facts(os_facts)
@@ -55,6 +56,8 @@ describe 'stunnel::config' do
 
         context 'with default parameters (chrooted) and selinux off' do
           let(:service_file) { File.read('spec/expected/connection/chroot-systemd.txt') }
+          let(:crypto_backend) { module_hiera_data(os_facts[:os]).fetch('stunnel::config::crypto_backend', 'provider') }
+          let(:expected_crypto) { (crypto_backend == 'provider') ? 'provider = default' : 'engine = auto' }
 
           it_behaves_like 'a chrooted and non-chrooted configuration'
 
@@ -68,7 +71,7 @@ describe 'stunnel::config' do
               syslog = no
               foreground = yes
               pid = /var/run/stunnel/stunnel.pid
-              engine = auto
+              #{expected_crypto}
               fips = no
               RNDoverwrite = yes
             EOM
@@ -114,6 +117,8 @@ describe 'stunnel::config' do
             mock_selinux_enforcing_facts(os_facts)
           end
           let(:service_file) { File.read('spec/expected/connection/nonchroot-systemd.txt') }
+          let(:crypto_backend) { module_hiera_data(os_facts[:os]).fetch('stunnel::config::crypto_backend', 'provider') }
+          let(:expected_crypto) { (crypto_backend == 'provider') ? 'provider = default' : 'engine = auto' }
 
           it_behaves_like 'a chrooted and non-chrooted configuration'
 
@@ -126,7 +131,7 @@ describe 'stunnel::config' do
               syslog = no
               foreground = yes
               pid = /var/run/stunnel/stunnel.pid
-              engine = auto
+              #{expected_crypto}
               fips = no
               RNDoverwrite = yes
             EOM

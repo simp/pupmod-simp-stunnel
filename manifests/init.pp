@@ -94,7 +94,6 @@ class stunnel (
   Variant[Enum['simp'],Boolean]  $pki                      = simplib::lookup('simp_options::pki', { 'default_value' => false }),
   Boolean                        $purge_instance_resources = true
 ) {
-
   contain 'stunnel::install'
 
   if $purge_instance_resources {

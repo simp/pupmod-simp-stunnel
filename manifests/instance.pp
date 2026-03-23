@@ -162,7 +162,6 @@
 # @see stunnel.conf(5)
 # @see stunnel.conf(8)
 #
-# @param client
 # @param compression
 # @param curve
 # @param delay
@@ -206,7 +205,7 @@
 #
 # @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
-define stunnel::instance(
+define stunnel::instance (
   Stunnel::Connect                            $connect,
   Variant[Simplib::Port, Simplib::Host::Port] $accept,
   Boolean                                     $client                  = true,
@@ -259,10 +258,10 @@ define stunnel::instance(
   String                                      $setuid                  = simplib::dlookup('stunnel::instance', 'setuid', $name, { 'default_value' => 'stunnel' }),
   String                                      $setgid                  = simplib::dlookup('stunnel::instance', 'setgid', $name, { 'default_value' => 'stunnel' }),
   Integer                                     $uid                     = simplib::dlookup('stunnel::instance', 'uid', $name, { 'default_value' => 600 }),
-  Integer                                     $gid                     = simplib::dlookup('stunnel::instance', 'gid', $name, { 'default_value' =>                                                                                                        $uid }),
+  Integer                                     $gid                     = simplib::dlookup('stunnel::instance', 'gid', $name, { 'default_value' => $uid }),
   Optional[String]                            $sni                     = simplib::dlookup('stunnel::instance', 'sni', $name, { 'default_value' => undef }),
   Array[String]                               $socket_options          = simplib::dlookup('stunnel::instance', 'socket_options', $name, { 'default_value' => [] }),
-  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::instance', 'ssl_version', $name, { 'default_value' => 'TLSv1.2'}),
+  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::instance', 'ssl_version', $name, { 'default_value' => 'TLSv1.2' }),
   Optional[Integer]                           $stack                   = simplib::dlookup('stunnel::instance', 'stack', $name, { 'default_value' => undef }),
   String                                      $stunnel_debug           = simplib::dlookup('stunnel::instance', 'stunnel_debug', $name, { 'default_value' => 'err' }),
   Boolean                                     $syslog                  = simplib::dlookup('stunnel::instance', 'syslog', $name, { 'default_value' => simplib::lookup('simp_options::syslog', { 'default_value' => false }) }),
@@ -273,7 +272,7 @@ define stunnel::instance(
   Integer                                     $verify                  = simplib::dlookup('stunnel::instance', 'verify', $name, { 'default_value' => 2 }),
   Optional[Array[String]]                     $systemd_wantedby        = simplib::dlookup('stunnel::instance', 'systemd_wantedby', $name, { 'default_value' => undef }),
   Optional[Array[String]]                     $systemd_requiredby      = simplib::dlookup('stunnel::instance', 'systemd_requiredby', $name, { 'default_value' => undef }),
-){
+) {
   $_safe_name = regsubst($name, '(/|\s)', '__')
   $_dport = split(String($accept),':')[-1]
 
@@ -287,15 +286,15 @@ define stunnel::instance(
 
   # Validation for RHEL Options
   if $fips {
-    if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
+    if $ssl_version { simplib::validate_array_member($ssl_version, ['TLSv1','TLSv1.1','TLSv1.2']) }
   }
   else {
     if $ssl_version {
-      simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
+      simplib::validate_array_member($ssl_version, ['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
     }
   }
   if $protocol {
-    simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
+    simplib::validate_array_member($protocol, ['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
   }
 
   ensure_resource('stunnel::account', $setuid,
@@ -316,28 +315,28 @@ define stunnel::instance(
     $_chroot = undef
   }
 
-  if !$pid and $_on_systemd {
+  if $_on_systemd and !$pid {
     $_foreground = true
-    $_pid        = $pid
+    $_pid        = undef
   } else {
     $_foreground = undef
-    $_pid        = "/var/run/stunnel/stunnel_managed_by_puppet_${_safe_name}.pid"
+    $_pid        = pick($pid, "/var/run/stunnel/stunnel_managed_by_puppet_${_safe_name}.pid")
   }
 
   file { "/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf":
-    ensure  => 'present',
+    ensure  => 'file',
     owner   => 'root',
     group   => 'root',
     mode    => '0600',
     content => template('stunnel/instance_conf.erb'),
-    require => File['/etc/stunnel']
+    require => File['/etc/stunnel'],
   }
 
   if $pki {
     pki::copy { "stunnel_${name}":
       source => $app_pki_external_source,
       pki    => $pki,
-      notify => Service["stunnel_managed_by_puppet_${_safe_name}"]
+      notify => Service["stunnel_managed_by_puppet_${_safe_name}"],
     }
   }
 
@@ -358,21 +357,7 @@ define stunnel::instance(
       exec { "mkdir -p ${_stunnel_pid_dirname}":
         path    => ['/bin','/usr/bin'],
         creates => $_chroot,
-        before  => File[$_chroot]
-      }
-
-      unless $_on_systemd {
-        ensure_resource('file', $_stunnel_pid_dirname,
-          {
-            'ensure'  => 'directory',
-            'owner'   => $setuid,
-            'group'   => $setgid,
-            'mode'    => '0644',
-            'seluser' => 'system_u',
-            'selrole' => 'object_r',
-            'seltype' => $_stunnel_chroot_seltype
-          }
-        )
+        before  => File[$_chroot],
       }
     }
     else {
@@ -382,7 +367,7 @@ define stunnel::instance(
       exec { "mkdir -p ${_chroot}":
         path    => ['/bin','/usr/bin'],
         creates => $_chroot,
-        before  => File[$_chroot]
+        before  => File[$_chroot],
       }
     }
 
@@ -391,7 +376,7 @@ define stunnel::instance(
       owner   => 'root',
       group   => $setgid,
       mode    => '0640',
-      seltype => $_stunnel_chroot_seltype
+      seltype => $_stunnel_chroot_seltype,
     }
 
     # The following two entries are required to be able to properly resolve
@@ -400,7 +385,7 @@ define stunnel::instance(
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0755'
+      mode   => '0755',
     }
 
     file { "${_chroot}/etc/resolv.conf":
@@ -408,7 +393,7 @@ define stunnel::instance(
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/resolv.conf'
+      source => 'file:///etc/resolv.conf',
     }
 
     file { "${_chroot}/etc/nsswitch.conf":
@@ -416,7 +401,7 @@ define stunnel::instance(
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/nsswitch.conf'
+      source => 'file:///etc/nsswitch.conf',
     }
 
     file { "${_chroot}/etc/hosts":
@@ -424,28 +409,28 @@ define stunnel::instance(
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/hosts'
+      source => 'file:///etc/hosts',
     }
 
     file { "${_chroot}/var":
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0644'
+      mode   => '0644',
     }
 
     file { "${_chroot}/var/run":
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0644'
+      mode   => '0644',
     }
 
     file { "${_chroot}/etc/pki":
       ensure => 'directory',
       owner  => 'root',
       group  => $setgid,
-      mode   => '0640'
+      mode   => '0640',
     }
 
     $_require_pki =  $pki ? { true => Pki::Copy["stunnel_${name}"], default => undef }
@@ -455,27 +440,12 @@ define stunnel::instance(
       group   => $setgid,
       mode    => '0640',
       recurse => true,
-      require => $_require_pki
+      require => $_require_pki,
     }
   }
   else {
     if $_pid {
       $_stunnel_piddir = File[dirname($_pid)]
-
-      unless $_on_systemd {
-        # The selinux context settings are ignored if SELinux is disabled
-        ensure_resource('file', dirname($_pid),
-          {
-            'ensure'  => 'directory',
-            'owner'   => $setuid,
-            'group'   => $setgid,
-            'mode'    => '0644',
-            'seluser' => 'system_u',
-            'selrole' => 'object_r',
-            'seltype' => 'stunnel_var_run_t',
-          }
-        )
-      }
     } else {
       $_stunnel_piddir = undef
     }
@@ -490,7 +460,7 @@ define stunnel::instance(
 
     iptables::listen::tcp_stateful { "allow_stunnel_${_safe_name}":
       trusted_nets => $trusted_nets,
-      dports       => [Integer($_dport)]
+      dports       => [Integer($_dport)],
     }
   }
 
@@ -500,32 +470,22 @@ define stunnel::instance(
     tcpwrappers::allow { "allow_stunnel_${_safe_name}":
       # Needed to work around a bug in the version of stunnel shipped with EL7.9
       pattern => 'ALL',
-      svc     => $_safe_name
+      svc     => $_safe_name,
     }
   }
 
   if $_on_systemd {
     $_service_file = "/etc/systemd/system/stunnel_managed_by_puppet_${_safe_name}.service"
     file { $_service_file:
-      ensure  => 'present',
+      ensure  => 'file',
       owner   => 'root',
       group   => 'root',
       mode    => '0644',
       content => template('stunnel/instance_systemd.erb'),
     }
   }
-  elsif 'sysv' in $facts['init_systems'] {
-    $_service_file = "/etc/rc.d/init.d/stunnel_managed_by_puppet_${_safe_name}"
-    file { $_service_file:
-      ensure  => 'present',
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0750',
-      content => template('stunnel/instance_init.erb')
-    }
-  }
   else {
-    fail("Init systems ${$facts['init_systems']} not supported. Only 'systemd' and 'sysv' supported.")
+    fail("Init systems ${$facts['init_systems']} not supported. Only 'systemd' is supported.")
   }
 
   service { "stunnel_managed_by_puppet_${_safe_name}":
@@ -534,6 +494,6 @@ define stunnel::instance(
     subscribe => [
       File[$_service_file],
       File["/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf"]
-    ] + $_stunnel_piddir
+    ] + $_stunnel_piddir,
   }
 }
