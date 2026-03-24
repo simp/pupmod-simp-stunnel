@@ -71,7 +71,7 @@ describe 'stunnel::instance' do
             .with_content(stunnel_conf)
         }
         it {
-          is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service')
+          is_expected.to create_systemd__unit_file('stunnel_managed_by_puppet_nfs.service')
             .with_content(service_file)
         }
         it {
@@ -111,7 +111,7 @@ describe 'stunnel::instance' do
             .with_content(%r{.*chroot = /var/stunnel_nfs.*})
         }
         it {
-          is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service')
+          is_expected.to create_systemd__unit_file('stunnel_managed_by_puppet_nfs.service')
             .with_content(service_file)
         }
       end
@@ -146,7 +146,7 @@ describe 'stunnel::instance' do
             .with_content(%r{.*chroot = /var/stunnel_sel.*})
         }
         it {
-          is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_sel.service')
+          is_expected.to create_systemd__unit_file('stunnel_managed_by_puppet_sel.service')
             .with_content(service_file)
         }
       end
@@ -205,7 +205,7 @@ describe 'stunnel::instance' do
         end
 
         it {
-          is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service')
+          is_expected.to create_systemd__unit_file('stunnel_managed_by_puppet_nfs.service')
             .without_content(%r{system_u:object_r:stunnel_var_run_t})
         }
       end
@@ -221,7 +221,7 @@ describe 'stunnel::instance' do
         end
 
         it {
-          is_expected.to create_file('/etc/systemd/system/stunnel_managed_by_puppet_nfs.service')
+          is_expected.to create_systemd__unit_file('stunnel_managed_by_puppet_nfs.service')
             .with_content(%r{WantedBy=nfs.service})
             .with_content(%r{RequiredBy=nfs-server.service})
         }

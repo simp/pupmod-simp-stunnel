@@ -7,10 +7,10 @@ class stunnel::service {
     file { '/etc/rc.d/init.d/stunnel': ensure => 'absent' }
 
     service { 'stunnel':
-      ensure  => running,
-      enable  => true,
-      require => [
-        File['/etc/systemd/system/stunnel.service'],
+      ensure    => running,
+      enable    => true,
+      subscribe => Systemd::Unit_file['stunnel.service'],
+      require   => [
         File['/etc/rc.d/init.d/stunnel']
       ],
     }

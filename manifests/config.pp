@@ -294,15 +294,7 @@ class stunnel::config (
     }
   }
 
-  # These templates need variables, that's why they are here
-  file { '/etc/systemd/system/stunnel.service':
-    ensure  => file,
+  systemd::unit_file { 'stunnel.service':
     content => template('stunnel/connection_systemd.erb'),
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    notify  => Systemd::Daemon_reload['stunnel'],
   }
-
-  systemd::daemon_reload { 'stunnel': }
 }

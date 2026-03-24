@@ -477,12 +477,7 @@ define stunnel::instance (
   }
 
   if $_on_systemd {
-    $_service_file = "/etc/systemd/system/stunnel_managed_by_puppet_${_safe_name}.service"
-    file { $_service_file:
-      ensure  => 'file',
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
+    systemd::unit_file { "stunnel_managed_by_puppet_${_safe_name}.service":
       content => template('stunnel/instance_systemd.erb'),
     }
   }
@@ -494,7 +489,7 @@ define stunnel::instance (
     ensure    => 'running',
     enable    => true,
     subscribe => [
-      File[$_service_file],
+      Systemd::Unit_file["stunnel_managed_by_puppet_${_safe_name}.service"],
       File["/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf"]
     ] + $_stunnel_piddir,
   }
