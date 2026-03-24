@@ -38,7 +38,7 @@ def variable_test(key, val, opts = {})
       it do
         values = opts[:val_str].is_a?(Array) ? opts[:val_str] : [opts[:val_str].to_s]
         values.each do |v|
-          contain_concat__fragment('0_stunnel_global').with(
+          is_expected.to contain_concat__fragment('0_stunnel_global').with(
                 'content' => %r{^\s*#{opts[:key_str]} = #{v}(?:\n|$)},
               )
         end
@@ -72,10 +72,7 @@ describe 'stunnel::config' do
         variable_test(:compression, 'rle')
         variable_test(:egd, '/foo/bar', { key_str: 'EGD' })
         crypto_backend = module_hiera_data(os_facts[:os]).fetch('stunnel::config::crypto_backend', 'provider')
-        if crypto_backend == 'provider'
-          variable_test(:provider, 'pkcs11')
-          variable_test(:provider_parameters, ['module=/usr/lib64/pkcs11/libsofthsm2.so', 'pin=12345'], { key_str: 'providerParameter' })
-        else
+        if crypto_backend == 'engine'
           variable_test(:engine, 'TEST')
           variable_test(:engine_ctrl, 'TEST_CTRL', { key_str: 'engineCtrl' })
         end

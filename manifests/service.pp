@@ -15,11 +15,6 @@ class stunnel::service {
       ],
     }
   } else {
-    # The script takes care of chkconfig
-    service { 'stunnel':
-      ensure  => running,
-      enable  => true,
-      require => File['/etc/rc.d/init.d/stunnel'],
-    }
+    fail("Init systems ${facts['init_systems']} not supported. Only 'systemd' is supported.")
   }
 }

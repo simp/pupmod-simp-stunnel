@@ -15,8 +15,7 @@ require 'yaml'
 #
 # Usage:
 #   hiera = module_hiera_data(facts[:os])
-#   hiera['sssd::config::sssd_config_dir_mode']
-#   hiera.dig('sssd::config::sssd_config_file_params', 'group')
+#   hiera['stunnel::config::crypto_backend']
 #
 DATA_DIR = File.expand_path('../../data', __dir__)
 

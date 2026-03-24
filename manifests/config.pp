@@ -84,11 +84,11 @@
 #
 # @param engine
 #   Sets the Hardware Engine to be used.
-#   This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
+#   This is ignored in EL10+ systems since stunnel in those versions does not support the engine option.
 #
 # @param engine_ctrl
 #   Sets the Hardware Engine Control parameters.
-#   This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
+#   This is ignored in EL10+ systems since stunnel in those versions does not support the engine option.
 #
 # @param fips
 #   Set the ``fips`` global option
@@ -180,7 +180,7 @@ class stunnel::config (
     if $_on_systemd {
       $_foreground = true
     } else {
-      $_foreground = undef
+      fail("Init systems ${facts['init_systems']} not supported. Only 'systemd' is supported.")
     }
     $_pid        = '/var/run/stunnel/stunnel.pid'
     $_legacy_pid = '/var/run/stunnel/stunnel.pid'
@@ -301,10 +301,8 @@ class stunnel::config (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    notify  => Exec['stunnel daemon reload'],
+    notify  => Systemd::Daemon_reload['stunnel'],
   }
-  exec { 'stunnel daemon reload':
-    command     => '/usr/bin/systemctl daemon-reload',
-    refreshonly => true,
-  }
+
+  systemd::daemon_reload { 'stunnel': }
 }

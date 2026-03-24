@@ -487,7 +487,7 @@ define stunnel::instance (
     }
   }
   else {
-    fail("Init systems ${$facts['init_systems']} not supported. Only 'systemd' is supported.")
+    fail("Init systems ${facts['init_systems']} not supported. Only 'systemd' is supported.")
   }
 
   service { "stunnel_managed_by_puppet_${_safe_name}":

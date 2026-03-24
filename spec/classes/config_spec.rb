@@ -92,10 +92,10 @@ describe 'stunnel::config' do
           it { is_expected.to contain_file('/var/stunnel/etc/pki/cacerts').with_source('file:///etc/pki/simp_apps/stunnel/x509/cacerts') }
           it {
             is_expected.to create_file('/etc/systemd/system/stunnel.service')
-              .that_notifies('Exec[stunnel daemon reload]')
+              .that_notifies('Systemd::Daemon_reload[stunnel]')
               .with_content(service_file)
           }
-          it { is_expected.to contain_exec('stunnel daemon reload') }
+          it { is_expected.to contain_systemd__daemon_reload('stunnel') }
         end
 
         context 'with parameters chroot set to /' do
@@ -150,14 +150,14 @@ describe 'stunnel::config' do
 
           it {
             is_expected.to create_file('/etc/systemd/system/stunnel.service')
-              .that_notifies('Exec[stunnel daemon reload]')
+              .that_notifies('Systemd::Daemon_reload[stunnel]')
               .with_content(service_file)
           }
           it {
             is_expected.to contain_service('stunnel')
               .that_requires('File[/etc/systemd/system/stunnel.service]')
           }
-          it { is_expected.to contain_exec('stunnel daemon reload') }
+          it { is_expected.to contain_systemd__daemon_reload('stunnel') }
         end
         context 'with pki = simp, syslog = true, and fips = true' do
           let(:params) do
