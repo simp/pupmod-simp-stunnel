@@ -1,2 +1,2 @@
 ---
-stunnel::config::crypto_backend: 'provider'
+stunnel::config::crypto_backend: 'none'

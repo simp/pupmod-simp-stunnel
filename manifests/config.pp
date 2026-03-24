@@ -90,15 +90,6 @@
 #   Sets the Hardware Engine Control parameters.
 #   This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
 #
-# @param provider
-#   Sets the default provider for the crypto backend.
-#   This is ignored in EL8 and earlier systems since stunnel in those versions does not support the provider option.
-#
-# @param provider_parameters
-#   Takes an array of strings, each of which is a provider parameter to be passed to stunnel.
-#   There is no validation of the contents of the array, so it is up to the user to validate their own inputs.
-#   This is ignored in EL8 and earlier systems since stunnel in those versions does not support the provider option.
-#
 # @param fips
 #   Set the ``fips`` global option
 #
@@ -125,7 +116,7 @@
 # @param crypto_backend
 #   The crypto backend to use.
 #   This is required since the options that are valid for the crypto backend depend on which backend is being used.
-#   Set this to 'engine' on el8 and earlier systems, and 'provider' on el9 and later systems.
+#   Set this to 'engine' on el9 and earlier systems, and 'none' on el10 and later systems.
 #
 # @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
@@ -148,8 +139,6 @@ class stunnel::config (
   Optional[String]               $egd                     = undef,
   String                         $engine                  = 'auto',
   Optional[String]               $engine_ctrl             = undef,
-  String                         $provider                = 'default',
-  Optional[Array[String]]        $provider_parameters     = undef,
   Optional[Stdlib::Absolutepath] $output                  = undef,
   Optional[Integer]              $rnd_bytes               = undef,
   Optional[Stdlib::Absolutepath] $rnd_file                = undef,
@@ -157,7 +146,7 @@ class stunnel::config (
   Array[String]                  $socket_options          = [],
   Boolean                        $syslog                  = $stunnel::syslog,
   Boolean                        $fips                    = $stunnel::fips,
-  Enum['engine','provider']      $crypto_backend,
+  Enum['engine','none']          $crypto_backend,
 ) inherits stunnel {
   include 'stunnel::monolithic'
 
@@ -181,6 +170,23 @@ class stunnel::config (
       source => $app_pki_external_source,
       pki    => $pki,
     }
+  }
+
+  # $_legacy_pid is used to kill the old stunnel process set up from a previous
+  #   version of this module. It should be set to $_pid, unless $_pid is unset.
+  $_on_systemd = 'systemd' in $facts['init_systems']
+
+  if $pid =~ Undef {
+    if $_on_systemd {
+      $_foreground = true
+    } else {
+      $_foreground = undef
+    }
+    $_pid        = '/var/run/stunnel/stunnel.pid'
+    $_legacy_pid = '/var/run/stunnel/stunnel.pid'
+  } else {
+    $_pid        = $pid
+    $_legacy_pid = $pid
   }
 
   concat { '/etc/stunnel/stunnel.conf':

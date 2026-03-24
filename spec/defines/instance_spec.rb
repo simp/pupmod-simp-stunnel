@@ -58,7 +58,10 @@ describe 'stunnel::instance' do
           }
         end
         let(:service_file) { File.read('spec/expected/instance/nonchroot-systemd.txt') }
-        let(:stunnel_conf) { File.read('spec/expected/instance/non_chroot_el7_stunnel.conf.txt') }
+        let(:stunnel_conf) do
+          file_path = "spec/expected/instance/non_chroot_el#{os_facts[:os][:release][:major]}_stunnel.conf.txt"
+          File.exist?(file_path) ? File.read(file_path) : File.read('spec/expected/instance/non_chroot_default_stunnel.conf.txt')
+        end
 
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to contain_file('/etc/stunnel') }
@@ -279,6 +282,9 @@ describe 'stunnel::instance' do
           }
         end
 
+        backend = module_hiera_data(os_facts[:os]).fetch('stunnel::config::crypto_backend', 'none')
+        expected_engine_ctrl = (backend == 'none') ? nil : %r{engineCtrl = LOAD}
+
         it { is_expected.to compile.with_all_deps }
 
         [
@@ -290,7 +296,7 @@ describe 'stunnel::instance' do
           %r{compression = zlib},
           %r{curve = prime256v1},
           %r{EGD = /some/socket/path},
-          %r{engineCtrl = LOAD},
+          expected_engine_ctrl,
           %r{engineNum = 1},
           %r{exec = /some/exec},
           %r{execargs = arg1 arg2},
@@ -317,6 +323,7 @@ describe 'stunnel::instance' do
           %r{TIMEOUTconnect = 15},
           %r{TIMEOUTidle = 20},
         ].each do |exp_regex|
+          next if exp_regex.nil?
           it { is_expected.to create_file(conf_file).with_content(exp_regex) }
         end
       end

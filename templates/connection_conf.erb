@@ -44,16 +44,6 @@ if has_variable?('setgid')
     end
   end
 
-  if @provider && @crypto_backend == 'provider'
-    stunnel_conf << "provider = #{@provider}"
-
-    if @provider_parameters
-      @provider_parameters.each do |param|
-        stunnel_conf << "providerParameter = #{param}"
-      end
-    end
-  end
-
   if @facts['os']['family'] == 'RedHat'
     stunnel_conf << "fips = #{bool_translate[(@facts['fips_enabled'] || @fips)]}"
   end

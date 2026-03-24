@@ -278,6 +278,8 @@ define stunnel::instance (
 
   $_on_systemd = 'systemd' in $facts['init_systems']
 
+  $_crypto_backend = simplib::lookup('stunnel::config::crypto_backend', { 'default_value' => 'none' })
+
   stunnel::instance::reserve_port { $_dport: }
 
   if $haveged { include 'haveged' }

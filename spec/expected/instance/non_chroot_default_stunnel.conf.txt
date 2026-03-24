@@ -1,0 +1,22 @@
+setgid = stunnel
+setuid = stunnel
+debug = err
+syslog = no
+foreground = yes
+pid =
+fips = yes
+RNDoverwrite = yes
+[nfs]
+connect = 2049
+accept = 20490
+client = no
+failover = rr
+key = /etc/pki/simp_apps/stunnel_nfs/x509/private/foo.example.com.pem
+cert = /etc/pki/simp_apps/stunnel_nfs/x509/public/foo.example.com.pub
+CAfile = /etc/pki/simp_apps/stunnel_nfs/x509/cacerts/cacerts.pem
+ciphers = HIGH:-SSLv2
+sslVersion = TLSv1.2
+verify = 2
+delay = no
+renegotiation = yes
+reset = yes

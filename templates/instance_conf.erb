@@ -33,21 +33,11 @@
     stunnel_conf << "EGD = #{@egd}"
   end
 
-  if @engine && @crypto_backend == 'engine'
+  if @engine && @_crypto_backend == 'engine'
     stunnel_conf << "engine = #{@engine}"
 
     if @engine_ctrl
       stunnel_conf << "engineCtrl = #{@engine_ctrl}"
-    end
-  end
-
-  if @provider && @crypto_backend == 'provider'
-    stunnel_conf << "provider = #{@provider}"
-
-    if @provider_parameters
-      @provider_parameters.each do |param|
-        stunnel_conf << "providerParameter = #{param}"
-      end
     end
   end
 

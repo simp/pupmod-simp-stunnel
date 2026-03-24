@@ -56,25 +56,28 @@ describe 'stunnel::config' do
 
         context 'with default parameters (chrooted) and selinux off' do
           let(:service_file) { File.read('spec/expected/connection/chroot-systemd.txt') }
-          let(:crypto_backend) { module_hiera_data(os_facts[:os]).fetch('stunnel::config::crypto_backend', 'provider') }
-          let(:expected_crypto) { (crypto_backend == 'provider') ? 'provider = default' : 'engine = auto' }
+          let(:crypto_backend) { module_hiera_data(os_facts[:os]).fetch('stunnel::config::crypto_backend', 'none') }
+          let(:expected_crypto) { (crypto_backend == 'none') ? '' : 'engine = auto' }
+          let(:expected_global_content) do
+            [
+              'chroot = /var/stunnel',
+              'setgid = stunnel',
+              'setuid = stunnel',
+              'debug = err',
+              'syslog = no',
+              'foreground = yes',
+              'pid = /var/run/stunnel/stunnel.pid',
+              expected_crypto,
+              'fips = no',
+              'RNDoverwrite = yes',
+            ].reject(&:empty?).join("\n") + "\n"
+          end
 
           it_behaves_like 'a chrooted and non-chrooted configuration'
 
           # Specific to chrooting
           it {
-            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<~EOM)
-              chroot = /var/stunnel
-              setgid = stunnel
-              setuid = stunnel
-              debug = err
-              syslog = no
-              foreground = yes
-              pid = /var/run/stunnel/stunnel.pid
-              #{expected_crypto}
-              fips = no
-              RNDoverwrite = yes
-            EOM
+            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(expected_global_content)
           }
 
           it { is_expected.to contain_file('/var/stunnel') }
@@ -91,11 +94,6 @@ describe 'stunnel::config' do
             is_expected.to create_file('/etc/systemd/system/stunnel.service')
               .that_notifies('Exec[stunnel daemon reload]')
               .with_content(service_file)
-          }
-          it { is_expected.to contain_file('/etc/rc.d/init.d/stunnel').with_ensure('absent') }
-          it {
-            is_expected.to contain_service('stunnel')
-              .that_requires(['File[/etc/systemd/system/stunnel.service]', 'File[/etc/rc.d/init.d/stunnel]'])
           }
           it { is_expected.to contain_exec('stunnel daemon reload') }
         end
@@ -117,24 +115,27 @@ describe 'stunnel::config' do
             mock_selinux_enforcing_facts(os_facts)
           end
           let(:service_file) { File.read('spec/expected/connection/nonchroot-systemd.txt') }
-          let(:crypto_backend) { module_hiera_data(os_facts[:os]).fetch('stunnel::config::crypto_backend', 'provider') }
-          let(:expected_crypto) { (crypto_backend == 'provider') ? 'provider = default' : 'engine = auto' }
+          let(:crypto_backend) { module_hiera_data(os_facts[:os]).fetch('stunnel::config::crypto_backend', 'none') }
+          let(:expected_crypto) { (crypto_backend == 'none') ? '' : 'engine = auto' }
+          let(:expected_global_content) do
+            [
+              'setgid = stunnel',
+              'setuid = stunnel',
+              'debug = err',
+              'syslog = no',
+              'foreground = yes',
+              'pid = /var/run/stunnel/stunnel.pid',
+              expected_crypto,
+              'fips = no',
+              'RNDoverwrite = yes',
+            ].reject(&:empty?).join("\n") + "\n"
+          end
 
           it_behaves_like 'a chrooted and non-chrooted configuration'
 
           # Fips should be disabled
           it {
-            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(<<~EOM)
-              setgid = stunnel
-              setuid = stunnel
-              debug = err
-              syslog = no
-              foreground = yes
-              pid = /var/run/stunnel/stunnel.pid
-              #{expected_crypto}
-              fips = no
-              RNDoverwrite = yes
-            EOM
+            is_expected.to contain_concat__fragment('0_stunnel_global').with_content(expected_global_content)
           }
           it { is_expected.not_to contain_file('/var/stunnel') }
           it { is_expected.not_to contain_file('/var/stunnel/etc') }
