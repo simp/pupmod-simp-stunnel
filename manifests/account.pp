@@ -42,16 +42,16 @@ define stunnel::account (
       'home'       => $home,
       'managehome' => false,
       'membership' => 'inclusive',
-      'shell'      => '/sbin/nologin'
-    }
+      'shell'      => '/sbin/nologin',
+    },
   }
 
   $_group = {
     $groupname    => {
       'ensure'    => 'present',
       'allowdupe' => false,
-      'gid'       =>  $gid
-    }
+      'gid'       => $gid,
+    },
   }
 
   ensure_resources('user', $_user)

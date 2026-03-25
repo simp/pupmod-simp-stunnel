@@ -104,7 +104,7 @@ Data type: `Stdlib::Absolutepath`
 
 Path and name of the private SSL key file
 
-Default value: `"${app_pki_dir}/private/${facts['fqdn']}.pem"`
+Default value: `"${app_pki_dir}/private/${facts['networking']['fqdn']}.pem"`
 
 ##### <a name="-stunnel--app_pki_cert"></a>`app_pki_cert`
 
@@ -112,7 +112,7 @@ Data type: `Stdlib::Absolutepath`
 
 Path and name of the public SSL certificate
 
-Default value: `"${app_pki_dir}/public/${facts['fqdn']}.pub"`
+Default value: `"${app_pki_dir}/public/${facts['networking']['fqdn']}.pub"`
 
 ##### <a name="-stunnel--app_pki_ca_dir"></a>`app_pki_ca_dir`
 
@@ -242,6 +242,7 @@ The following parameters are available in the `stunnel::config` class:
 * [`rnd_file`](#-stunnel--config--rnd_file)
 * [`rnd_overwrite`](#-stunnel--config--rnd_overwrite)
 * [`socket_options`](#-stunnel--config--socket_options)
+* [`crypto_backend`](#-stunnel--config--crypto_backend)
 
 ##### <a name="-stunnel--config--chroot"></a>`chroot`
 
@@ -414,7 +415,8 @@ Default value: `undef`
 
 Data type: `String`
 
-If ``$egd`` is set, sets the Hardware Engine to be used
+Sets the Hardware Engine to be used.
+This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
 
 Default value: `'auto'`
 
@@ -422,7 +424,8 @@ Default value: `'auto'`
 
 Data type: `Optional[String]`
 
-If ``$egd`` is set, sets the Hardware Engine Control parameters
+Sets the Hardware Engine Control parameters.
+This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
 
 Default value: `undef`
 
@@ -480,6 +483,14 @@ Data type: `Array[String]`
 
 Default value: `[]`
 
+##### <a name="-stunnel--config--crypto_backend"></a>`crypto_backend`
+
+Data type: `Enum['engine','none']`
+
+The crypto backend to use.
+This is required since the options that are valid for the crypto backend depend on which backend is being used.
+Set this to 'engine' on el9 and earlier systems, and 'none' on el10 and later systems.
+
 ### <a name="stunnel--install"></a>`stunnel::install`
 
 **NOTE: THIS IS A [PRIVATE](https://github.com/puppetlabs/puppetlabs-stdlib#assert_private) Defined Type**
@@ -527,10 +538,10 @@ The directories to search for files to purge
 Default value:
 
 ```puppet
-[ '/etc/stunnel',
-                                              '/etc/rc.d/init.d',
-                                              '/etc/systemd/system'
-                                            ]
+['/etc/stunnel',
+    '/etc/rc.d/init.d',
+    '/etc/systemd/system',
+  ]
 ```
 
 ### <a name="stunnel--monolithic"></a>`stunnel::monolithic`
@@ -813,7 +824,7 @@ Dictate the SSL version that can be used on the system
 * This default, combined with the default ``$ciphers``, will only negotiate
   at ``TLSv1.1`` or higher
 
-Default value: `simplib::dlookup('stunnel::connection', 'ssl_version', $name, { 'default_value' => 'TLSv1.2'})`
+Default value: `simplib::dlookup('stunnel::connection', 'ssl_version', $name, { 'default_value' => 'TLSv1.2' })`
 
 ##### <a name="-stunnel--connection--options"></a>`options`
 
@@ -1025,7 +1036,7 @@ connection
 
 * This only makes sense for servers
 
-Default value: `pick(simplib::dlookup('stunnel::connection', 'trusted_nets', $name, {'default_value' => undef }), simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }))`
+Default value: `pick(simplib::dlookup('stunnel::connection', 'trusted_nets', $name, { 'default_value' => undef }), simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }))`
 
 ##### <a name="-stunnel--connection--firewall"></a>`firewall`
 
@@ -1033,7 +1044,7 @@ Data type: `Boolean`
 
 Include the SIMP ``iptables`` module to manage the firewall
 
-Default value: `pick(simplib::dlookup('stunnel::connection', 'firewall', $name, {'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false }))`
+Default value: `pick(simplib::dlookup('stunnel::connection', 'firewall', $name, { 'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false }))`
 
 ##### <a name="-stunnel--connection--tcpwrappers"></a>`tcpwrappers`
 
@@ -1041,7 +1052,7 @@ Data type: `Boolean`
 
 Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
 
-Default value: `pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, {'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))`
+Default value: `pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, { 'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))`
 
 ##### <a name="-stunnel--connection--exec"></a>`exec`
 
@@ -1132,7 +1143,6 @@ The following parameters are available in the `stunnel::instance` defined type:
 * [`pid`](#-stunnel--instance--pid)
 * [`systemd_wantedby`](#-stunnel--instance--systemd_wantedby)
 * [`systemd_requiredby`](#-stunnel--instance--systemd_requiredby)
-* [`client`](#-stunnel--instance--client)
 * [`compression`](#-stunnel--instance--compression)
 * [`curve`](#-stunnel--instance--curve)
 * [`delay`](#-stunnel--instance--delay)
@@ -1293,7 +1303,7 @@ Data type: `Stdlib::Absolutepath`
 
 Path and name of the private SSL key file
 
-Default value: `simplib::dlookup('stunnel::instance', 'app_pki_key', $name, { 'default_value' => "${app_pki_dir}/private/${facts['fqdn']}.pem" })`
+Default value: `simplib::dlookup('stunnel::instance', 'app_pki_key', $name, { 'default_value' => "${app_pki_dir}/private/${facts['networking']['fqdn']}.pem" })`
 
 ##### <a name="-stunnel--instance--app_pki_cert"></a>`app_pki_cert`
 
@@ -1301,7 +1311,7 @@ Data type: `Stdlib::Absolutepath`
 
 Path and name of the public SSL certificate
 
-Default value: `simplib::dlookup('stunnel::instance', 'app_pki_cert', $name, { 'default_value' => "${app_pki_dir}/public/${facts['fqdn']}.pub" })`
+Default value: `simplib::dlookup('stunnel::instance', 'app_pki_cert', $name, { 'default_value' => "${app_pki_dir}/public/${facts['networking']['fqdn']}.pub" })`
 
 ##### <a name="-stunnel--instance--app_pki_ca_dir"></a>`app_pki_ca_dir`
 
@@ -1379,7 +1389,7 @@ Dictate the SSL version that can be used on the system
 * This default, combined with the default ``$ciphers``, will only negotiate
   at ``TLSv1.1`` or higher
 
-Default value: `simplib::dlookup('stunnel::instance', 'ssl_version', $name, { 'default_value' => 'TLSv1.2'})`
+Default value: `simplib::dlookup('stunnel::instance', 'ssl_version', $name, { 'default_value' => 'TLSv1.2' })`
 
 ##### <a name="-stunnel--instance--options"></a>`options`
 
@@ -1403,7 +1413,7 @@ Data type: `Integer`
 
 The group id of the stunnel group
 
-Default value: `simplib::dlookup('stunnel::instance', 'gid', $name, { 'default_value' =>                                                                                                        $uid })`
+Default value: `simplib::dlookup('stunnel::instance', 'gid', $name, { 'default_value' => $uid })`
 
 ##### <a name="-stunnel--instance--pid"></a>`pid`
 
@@ -1428,12 +1438,6 @@ Data type: `Optional[Array[String]]`
 Systemd services or targets that require stunnel
 
 Default value: `simplib::dlookup('stunnel::instance', 'systemd_requiredby', $name, { 'default_value' => undef })`
-
-##### <a name="-stunnel--instance--client"></a>`client`
-
-
-
-Default value: `true`
 
 ##### <a name="-stunnel--instance--compression"></a>`compression`
 
@@ -1796,7 +1800,7 @@ The following properties are available in the `stunnel_instance_purge` type.
 
 ##### `dirs`
 
-Valid values: `/^\//`
+Valid values: `%r{^/}`
 
 The directories from which the files matching "${name}.*" should be purged
 

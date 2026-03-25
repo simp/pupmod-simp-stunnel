@@ -33,7 +33,7 @@
     stunnel_conf << "EGD = #{@egd}"
   end
 
-  if @engine
+  if @engine && @_crypto_backend == 'engine'
     stunnel_conf << "engine = #{@engine}"
 
     if @engine_ctrl

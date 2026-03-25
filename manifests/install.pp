@@ -12,7 +12,7 @@
 #
 class stunnel::install (
   Variant[String, Integer] $version = simplib::lookup('simp_options::package_ensure', { 'default_value' => 'installed' })
-){
+) {
   assert_private()
 
   if $stunnel::haveged { include 'haveged' }
@@ -24,6 +24,6 @@ class stunnel::install (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    require =>  Package['stunnel']
+    require => Package['stunnel'],
   }
 }

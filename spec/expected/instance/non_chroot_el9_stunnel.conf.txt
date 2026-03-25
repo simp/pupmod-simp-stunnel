@@ -2,8 +2,10 @@ setgid = stunnel
 setuid = stunnel
 debug = err
 syslog = no
-pid = /var/run/stunnel/stunnel_managed_by_puppet_nfs.pid
+foreground = yes
+pid =
 engine = auto
+fips = yes
 RNDoverwrite = yes
 [nfs]
 connect = 2049
@@ -17,3 +19,5 @@ ciphers = HIGH:-SSLv2
 sslVersion = TLSv1.2
 verify = 2
 delay = no
+renegotiation = yes
+reset = yes

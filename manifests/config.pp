@@ -83,10 +83,12 @@
 #   Random Number Generator
 #
 # @param engine
-#   If ``$egd`` is set, sets the Hardware Engine to be used
+#   Sets the Hardware Engine to be used.
+#   This is ignored in EL10+ systems since stunnel in those versions does not support the engine option.
 #
 # @param engine_ctrl
-#   If ``$egd`` is set, sets the Hardware Engine Control parameters
+#   Sets the Hardware Engine Control parameters.
+#   This is ignored in EL10+ systems since stunnel in those versions does not support the engine option.
 #
 # @param fips
 #   Set the ``fips`` global option
@@ -110,6 +112,11 @@
 #   Overwrite the random seed file with new random data
 #
 # @param socket_options
+#
+# @param crypto_backend
+#   The crypto backend to use.
+#   This is required since the options that are valid for the crypto backend depend on which backend is being used.
+#   Set this to 'engine' on el9 and earlier systems, and 'none' on el10 and later systems.
 #
 # @author https://github.com/simp/pupmod-simp-stunnel/graphs/contributors
 #
@@ -138,9 +145,9 @@ class stunnel::config (
   Boolean                        $rnd_overwrite           = true,
   Array[String]                  $socket_options          = [],
   Boolean                        $syslog                  = $stunnel::syslog,
-  Boolean                        $fips                    = $stunnel::fips
+  Boolean                        $fips                    = $stunnel::fips,
+  Enum['engine','none']          $crypto_backend,
 ) inherits stunnel {
-
   include 'stunnel::monolithic'
 
   ensure_resource('stunnel::account', $setuid,
@@ -161,41 +168,25 @@ class stunnel::config (
   if $pki {
     pki::copy { 'stunnel':
       source => $app_pki_external_source,
-      pki    => $pki
+      pki    => $pki,
     }
   }
 
   # $_legacy_pid is used to kill the old stunnel process set up from a previous
   #   version of this module. It should be set to $_pid, unless $_pid is unset.
-  $on_systemd = 'systemd' in $facts['init_systems']
+  $_on_systemd = 'systemd' in $facts['init_systems']
 
   if $pid =~ Undef {
-    if $on_systemd {
+    if $_on_systemd {
       $_foreground = true
     } else {
-      $_foreground = undef
+      fail("Init systems ${facts['init_systems']} not supported. Only 'systemd' is supported.")
     }
     $_pid        = '/var/run/stunnel/stunnel.pid'
     $_legacy_pid = '/var/run/stunnel/stunnel.pid'
-
   } else {
     $_pid        = $pid
     $_legacy_pid = $pid
-  }
-
-  if $_pid and !$on_systemd {
-    $_stunnel_piddir = File[dirname($_pid)]
-    ensure_resource('file', dirname($_pid),
-      {
-        'ensure'  => 'directory',
-        'owner'   => $setuid,
-        'group'   => $setgid,
-        'mode'    => '0644',
-        'seluser' => 'system_u',
-        'selrole' => 'object_r',
-        'seltype' => 'stunnel_var_run_t',
-      }
-    )
   }
 
   concat { '/etc/stunnel/stunnel.conf':
@@ -203,13 +194,13 @@ class stunnel::config (
     group          => 'root',
     mode           => '0600',
     ensure_newline => true,
-    warn           => true
+    warn           => true,
   }
 
   concat::fragment { '0_stunnel_global':
     order   => 1,
     target  => '/etc/stunnel/stunnel.conf',
-    content => template('stunnel/connection_conf.erb')
+    content => template('stunnel/connection_conf.erb'),
   }
 
   if $_chroot !~ Undef {
@@ -225,7 +216,7 @@ class stunnel::config (
       ensure => 'directory',
       owner  => 'root',
       group  => $setgid,
-      mode   => '0770'
+      mode   => '0770',
     }
 
     # The following two entries are required to be able to properly resolve
@@ -234,7 +225,7 @@ class stunnel::config (
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0755'
+      mode   => '0755',
     }
 
     file { "${_chroot}/etc/resolv.conf":
@@ -242,7 +233,7 @@ class stunnel::config (
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/resolv.conf'
+      source => 'file:///etc/resolv.conf',
     }
 
     file { "${_chroot}/etc/nsswitch.conf":
@@ -250,7 +241,7 @@ class stunnel::config (
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/nsswitch.conf'
+      source => 'file:///etc/nsswitch.conf',
     }
 
     file { "${_chroot}/etc/hosts":
@@ -258,35 +249,35 @@ class stunnel::config (
       owner  => 'root',
       group  => 'root',
       mode   => '0644',
-      source => 'file:///etc/hosts'
+      source => 'file:///etc/hosts',
     }
 
     file { "${_chroot}/var":
       ensure => 'directory',
       owner  => 'root',
       group  => 'root',
-      mode   => '0644'
+      mode   => '0644',
     }
 
     file { "${_chroot}/var/run":
       ensure => 'directory',
       owner  => $setuid,
       group  => $setgid,
-      mode   => '0644'
+      mode   => '0644',
     }
 
     file { "${_chroot}/var/run/stunnel":
       ensure => 'directory',
       owner  => $setuid,
       group  => $setgid,
-      mode   => '0644'
+      mode   => '0644',
     }
 
     file { "${_chroot}/etc/pki":
       ensure => 'directory',
       owner  => 'root',
       group  => $setgid,
-      mode   => '0640'
+      mode   => '0640',
     }
 
     file { "${_chroot}/etc/pki/cacerts":
@@ -303,46 +294,7 @@ class stunnel::config (
     }
   }
 
-  # These templates need variables, that's why they are here
-  if $on_systemd {
-    file { '/etc/systemd/system/stunnel.service':
-      ensure  => file,
-      content => template('stunnel/connection_systemd.erb'),
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      notify  => Exec['stunnel daemon reload']
-    }
-    exec { 'stunnel daemon reload':
-      command     => '/usr/bin/systemctl daemon-reload',
-      refreshonly => true,
-    }
-
+  systemd::unit_file { 'stunnel.service':
+    content => template('stunnel/connection_systemd.erb'),
   }
-  else {
-    if $_pid {
-      # The selinux context settings are ignored if SELinux is disabled
-      ensure_resource('file', dirname($_pid),
-        {
-          'ensure'  => 'directory',
-          'owner'   => $setuid,
-          'group'   => $setgid,
-          'mode'    => '0644',
-          'seluser' => 'system_u',
-          'selrole' => 'object_r',
-          'seltype' => 'stunnel_var_run_t',
-        }
-      )
-    }
-
-    file { '/etc/rc.d/init.d/stunnel':
-      ensure  => 'present',
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0750',
-      content => template('stunnel/connection_init.erb'),
-    }
-
-  }
-
 }

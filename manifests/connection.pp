@@ -208,7 +208,7 @@ define stunnel::connection (
   Optional[Stdlib::Absolutepath]              $app_pki_crl             = simplib::dlookup('stunnel::connection', 'app_pki_crl', $name, { 'default_value' => undef }),
   Array[String]                               $openssl_cipher_suite    = simplib::dlookup('stunnel::connection', 'openssl_cipher_suite', $name, { 'default_value' => ['HIGH','-SSLv2'] }),
   Optional[String]                            $curve                   = simplib::dlookup('stunnel::connection', 'curve', $name, { 'default_value' => undef }),
-  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::connection', 'ssl_version', $name, { 'default_value' => 'TLSv1.2'}),
+  Optional[String]                            $ssl_version             = simplib::dlookup('stunnel::connection', 'ssl_version', $name, { 'default_value' => 'TLSv1.2' }),
   Array[String]                               $options                 = simplib::dlookup('stunnel::connection', 'options', $name, { 'default_value' => [] }),
   Integer                                     $verify                  = simplib::dlookup('stunnel::connection', 'verify', $name, { 'default_value' => 2 }),
   Optional[Simplib::URI]                      $ocsp                    = simplib::dlookup('stunnel::connection', 'ocsp', $name, { 'default_value' => undef }),
@@ -234,11 +234,10 @@ define stunnel::connection (
   Optional[Integer]                           $timeout_close           = simplib::dlookup('stunnel::connection', 'timeout_close', $name, { 'default_value' => undef }),
   Optional[Integer]                           $timeout_connect         = simplib::dlookup('stunnel::connection', 'timeout_connect', $name, { 'default_value' => undef }),
   Optional[Integer]                           $timeout_idle            = simplib::dlookup('stunnel::connection', 'timeout_idle', $name, { 'default_value' => undef }),
-  Simplib::Netlist                            $trusted_nets            = pick(simplib::dlookup('stunnel::connection', 'trusted_nets', $name, {'default_value' => undef }), simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] })),
-  Boolean                                     $firewall                = pick(simplib::dlookup('stunnel::connection', 'firewall', $name, {'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false })),
-  Boolean                                     $tcpwrappers             = pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, {'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))
+  Simplib::Netlist                            $trusted_nets            = pick(simplib::dlookup('stunnel::connection', 'trusted_nets', $name, { 'default_value' => undef }), simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] })),
+  Boolean                                     $firewall                = pick(simplib::dlookup('stunnel::connection', 'firewall', $name, { 'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false })),
+  Boolean                                     $tcpwrappers             = pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, { 'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))
 ) {
-
   $_dport = split(String($accept),':')[-1]
 
   stunnel::instance::reserve_port { $_dport: }
@@ -247,15 +246,15 @@ define stunnel::connection (
 
   # Validation for RHEL Options
   if $stunnel::fips {
-    if $ssl_version { simplib::validate_array_member($ssl_version,['TLSv1','TLSv1.1','TLSv1.2']) }
+    if $ssl_version { simplib::validate_array_member($ssl_version, ['TLSv1','TLSv1.1','TLSv1.2']) }
   }
   else {
     if $ssl_version {
-      simplib::validate_array_member($ssl_version,['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
+      simplib::validate_array_member($ssl_version, ['all','SSLv2','SSLv3','TLSv1','TLSv1.1','TLSv1.2'])
     }
   }
   if $protocol {
-    simplib::validate_array_member($protocol,['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
+    simplib::validate_array_member($protocol, ['cifs','connect','imap','nntp','pgsql','pop3','proxy','smtp'])
   }
 
   if $app_pki_key {
@@ -285,7 +284,7 @@ define stunnel::connection (
 
   concat::fragment { "stunnel_connection_${name}":
     target  => '/etc/stunnel/stunnel.conf',
-    content => template('stunnel/connection_conf.erb')
+    content => template('stunnel/connection_conf.erb'),
   }
 
   # The rules are pulled together from the accept_* and connect_*
@@ -297,7 +296,7 @@ define stunnel::connection (
 
     iptables::listen::tcp_stateful { "allow_stunnel_${name}":
       trusted_nets => $trusted_nets,
-      dports       => [Integer($_dport)]
+      dports       => [Integer($_dport)],
     }
   }
 
@@ -307,7 +306,7 @@ define stunnel::connection (
     tcpwrappers::allow { "allow_stunnel_${name}":
       svc     => $name,
       # Needed to work around a bug in the version of stunnel shipped with EL7.9
-      pattern => 'ALL'
+      pattern => 'ALL',
     }
   }
 }

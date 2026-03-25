@@ -36,7 +36,7 @@ if has_variable?('setgid')
     stunnel_conf << "EGD = #{@egd}"
   end
 
-  if @engine
+  if @engine && @crypto_backend == 'engine'
     stunnel_conf << "engine = #{@engine}"
 
     if @engine_ctrl
