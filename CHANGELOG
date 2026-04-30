@@ -1,3 +1,6 @@
+* Thu Apr 30 2026 Brideau, Patrick <patrick.brideau@teluq.ca> - 7.0.1
+- Fix ordering of account for instance service (#142)
+
 * Thu Mar 19 2026 Mike Riddle <mike@sicura.us> - 7.0.0
 - Removed el7 support
 - Added el10 support
