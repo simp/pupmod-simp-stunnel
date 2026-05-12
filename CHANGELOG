@@ -1,3 +1,6 @@
+* Mon May 11 2026 Steven Pritchard <steve@sicura.us> - 8.0.0
+- Remove unmaintained Compliance Engine data
+
 * Thu Apr 30 2026 Brideau, Patrick <patrick.brideau@teluq.ca> - 7.0.1
 - Fix ordering of account for instance service (#142)
 
