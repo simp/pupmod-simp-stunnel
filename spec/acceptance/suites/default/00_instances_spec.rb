@@ -103,13 +103,15 @@ describe 'instance' do
     end
 
     context 'renaming an stunnel session but keeping the same port' do
-      rename_manifest = <<~EOM
-        stunnel::instance { 'new_test_service':
-          client  => false,
-          connect => [5049],
-          accept  => 50490,
-        }
-      EOM
+      let(:rename_manifest) do
+        <<~EOM
+          stunnel::instance { 'new_test_service':
+            client  => false,
+            connect => [5049],
+            accept  => 50490,
+          }
+        EOM
+      end
 
       it 'succeeds' do
         apply_manifest_on(host, rename_manifest)
