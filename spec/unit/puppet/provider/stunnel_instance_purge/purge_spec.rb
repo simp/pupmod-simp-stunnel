@@ -1,7 +1,9 @@
 #! /usr/bin/env ruby -S rspec
 require 'spec_helper'
 
-provider_class = Puppet::Type.type(:stunnel_instance_purge).provider(:purge)
+def provider_class
+  @provider_class ||= Puppet::Type.type(:stunnel_instance_purge).provider(:purge)
+end
 
 describe provider_class do
   let(:verbose) { false }
