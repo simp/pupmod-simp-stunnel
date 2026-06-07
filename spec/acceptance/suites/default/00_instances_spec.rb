@@ -75,7 +75,7 @@ describe 'instance' do
           'stunnel',
         ].each do |service|
           result = on(host, "puppet resource service #{service}").stdout
-          expect(result).to match(%r{running})
+          expect(result).to include('running')
         end
         on(host, 'netstat -plant | grep `lsof -ti :20490` | grep stunnel', acceptable_exit_codes: [1])
         [30_490, 40_490].each do |port|
@@ -93,7 +93,7 @@ describe 'instance' do
           'stunnel_managed_by_puppet_nfs',
         ].each do |service|
           result = on(host, "puppet resource service #{service}").stdout
-          expect(result).to match(%r{running})
+          expect(result).to include('running')
         end
         on(host, 'netstat -plant | grep `lsof -ti :30490` | grep stunnel', acceptable_exit_codes: [1])
         [20_490, 40_490].each do |port|
