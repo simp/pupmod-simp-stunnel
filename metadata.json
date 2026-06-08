@@ -1,12 +1,12 @@
 {
   "name": "simp-stunnel",
-  "version": "8.0.0",
+  "version": "9.0.0",
   "author": "SIMP Team",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",
   "source": "https://github.com/simp/pupmod-simp-stunnel",
   "project_page": "https://github.com/simp/pupmod-simp-stunnel",
-  "issues_url": "https://simp-project.atlassian.net",
+  "issues_url": "https://github.com/simp/pupmod-simp-stunnel/issues",
   "tags": [
     "simp",
     "stunnel",
@@ -30,15 +30,15 @@
     },
     {
       "name": "simp/iptables",
-      "version_requirement": ">= 6.5.3 < 8.0.0"
+      "version_requirement": ">= 6.5.3 < 9.0.0"
     },
     {
       "name": "simp/pki",
-      "version_requirement": ">= 6.2.0 < 7.0.0"
+      "version_requirement": ">= 6.2.0 < 8.0.0"
     },
     {
       "name": "simp/simplib",
-      "version_requirement": ">= 4.9.0 < 5.0.0"
+      "version_requirement": ">= 4.9.0 < 6.0.0"
     },
     {
       "name": "simp/tcpwrappers",
@@ -88,8 +88,8 @@
   ],
   "requirements": [
     {
-      "name": "puppet",
-      "version_requirement": ">= 7.0.0 < 9.0.0"
+      "name": "openvox",
+      "version_requirement": ">= 8.0.0 < 9.0.0"
     }
   ]
 }
