@@ -69,9 +69,6 @@
 # @param firewall
 #   Include the SIMP ``iptables`` module to manage the firewall
 #
-# @param tcpwrappers
-#   Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
-#
 # @param pki
 #   * If ``simp``, include SIMP's ``pki`` module and use ``pki::copy`` to
 #     manage application certs in ``/etc/pki/simp_apps/stunnel/x509``
@@ -213,7 +210,6 @@ define stunnel::instance (
   Simplib::Netlist                            $trusted_nets            = simplib::dlookup('stunnel::instance', 'trusted_nets', $name, { 'default_value' => simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }) }),
   Boolean                                     $firewall                = simplib::dlookup('stunnel::instance', 'firewall', $name, { 'default_value' => simplib::lookup('simp_options::firewall', { 'default_value' => false }) }),
   Boolean                                     $haveged                 = simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => simplib::lookup('simp_options::haveged', { 'default_value' => true }) }),
-  Boolean                                     $tcpwrappers             = simplib::dlookup('stunnel::instance', 'tcpwrappers', $name, { 'default_value' => simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }) }),
   Variant[Enum['simp'],Boolean]               $pki                     = simplib::dlookup('stunnel::instance', 'pki', $name, { 'default_value' => simplib::lookup('simp_options::pki', { 'default_value' => false }) }),
   Stdlib::Absolutepath                        $app_pki_dir             = simplib::dlookup('stunnel::instance', 'app_pki_dir', $name, { 'default_value' => "/etc/pki/simp_apps/stunnel_${name}/x509" }),
   String                                      $app_pki_external_source = simplib::dlookup('stunnel::instance', 'app_pki_external_source', $name, { 'default_value' => simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }) }),
@@ -463,16 +459,6 @@ define stunnel::instance (
     iptables::listen::tcp_stateful { "allow_stunnel_${_safe_name}":
       trusted_nets => $trusted_nets,
       dports       => [Integer($_dport)],
-    }
-  }
-
-  if !$client and $tcpwrappers {
-    include 'tcpwrappers'
-
-    tcpwrappers::allow { "allow_stunnel_${_safe_name}":
-      # Needed to work around a bug in the version of stunnel shipped with EL7.9
-      pattern => 'ALL',
-      svc     => $_safe_name,
     }
   }
 

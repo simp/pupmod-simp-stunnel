@@ -184,9 +184,6 @@
 # @param firewall
 #   Include the SIMP ``iptables`` module to manage the firewall
 #
-# @param tcpwrappers
-#   Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
-#
 # All other configuration options can be found in the stunnel man pages
 # @see stunnel.conf(5)
 # @see stunnel.conf(8)
@@ -236,7 +233,6 @@ define stunnel::connection (
   Optional[Integer]                           $timeout_idle            = simplib::dlookup('stunnel::connection', 'timeout_idle', $name, { 'default_value' => undef }),
   Simplib::Netlist                            $trusted_nets            = pick(simplib::dlookup('stunnel::connection', 'trusted_nets', $name, { 'default_value' => undef }), simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] })),
   Boolean                                     $firewall                = pick(simplib::dlookup('stunnel::connection', 'firewall', $name, { 'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false })),
-  Boolean                                     $tcpwrappers             = pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, { 'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))
 ) {
   $_dport = split(String($accept),':')[-1]
 
@@ -300,13 +296,4 @@ define stunnel::connection (
     }
   }
 
-  if !$client and $tcpwrappers {
-    include 'tcpwrappers'
-
-    tcpwrappers::allow { "allow_stunnel_${name}":
-      svc     => $name,
-      # Needed to work around a bug in the version of stunnel shipped with EL7.9
-      pattern => 'ALL',
-    }
-  }
 }

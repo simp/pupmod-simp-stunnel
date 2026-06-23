@@ -29,7 +29,6 @@ stunnel::connection::session_cache_timeout: 1000
 stunnel::connection::sni: 'global.sni.server'
 stunnel::connection::ssl_version: 'TLSv1'
 stunnel::connection::stack: 1024
-stunnel::connection::tcpwrappers: true
 stunnel::connection::timeout_busy: 5
 stunnel::connection::timeout_close: 10
 stunnel::connection::timeout_connect: 15
@@ -89,7 +88,6 @@ stunnel::instance::stunnel_debug: 'info'
 stunnel::instance::syslog: true
 stunnel::instance::systemd_wantedby: [ 'some.service' ]
 stunnel::instance::systemd_requiredby: [ 'someother.service' ]
-stunnel::instance::tcpwrappers: true
 stunnel::instance::timeout_busy: 5
 stunnel::instance::timeout_close: 10
 stunnel::instance::timeout_connect: 15

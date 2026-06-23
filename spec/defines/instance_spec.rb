@@ -39,12 +39,11 @@ describe 'stunnel::instance' do
         it { is_expected.to create_stunnel__instance__reserve_port('20490') }
         it { is_expected.to contain_class('stunnel::install') }
         it { is_expected.not_to create_iptables__listen__tcp_stateful('allow_stunnel_nfs') }
-        it { is_expected.not_to create_tcpwrappers__allow('allow_stunnel_nfs') }
         it { is_expected.not_to create_pki__copy('stunnel_nfs') }
         it { is_expected.not_to create_file('/var/stunnel_nfs') }
       end
 
-      context 'with firewall, tcpwrappers, pki, fips true' do
+      context 'with firewall, pki, fips true' do
         let(:params) do
           {
             client:       false,
@@ -52,7 +51,6 @@ describe 'stunnel::instance' do
             accept:       20_490,
             trusted_nets: ['any'],
             firewall:     true,
-            tcpwrappers:  true,
             pki:          true,
             fips:         true,
           }
@@ -80,7 +78,6 @@ describe 'stunnel::instance' do
             dports:       [params[:accept].to_s.split(':')[-1]],
           )
         }
-        it { is_expected.to create_tcpwrappers__allow('allow_stunnel_nfs').with_pattern(['ALL']) }
         it { is_expected.to create_pki__copy('stunnel_nfs') }
         it { is_expected.to contain_class('stunnel::install') }
       end
@@ -409,7 +406,6 @@ describe 'stunnel::instance' do
               syslog: true,
               systemd_wantedby: [ 'some.service' ],
               systemd_requiredby: [ 'someother.service' ],
-              tcpwrappers: true,
               timeout_busy: 5,
               timeout_close: 10,
               timeout_connect: 15,
@@ -472,7 +468,6 @@ describe 'stunnel::instance' do
               syslog: true,
               systemd_wantedby: [ 'some.service' ],
               systemd_requiredby: [ 'someother.service' ],
-              tcpwrappers: true,
               timeout_busy: 5,
               timeout_close: 10,
               timeout_connect: 15,
