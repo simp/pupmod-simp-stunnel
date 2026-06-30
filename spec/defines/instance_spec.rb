@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'support/hiera_data_helper'
 
 describe 'stunnel::instance' do
   def mock_selinux_false_facts(os_facts)
