@@ -4,7 +4,6 @@ debug = err
 syslog = no
 foreground = yes
 pid =
-engine = auto
 fips = yes
 RNDoverwrite = yes
 [nfs]
