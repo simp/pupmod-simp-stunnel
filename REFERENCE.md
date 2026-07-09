@@ -53,7 +53,6 @@ The following parameters are available in the `stunnel` class:
 * [`syslog`](#-stunnel--syslog)
 * [`fips`](#-stunnel--fips)
 * [`haveged`](#-stunnel--haveged)
-* [`pki`](#-stunnel--pki)
 * [`purge_instance_resources`](#-stunnel--purge_instance_resources)
 
 ##### <a name="-stunnel--pki"></a>`pki`
@@ -192,12 +191,6 @@ Data type: `Boolean`
 Include the SIMP ``haveged`` module to assist with entropy generation
 
 Default value: `simplib::lookup('simp_options::haveged', { 'default_value' => false })`
-
-##### <a name="-stunnel--pki"></a>`pki`
-
-Whether or not to use the SIMP PKI subsystem
-
-Default value: `simplib::lookup('simp_options::pki', { 'default_value' => false })`
 
 ##### <a name="-stunnel--purge_instance_resources"></a>`purge_instance_resources`
 
