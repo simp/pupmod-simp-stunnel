@@ -27,121 +27,121 @@ The module supports **two deployment models**:
 `stunnel::instance_purge` (backed by the custom `stunnel_instance_purge` native
 type) tears down instance config files and services that Puppet no longer
 manages, so removing a tunnel from your manifest actually stops and cleans it up.
-It is included by default from `init.pp` (`manifests/init.pp:99-101`).
+It is included by default from `init.pp` (`manifests/init.pp`).
 
 ### Business logic
 
-The main class is a thin composition root. `stunnel` (`manifests/init.pp:80-102`)
+The main class is a thin composition root. `stunnel` (`manifests/init.pp`)
 is the only public class you `include`; it `contain`s `stunnel::install` and,
 when `$purge_instance_resources` is true (the default), includes
 `stunnel::instance_purge`. It does **not** itself set up any tunnel — the
 `stunnel::connection` and `stunnel::instance` defines do that.
 
-- **`stunnel` (`manifests/init.pp:80-102`)** — public entry class. Holds the
+- **`stunnel` (`manifests/init.pp`)** — public entry class. Holds the
   shared PKI parameters (`$app_pki_dir` defaults to
-  `/etc/pki/simp_apps/stunnel/x509`, `init.pp:81`), the service account
+  `/etc/pki/simp_apps/stunnel/x509`, `init.pp`), the service account
   identity (`$setuid`/`$setgid` = `stunnel`, `$uid`/`$gid` = `600`,
-  `init.pp:87-90`), and the `simp_options` feature toggles (see the seam
-  section). `$purge_instance_resources` defaults to `true` (`init.pp:95`).
+  `init.pp`), and the `simp_options` feature toggles (see the seam
+  section). `$purge_instance_resources` defaults to `true` (`init.pp`).
 - **`stunnel::install` (`manifests/install.pp`, private)** — `assert_private()`
-  at `install.pp:16`. Installs the `stunnel` package, creates `/etc/stunnel`,
+  at `install.pp`. Installs the `stunnel` package, creates `/etc/stunnel`,
   and conditionally `include`s `haveged` when `$stunnel::haveged` is set
-  (`install.pp:18`).
+  (`install.pp`).
 - **`stunnel::config` (`manifests/config.pp`)** — the monolithic daemon's global
   config. Inherits `stunnel`, `include`s `stunnel::monolithic`, ensures the
-  `stunnel::account`, optionally runs `pki::copy` (`config.pp:168-173`), builds
+  `stunnel::account`, optionally runs `pki::copy` (`config.pp`), builds
   the chroot tree, writes `/etc/stunnel/stunnel.conf` via `concat` +
   `connection_conf.erb`, and installs the `stunnel.service` unit from
-  `connection_systemd.erb` (`config.pp:297-299`). Requires a value for
+  `connection_systemd.erb` (`config.pp`). Requires a value for
   `$crypto_backend` — see gotchas.
 - **`stunnel::service` (`manifests/service.pp`)** — manages the monolithic
   `stunnel` service; removes the legacy SysV init script; **fails the compile on
-  non-systemd systems** (`service.pp:18`).
+  non-systemd systems** (`service.pp`).
 - **`stunnel::monolithic` (`manifests/monolithic.pp`, private)** —
-  `assert_private()` at `monolithic.pp:6`. Contains `stunnel::config` and
+  `assert_private()` at `monolithic.pp`. Contains `stunnel::config` and
   `stunnel::service` and wires the notify chain (config `~>` service, and
   `haveged ~> service` when enabled).
 - **`stunnel::account` (`manifests/account.pp`, private define)** —
-  `assert_private()` at `account.pp:34`. `ensure_resources` the stunnel user and
+  `assert_private()` at `account.pp`. `ensure_resources` the stunnel user and
   group so multiple tunnels sharing one user/group don't collide.
 - **`stunnel::connection` (`manifests/connection.pp`, define)** — a tunnel in the
   **monolithic** model: appends a `concat::fragment` to `stunnel.conf`
-  (`connection.pp:285-288`) and, for servers, opens the firewall
-  (`connection.pp:294-301`) and tcpwrappers (`connection.pp:303-311`).
+  (`connection.pp`) and, for servers, opens the firewall
+  (`connection.pp`) and tcpwrappers (`connection.pp`).
 - **`stunnel::instance` (`manifests/instance.pp`, define)** — a tunnel in the
   **instance** model: its own conf file, chroot, `pki::copy`, systemd unit, and
-  service (`instance.pp:328-496`). **Fails the compile on non-systemd systems**
-  (`instance.pp:485`).
+  service (`instance.pp`). **Fails the compile on non-systemd systems**
+  (`instance.pp`).
 - **`stunnel::instance::reserve_port` (`manifests/instance/reserve_port.pp`,
-  private define)** — `assert_private()` at `reserve_port.pp:8`. A "canary"
+  private define)** — `assert_private()` at `reserve_port.pp`. A "canary"
   define declared once per accept-port by both `connection` and `instance`
-  (`connection.pp:243`, `instance.pp:283`); a duplicate-declaration error here
+  (`connection.pp`, `instance.pp`); a duplicate-declaration error here
   is the intended signal that two tunnels want the same listen port.
 - **`stunnel::instance_purge` (`manifests/instance_purge.pp`)** — declares the
   `stunnel_instance_purge` native resource over `/etc/stunnel`,
-  `/etc/rc.d/init.d`, `/etc/systemd/system` (`instance_purge.pp:15-24`).
+  `/etc/rc.d/init.d`, `/etc/systemd/system` (`instance_purge.pp`).
 
 ## Gotchas / non-obvious details
 
 - **`$crypto_backend` has no default and is version-dependent.**
   `stunnel::config` declares `Enum['engine','none'] $crypto_backend` with **no
-  default** (`config.pp:149`); `stunnel::instance` reads
+  default** (`config.pp`); `stunnel::instance` reads
   `stunnel::config::crypto_backend` via `simplib::lookup` defaulting to `'none'`
-  (`instance.pp:281`). The value is supplied from module data by OS: `'engine'`
+  (`instance.pp`). The value is supplied from module data by OS: `'engine'`
   for RedHat-8/RedHat-9 (`data/os/RedHat-8.yaml`, `data/os/RedHat-9.yaml`),
   `'none'` in `data/common.yaml`. Per the docstring, engine options only exist
   on EL9 and earlier; EL10 dropped the engine option, hence `'none'` there
-  (`config.pp:116-119`).
-- **systemd is mandatory.** Both `stunnel::service` (`service.pp:18`) and
-  `stunnel::instance` (`instance.pp:485`), and the monolithic PID handling in
-  `config.pp:179-190`, call `fail(...)` when `systemd` is not in
+  (`config.pp`).
+- **systemd is mandatory.** Both `stunnel::service` (`service.pp`) and
+  `stunnel::instance` (`instance.pp`), and the monolithic PID handling in
+  `config.pp`, call `fail(...)` when `systemd` is not in
   `$facts['init_systems']`. There is no SysV path anymore — the module actively
-  removes the old init script (`service.pp:7`).
+  removes the old init script (`service.pp`).
 - **The chroot is skipped when SELinux is enabled — but the two defines differ.**
   In `stunnel::config`, a chroot is used **unless** SELinux is enforcing/permissive
-  (`config.pp:161-166`). In `stunnel::instance` it is the opposite polarity: a
+  (`config.pp`). In `stunnel::instance` it is the opposite polarity: a
   default `/var/stunnel_<name>` chroot is only chosen when SELinux is **disabled**
-  (`instance.pp:313-318`). Read those blocks carefully before touching chroot
+  (`instance.pp`). Read those blocks carefully before touching chroot
   logic. Either way, `$chroot` may never be `/` or under `/var/run`
-  (`config.pp:206-212`, `instance.pp:345-351`).
+  (`config.pp`, `instance.pp`).
 - **`reserve_port` is a deliberate compile-time port-collision detector.** Both
   tunnel defines declare `stunnel::instance::reserve_port { $_dport: }` keyed on
   the accept port. Two tunnels on the same port produce a duplicate-resource
-  error on purpose (`reserve_port.pp:1-9`). Don't "fix" that by making the name
+  error on purpose (`reserve_port.pp`). Don't "fix" that by making the name
   unique.
 - **The purge type stops/removes *unmanaged* stunnel services.** The
   `stunnel_instance_purge` provider searches the system for services matching the
   resource name prefix, subtracts the ones in the catalog, and stops/disables +
   deletes files for the remainder
-  (`lib/puppet/provider/stunnel_instance_purge/purge.rb:15-84`). The type's
-  `autobefore(:service)` (`lib/puppet/type/stunnel_instance_purge.rb:50-57`)
+  (`lib/puppet/provider/stunnel_instance_purge/purge.rb`). The type's
+  `autobefore(:service)` (`lib/puppet/type/stunnel_instance_purge.rb`)
   matches any service starting with `stunnel` **or** the namevar, so the purge
   always runs before those services start — this is what prevents port conflicts
   when a tunnel is renamed. Its docstring warns in caps that the namevar must be
-  precise (`stunnel_instance_purge.rb:26`); a loose prefix could purge unrelated
+  precise (`stunnel_instance_purge.rb`); a loose prefix could purge unrelated
   services.
 - **Instances created before module 6.3.0 are not auto-removed.** The
-  `instance.pp` header (`instance.pp:30-31`) notes there was no safe way to clean
+  `instance.pp` header (`instance.pp`) notes there was no safe way to clean
   up pre-6.3.0 files, so those must be removed by hand.
 - **FIPS narrows the allowed `ssl_version` set.** When FIPS is on, only
   `TLSv1`/`TLSv1.1`/`TLSv1.2` validate; when off, `all`/`SSLv2`/`SSLv3` are also
-  allowed (`connection.pp:248-255`, `instance.pp:290-297`). FIPS is **not**
+  allowed (`connection.pp`, `instance.pp`). FIPS is **not**
   enabled by default — the comment explains this is to keep TLS1.2 usable
-  (`config.pp:96-97`, `instance.pp:134-135`).
+  (`config.pp`, `instance.pp`).
 - **`haveged` defaults differ between the two models.** `stunnel::instance`
   defaults `$haveged` to `simp_options::haveged` **falling back to `true`**
-  (`instance.pp:215`), whereas the main class `stunnel::haveged` falls back to
-  `false` (`init.pp:93`). So an instance pulls in `haveged` by default unless
+  (`instance.pp`), whereas the main class `stunnel::haveged` falls back to
+  `false` (`init.pp`). So an instance pulls in `haveged` by default unless
   `simp_options::haveged` says otherwise.
 - **`tcpwrappers::allow` pins `pattern => 'ALL'`** in both defines to work around
-  a bug in the EL7.9 stunnel build (`connection.pp:308-309`,
-  `instance.pp:472-475`).
+  a bug in the EL7.9 stunnel build (`connection.pp`,
+  `instance.pp`).
 - **`simp/simp_options` is NOT a declared dependency** in `metadata.json`, yet
   the manifests consume the `simp_options::*` seam via `simplib::lookup` /
   `simplib::dlookup` (both provided by `simp/simplib`). Route SIMP feature
   toggles through that seam rather than assuming `simp_options` is included.
 - **Docstring note:** `manifests/init.pp` documents `@param pki` twice
-  (`init.pp:3-14` and `init.pp:70-71`) — harmless duplication in the
+  (`init.pp` and `init.pp`) — harmless duplication in the
   puppet-strings header, left as-is.
 
 ## The `simp_options` / `dlookup` seam
@@ -150,18 +150,18 @@ This module's real business-logic seam is the two-layer override system. The
 main class reads plain `simplib::lookup('simp_options::*', ...)` toggles
 (`manifests/init.pp`):
 
-| Line | Key | `default_value` |
+| File | Key | `default_value` |
 |------|-----|-----------------|
-| `init.pp:82` | `simp_options::pki::source` | `'/etc/pki/simp/x509'` |
-| `init.pp:91` | `simp_options::syslog` | `false` |
-| `init.pp:92` | `simp_options::fips` | `pick($facts['fips_enabled'], false)` |
-| `init.pp:93` | `simp_options::haveged` | `false` |
-| `init.pp:94` | `simp_options::pki` | `false` |
+| `init.pp` | `simp_options::pki::source` | `'/etc/pki/simp/x509'` |
+| `init.pp` | `simp_options::syslog` | `false` |
+| `init.pp` | `simp_options::fips` | `pick($facts['fips_enabled'], false)` |
+| `init.pp` | `simp_options::haveged` | `false` |
+| `init.pp` | `simp_options::pki` | `false` |
 
 The `stunnel::connection` and `stunnel::instance` defines add a second layer via
 `simplib::dlookup`, giving each parameter a **per-instance → global → simp_options
-default** fallback chain. The pattern (from `connection.pp:237-239` /
-`instance.pp:213-267`) is:
+default** fallback chain. The pattern (from `connection.pp` /
+`instance.pp`) is:
 
 ```puppet
 # per-instance override, then a simp_options default:
@@ -177,7 +177,7 @@ override (`stunnel::connection::param: ...` in Hiera, affecting all instances)
 (`Stunnel::Connection[rsync]::param: ...`), falling back to the given default —
 often another `simp_options::*` lookup. Keep new per-tunnel parameters on this
 `dlookup` seam so both override styles keep working (see the header docs at
-`connection.pp:1-16` and `instance.pp:1-16`).
+`connection.pp` and `instance.pp`).
 
 ## Dependencies
 
@@ -207,7 +207,7 @@ Runtime requirement (from `metadata.json` `requirements`): `puppet
 >= 7.0.0 < 9.0.0`. This is the **older** SIMP baseline — the module has **not**
 yet migrated to OpenVox. The `Gemfile` still installs the upstream Puppet gem
 only, via `gem 'puppet', puppet_version` with `puppet_version` defaulting to
-`['>= 7', '< 9']` (`Gemfile:23,29`). When the baseline moves this module to
+`['>= 7', '< 9']` (`Gemfile`). When the baseline moves this module to
 OpenVox, update both `metadata.json` and this line.
 
 Supported OS matrix (from `metadata.json`): CentOS 9/10; RedHat 8/9/10;
@@ -292,10 +292,10 @@ puppet strings generate --format markdown --out REFERENCE.md
 bundle exec rake beaker:suites[default,almalinux8]
 ```
 
-Relevant gem pins (from `Gemfile`): `rubocop ~> 1.88.0` (`Gemfile:16`),
-`puppetlabs_spec_helper ~> 8.0.0` (`Gemfile:30`), `simp-rake-helpers ~> 5.24.0`
-(`Gemfile:36`), `simp-beaker-helpers ~> 2.0.0` (`Gemfile:53`). The spec harness
-requires `puppetlabs_spec_helper/module_spec_helper` (`spec/spec_helper.rb:11`).
+Relevant gem pins (from `Gemfile`): `rubocop ~> 1.88.0` (`Gemfile`),
+`puppetlabs_spec_helper ~> 8.0.0` (`Gemfile`), `simp-rake-helpers ~> 5.24.0`
+(`Gemfile`), `simp-beaker-helpers ~> 2.0.0` (`Gemfile`). The spec harness
+requires `puppetlabs_spec_helper/module_spec_helper` (`spec/spec_helper.rb`).
 The tested Puppet range is `>= 7 < 9`.
 
 ## Conventions
@@ -311,8 +311,8 @@ The tested Puppet range is `>= 7 < 9`.
 - Keep OS-specific values (`crypto_backend`) in `data/*.yaml`, not hard-coded in
   manifests.
 - Mark internal classes/defines `assert_private()` as the existing ones do
-  (`account.pp:34`, `monolithic.pp:6`, `install.pp:16`,
-  `instance/reserve_port.pp:8`).
+  (`account.pp`, `monolithic.pp`, `install.pp`,
+  `instance/reserve_port.pp`).
 - Preserve the `reserve_port` port-collision guard — it is intentional.
 - `Gemfile`, `spec/spec_helper.rb`, and `.github/workflows/pr_tests.yml` carry a
   **puppetsync** notice — they are baseline-managed and the next sync overwrites
