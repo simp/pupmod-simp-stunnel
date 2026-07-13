@@ -53,7 +53,6 @@ The following parameters are available in the `stunnel` class:
 * [`syslog`](#-stunnel--syslog)
 * [`fips`](#-stunnel--fips)
 * [`haveged`](#-stunnel--haveged)
-* [`pki`](#-stunnel--pki)
 * [`purge_instance_resources`](#-stunnel--purge_instance_resources)
 
 ##### <a name="-stunnel--pki"></a>`pki`
@@ -192,12 +191,6 @@ Data type: `Boolean`
 Include the SIMP ``haveged`` module to assist with entropy generation
 
 Default value: `simplib::lookup('simp_options::haveged', { 'default_value' => false })`
-
-##### <a name="-stunnel--pki"></a>`pki`
-
-Whether or not to use the SIMP PKI subsystem
-
-Default value: `simplib::lookup('simp_options::pki', { 'default_value' => false })`
 
 ##### <a name="-stunnel--purge_instance_resources"></a>`purge_instance_resources`
 
@@ -416,7 +409,7 @@ Default value: `undef`
 Data type: `String`
 
 Sets the Hardware Engine to be used.
-This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
+This is ignored in EL10+ systems since stunnel in those versions does not support the engine option.
 
 Default value: `'auto'`
 
@@ -425,7 +418,7 @@ Default value: `'auto'`
 Data type: `Optional[String]`
 
 Sets the Hardware Engine Control parameters.
-This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
+This is ignored in EL10+ systems since stunnel in those versions does not support the engine option.
 
 Default value: `undef`
 
@@ -490,6 +483,8 @@ Data type: `Enum['engine','none']`
 The crypto backend to use.
 This is required since the options that are valid for the crypto backend depend on which backend is being used.
 Set this to 'engine' on el9 and earlier systems, and 'none' on el10 and later systems.
+
+Default value: `'none'`
 
 ### <a name="stunnel--install"></a>`stunnel::install`
 

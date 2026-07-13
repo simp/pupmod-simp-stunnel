@@ -67,9 +67,6 @@
 # @param haveged
 #   Include the SIMP ``haveged`` module to assist with entropy generation
 #
-# @param pki
-#   Whether or not to use the SIMP PKI subsystem
-#
 # @param purge_instance_resources
 #   Enable purging of stunnel instance resources that are no longer managed
 #
