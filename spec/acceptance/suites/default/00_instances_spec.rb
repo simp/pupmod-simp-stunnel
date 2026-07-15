@@ -41,13 +41,20 @@ describe 'instance' do
     # runs before the applies below configure the stunnel instances, so it is
     # the genuine fresh-node preview. A post-convergence noop check is omitted
     # (`--noop --detailed-exitcodes` always exits 0). No package removal (as
-    # with fips/ssh) and, deliberately, no hieradata: the real apply sets
-    # `simp_firewalld::enable`/`simp_options::pki => true`, so the noop runs the
-    # instance manifest with firewall/pki default-off -- exactly what the
-    # console previews on a fresh node before those options are turned on.
+    # with fips/ssh).
+    #
+    # We noop a bare `include 'stunnel'` (the module class, pki/firewall
+    # default-off), NOT the suite's instance `manifest`: that manifest's
+    # `stunnel::instance { 'chroot' }` copies PKI cacerts from a
+    # `file { source => 'file:///etc/pki/simp_apps/.../cacerts' }` that does not
+    # exist on a clean node, and a file source is still fetched for metadata
+    # under --noop -> "Could not evaluate" -> exit 4. A bare `include 'stunnel'`
+    # is what the console previews for the module class anyway.
     context 'in noop mode from a clean state' do
+      let(:noop_manifest) { "include 'stunnel'" }
+
       it 'applies without errors in noop mode' do
-        apply_manifest_on(host, manifest, catch_failures: true, noop: true)
+        apply_manifest_on(host, noop_manifest, catch_failures: true, noop: true)
       end
     end
 
