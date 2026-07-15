@@ -36,6 +36,21 @@ describe 'instance' do
       }
     end
 
+    # Exercise noop from a clean state: on a fresh node the Sicura console
+    # previews the module with `puppet apply --noop`, which must not error. This
+    # runs before the applies below configure the stunnel instances, so it is
+    # the genuine fresh-node preview. A post-convergence noop check is omitted
+    # (`--noop --detailed-exitcodes` always exits 0). No package removal (as
+    # with fips/ssh) and, deliberately, no hieradata: the real apply sets
+    # `simp_firewalld::enable`/`simp_options::pki => true`, so the noop runs the
+    # instance manifest with firewall/pki default-off -- exactly what the
+    # console previews on a fresh node before those options are turned on.
+    context 'in noop mode from a clean state' do
+      it 'applies without errors in noop mode' do
+        apply_manifest_on(host, manifest, catch_failures: true, noop: true)
+      end
+    end
+
     # This test verifies the validity of basic stunnel configurations
     # and ensures multiple connections can co-exist as advertised. It
     # does not test stunnel itself.
