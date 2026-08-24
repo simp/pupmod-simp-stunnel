@@ -1,6 +1,6 @@
 {
   "name": "simp-stunnel",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "author": "SIMP Team",
   "summary": "manages stunnel with PKI support",
   "license": "Apache-2.0",
@@ -18,11 +18,11 @@
   "dependencies": [
     {
       "name": "puppetlabs/concat",
-      "version_requirement": ">= 6.4.0 < 10.0.0"
+      "version_requirement": ">= 6.4.0 < 11.0.0"
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 8.0.0 < 10.0.0"
+      "version_requirement": ">= 8.0.0 < 11.0.0"
     },
     {
       "name": "simp/haveged",
@@ -38,7 +38,7 @@
     },
     {
       "name": "simp/simplib",
-      "version_requirement": ">= 4.9.0 < 6.0.0"
+      "version_requirement": ">= 4.9.0 < 8.0.0"
     },
     {
       "name": "simp/tcpwrappers",
