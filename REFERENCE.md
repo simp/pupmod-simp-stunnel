@@ -1837,4 +1837,3 @@ Alias of `Variant[Array[Simplib::Port], Array[Simplib::Netlist::Port], Simplib::
 Valid stunnel OCSP flag options
 
 Alias of `Tuple[Pattern[/(?i:NOCERTS|NOINTERN|NOSIGS|NOCHAIN|NOVERIFY|NOEXPLICIT|NOCASIGN|NODELEGATED|NOCHECKS|TRUSTOTHER|RESPID_KEY|NOTIME)/], 0]`
-
