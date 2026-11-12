@@ -9,6 +9,7 @@ describe 'stunnel' do
         it { is_expected.to compile.with_all_deps }
         it { is_expected.to create_class('stunnel') }
         it { is_expected.not_to create_class('haveged') }
+        it { is_expected.not_to create_class('rngd') }
         it { is_expected.to create_class('stunnel::install') }
         it { is_expected.to create_package('stunnel').with_ensure('installed') }
         it {
@@ -37,6 +38,15 @@ describe 'stunnel' do
           end
 
           it { is_expected.to create_class('haveged') }
+          it { is_expected.not_to create_class('rngd') }
+        end
+
+        context 'with rngd included' do
+          let(:params) { { rngd: true } }
+
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to create_class('rngd') }
+          it { is_expected.not_to create_class('haveged') }
         end
       end
     end

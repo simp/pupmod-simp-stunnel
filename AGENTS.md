@@ -45,8 +45,9 @@ when `$purge_instance_resources` is true (the default), includes
   section). `$purge_instance_resources` defaults to `true` (`init.pp`).
 - **`stunnel::install` (`manifests/install.pp`, private)** — `assert_private()`
   at `install.pp`. Installs the `stunnel` package, creates `/etc/stunnel`,
-  and conditionally `include`s `haveged` when `$stunnel::haveged` is set
-  (`install.pp`).
+  and conditionally `include`s `rngd` when `$stunnel::rngd` is set, or, when
+  the deprecated `$stunnel::haveged` is set, warns, asserts the optional
+  `simp/haveged` dependency and `include`s `haveged` (`install.pp`).
 - **`stunnel::config` (`manifests/config.pp`)** — the monolithic daemon's global
   config. Inherits `stunnel`, `include`s `stunnel::monolithic`, ensures the
   `stunnel::account`, optionally runs `pki::copy` (`config.pp`), builds
@@ -60,7 +61,7 @@ when `$purge_instance_resources` is true (the default), includes
 - **`stunnel::monolithic` (`manifests/monolithic.pp`, private)** —
   `assert_private()` at `monolithic.pp`. Contains `stunnel::config` and
   `stunnel::service` and wires the notify chain (config `~>` service, and
-  `haveged ~> service` when enabled).
+  `rngd ~> service` / `haveged ~> service` when enabled).
 - **`stunnel::account` (`manifests/account.pp`, private define)** —
   `assert_private()` at `account.pp`. `ensure_resources` the stunnel user and
   group so multiple tunnels sharing one user/group don't collide.
@@ -128,11 +129,12 @@ when `$purge_instance_resources` is true (the default), includes
   allowed (`connection.pp`, `instance.pp`). FIPS is **not**
   enabled by default — the comment explains this is to keep TLS1.2 usable
   (`config.pp`, `instance.pp`).
-- **`haveged` defaults differ between the two models.** `stunnel::instance`
-  defaults `$haveged` to `simp_options::haveged` **falling back to `true`**
+- **`haveged` (deprecated) defaults differ between the two models.**
+  `stunnel::instance` defaults `$haveged` to `simp_options::haveged` **falling
+  back to `true` when `simp/haveged` is installed and `$rngd` is not `true`**
   (`instance.pp`), whereas the main class `stunnel::haveged` falls back to
-  `false` (`init.pp`). So an instance pulls in `haveged` by default unless
-  `simp_options::haveged` says otherwise.
+  `false` (`init.pp`). `$rngd` defaults to `false` in both. The `haveged`
+  parameters are deprecated and will be removed in the next major release.
 - **`tcpwrappers::allow` pins `pattern => 'ALL'`** in both defines to work around
   a bug in the EL7.9 stunnel build (`connection.pp`,
   `instance.pp`).
@@ -155,7 +157,7 @@ main class reads plain `simplib::lookup('simp_options::*', ...)` toggles
 | `init.pp` | `simp_options::pki::source` | `'/etc/pki/simp/x509'` |
 | `init.pp` | `simp_options::syslog` | `false` |
 | `init.pp` | `simp_options::fips` | `pick($facts['fips_enabled'], false)` |
-| `init.pp` | `simp_options::haveged` | `false` |
+| `init.pp` | `simp_options::haveged` (deprecated) | `false` |
 | `init.pp` | `simp_options::pki` | `false` |
 
 The `stunnel::connection` and `stunnel::instance` defines add a second layer via
@@ -189,7 +191,7 @@ anywhere in this module:**
   assembled with `concat` / `concat::fragment`.
 - `puppetlabs/stdlib` `>= 8.0.0 < 10.0.0` — `ensure_resource(s)`, `dirname`,
   `regsubst`, etc.
-- `simp/haveged` `>= 0.4.5 < 1.0.0` — entropy daemon, `include`d when `$haveged`.
+- `simp/rngd` `>= 0.2.0 < 1.0.0` — entropy daemon, `include`d when `$rngd`.
 - `simp/iptables` `>= 6.5.3 < 8.0.0` — `iptables::listen::tcp_stateful` for
   server-side firewall rules.
 - `simp/pki` `>= 6.2.0 < 7.0.0` — `pki::copy` for certificate provisioning.
@@ -199,7 +201,11 @@ anywhere in this module:**
 - `simp/tcpwrappers` `>= 6.2.0 < 7.0.0` — `tcpwrappers::allow` for server-side
   access control.
 
-There are **no optional dependencies.** `simp/haveged`, `simp/iptables`,
+Optional dependency (`simp.optional_dependencies`): `simp/haveged`
+`>= 0.4.5 < 1.0.0`, used only by the deprecated `$haveged` parameters and
+checked with `simplib::assert_optional_dependency`.
+
+`simp/rngd`, `simp/iptables`,
 `simp/pki`, and `simp/tcpwrappers` are hard runtime dependencies even though the
 manifests only `include` them conditionally.
 

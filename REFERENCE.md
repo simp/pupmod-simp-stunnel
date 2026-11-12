@@ -53,6 +53,7 @@ The following parameters are available in the `stunnel` class:
 * [`syslog`](#-stunnel--syslog)
 * [`fips`](#-stunnel--fips)
 * [`haveged`](#-stunnel--haveged)
+* [`rngd`](#-stunnel--rngd)
 * [`purge_instance_resources`](#-stunnel--purge_instance_resources)
 
 ##### <a name="-stunnel--pki"></a>`pki`
@@ -188,9 +189,25 @@ Default value: `simplib::lookup('simp_options::fips', { 'default_value' => pick(
 
 Data type: `Boolean`
 
-Include the SIMP ``haveged`` module to assist with entropy generation
+Deprecated; use ``rngd`` instead. Include the SIMP ``haveged`` module to
+assist with entropy generation
+
+* ``simp/haveged`` is an optional dependency and must be installed
+  separately
+* This parameter will be removed in the next major release
 
 Default value: `simplib::lookup('simp_options::haveged', { 'default_value' => false })`
+
+##### <a name="-stunnel--rngd"></a>`rngd`
+
+Data type: `Boolean`
+
+Include the SIMP ``rngd`` module to assist with entropy generation
+
+* By default ``rngd`` only installs ``rng-tools``; set
+  ``rngd::service_ensure`` and ``rngd::service_enable`` to run the service
+
+Default value: `false`
 
 ##### <a name="-stunnel--purge_instance_resources"></a>`purge_instance_resources`
 
@@ -1117,6 +1134,7 @@ The following parameters are available in the `stunnel::instance` defined type:
 * [`accept`](#-stunnel--instance--accept)
 * [`trusted_nets`](#-stunnel--instance--trusted_nets)
 * [`haveged`](#-stunnel--instance--haveged)
+* [`rngd`](#-stunnel--instance--rngd)
 * [`firewall`](#-stunnel--instance--firewall)
 * [`tcpwrappers`](#-stunnel--instance--tcpwrappers)
 * [`pki`](#-stunnel--instance--pki)
@@ -1230,9 +1248,28 @@ Default value: `simplib::dlookup('stunnel::instance', 'trusted_nets', $name, { '
 
 Data type: `Boolean`
 
-Include ``haveged`` support when setting up stunnel (highly recommended)
+Deprecated; use ``rngd`` instead. Include ``haveged`` support when setting
+up stunnel
 
-Default value: `simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => simplib::lookup('simp_options::haveged', { 'default_value' => true }) })`
+* ``simp/haveged`` is an optional dependency and must be installed
+  separately
+* Defaults to ``simp_options::haveged``. When that is unset, it defaults to
+  ``true`` if the ``simp/haveged`` module is installed (the previous
+  behavior) unless ``rngd`` is ``true``, and ``false`` otherwise
+* This parameter will be removed in the next major release
+
+Default value: `simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => simplib::lookup('simp_options::haveged', { 'default_value' => (simplib::module_exist('simp/haveged') and !$rngd) }) })`
+
+##### <a name="-stunnel--instance--rngd"></a>`rngd`
+
+Data type: `Boolean`
+
+Include the SIMP ``rngd`` module to assist with entropy generation
+
+* By default ``rngd`` only installs ``rng-tools``; set
+  ``rngd::service_ensure`` and ``rngd::service_enable`` to run the service
+
+Default value: `false`
 
 ##### <a name="-stunnel--instance--firewall"></a>`firewall`
 

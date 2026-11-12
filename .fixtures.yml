@@ -15,6 +15,7 @@ fixtures:
     vox_selinux:
       repo: https://github.com/simp/pupmod-voxpupuli-selinux.git
       branch: simp-master
+    rngd: https://github.com/simp/pupmod-simp-rngd.git
     rsyslog: https://github.com/simp/pupmod-simp-rsyslog.git
     simplib: https://github.com/simp/pupmod-simp-simplib.git
     simp_firewalld: https://github.com/simp/pupmod-simp-simp_firewalld.git

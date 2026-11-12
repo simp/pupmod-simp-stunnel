@@ -54,6 +54,19 @@ the creation of stunnel connections for services.
 | this was deemed to be too risky for use across services that are not related.
 
 
+## Entropy: `rngd` replaces `haveged`
+
+`stunnel::rngd` (and `stunnel::instance::rngd`) include
+[`simp/rngd`](https://github.com/simp/pupmod-simp-rngd) and default to `false`.
+By default `rngd` only installs `rng-tools`; set `rngd::service_ensure` and
+`rngd::service_enable` to run the daemon.
+
+`stunnel::haveged` and `stunnel::instance::haveged` are deprecated and will be
+removed in the next major release. Their defaults are unchanged, so existing
+sites keep `haveged` until they switch. `simp/haveged` is now an optional
+dependency and must be installed separately by sites that still use it.
+Switching to `rngd` does not remove `haveged` from nodes where it is installed.
+
 ## Setup
 
 ### What simp stunnel affects

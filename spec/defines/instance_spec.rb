@@ -28,6 +28,36 @@ describe 'stunnel::instance' do
         mock_selinux_enforcing_facts(os_facts.merge(haveged__rngd_enabled: false))
       end
 
+      context 'with rngd = true' do
+        let(:params) do
+          {
+            connect: [2049],
+            accept:  20_490,
+            pki:     true,
+            rngd:    true,
+          }
+        end
+
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to contain_class('rngd') }
+        it { is_expected.not_to contain_class('haveged') }
+      end
+
+      context 'with haveged = true (deprecated)' do
+        let(:params) do
+          {
+            connect: [2049],
+            accept:  20_490,
+            pki:     true,
+            haveged: true,
+          }
+        end
+
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to contain_class('haveged') }
+        it { is_expected.not_to contain_class('rngd') }
+      end
+
       context 'with default parameters' do
         let(:params) do
           {

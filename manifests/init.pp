@@ -65,7 +65,18 @@
 #     fips option in that version of stunnel.
 #
 # @param haveged
-#   Include the SIMP ``haveged`` module to assist with entropy generation
+#   Deprecated; use ``rngd`` instead. Include the SIMP ``haveged`` module to
+#   assist with entropy generation
+#
+#   * ``simp/haveged`` is an optional dependency and must be installed
+#     separately
+#   * This parameter will be removed in the next major release
+#
+# @param rngd
+#   Include the SIMP ``rngd`` module to assist with entropy generation
+#
+#   * By default ``rngd`` only installs ``rng-tools``; set
+#     ``rngd::service_ensure`` and ``rngd::service_enable`` to run the service
 #
 # @param purge_instance_resources
 #   Enable purging of stunnel instance resources that are no longer managed
@@ -88,6 +99,7 @@ class stunnel (
   Boolean                        $syslog                   = simplib::lookup('simp_options::syslog', { 'default_value' => false }),
   Boolean                        $fips                     = simplib::lookup('simp_options::fips', { 'default_value' => pick($facts['fips_enabled'], false) }),
   Boolean                        $haveged                  = simplib::lookup('simp_options::haveged', { 'default_value' => false }),
+  Boolean                        $rngd                     = false,
   Variant[Enum['simp'],Boolean]  $pki                      = simplib::lookup('simp_options::pki', { 'default_value' => false }),
   Boolean                        $purge_instance_resources = true
 ) {
