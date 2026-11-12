@@ -133,7 +133,8 @@ when `$purge_instance_resources` is true (the default), includes
   `stunnel::instance` defaults `$haveged` to `simp_options::haveged` **falling
   back to `true` when `simp/haveged` is installed and `$rngd` is not `true`**
   (`instance.pp`), whereas the main class `stunnel::haveged` falls back to
-  `false` (`init.pp`). `$rngd` defaults to `false` in both. The `haveged`
+  `false` (`init.pp`). `$rngd` defaults to `false` in both (per instance it can
+  be set in Hiera through `simplib::dlookup`). The `haveged`
   parameters are deprecated and will be removed in the next major release.
 - **`tcpwrappers::allow` pins `pattern => 'ALL'`** in both defines to work around
   a bug in the EL7.9 stunnel build (`connection.pp`,
@@ -183,19 +184,17 @@ often another `simp_options::*` lookup. Keep new per-tunnel parameters on this
 
 ## Dependencies
 
-Module dependencies (from `metadata.json`) — **all required; there is no
-`simp.optional_dependencies` block and no `assert_optional_dependency` call
-anywhere in this module:**
+Required module dependencies (from `metadata.json` `dependencies`):
 
-- `puppetlabs/concat` `>= 6.4.0 < 10.0.0` — the monolithic `stunnel.conf` is
+- `puppetlabs/concat` `>= 6.4.0 < 11.0.0` — the monolithic `stunnel.conf` is
   assembled with `concat` / `concat::fragment`.
-- `puppetlabs/stdlib` `>= 8.0.0 < 10.0.0` — `ensure_resource(s)`, `dirname`,
+- `puppetlabs/stdlib` `>= 9.2.0 < 11.0.0` — `ensure_resource(s)`, `dirname`,
   `regsubst`, etc.
 - `simp/rngd` `>= 0.2.0 < 1.0.0` — entropy daemon, `include`d when `$rngd`.
-- `simp/iptables` `>= 6.5.3 < 8.0.0` — `iptables::listen::tcp_stateful` for
+- `simp/iptables` `>= 6.5.3 < 10.0.0` — `iptables::listen::tcp_stateful` for
   server-side firewall rules.
-- `simp/pki` `>= 6.2.0 < 7.0.0` — `pki::copy` for certificate provisioning.
-- `simp/simplib` `>= 4.9.0 < 5.0.0` — `simplib::lookup`, `simplib::dlookup`,
+- `simp/pki` `>= 6.2.0 < 8.0.0` — `pki::copy` for certificate provisioning.
+- `simp/simplib` `>= 4.9.0 < 8.0.0` — `simplib::lookup`, `simplib::dlookup`,
   `simplib::validate_array_member`, the `Simplib::*` types, and the
   `fips_enabled` fact.
 - `simp/tcpwrappers` `>= 6.2.0 < 7.0.0` — `tcpwrappers::allow` for server-side
@@ -209,12 +208,9 @@ checked with `simplib::assert_optional_dependency`.
 `simp/pki`, and `simp/tcpwrappers` are hard runtime dependencies even though the
 manifests only `include` them conditionally.
 
-Runtime requirement (from `metadata.json` `requirements`): `puppet
->= 7.0.0 < 9.0.0`. This is the **older** SIMP baseline — the module has **not**
-yet migrated to OpenVox. The `Gemfile` still installs the upstream Puppet gem
-only, via `gem 'puppet', puppet_version` with `puppet_version` defaulting to
-`['>= 7', '< 9']` (`Gemfile`). When the baseline moves this module to
-OpenVox, update both `metadata.json` and this line.
+Runtime requirement (from `metadata.json` `requirements`): `openvox
+>= 8.0.0 < 10.0.0`. The `Gemfile` installs the `openvox` gem (`PUPPET_VERSION` /
+`OPENVOX_VERSION`, default `>= 8, < 9`).
 
 Supported OS matrix (from `metadata.json`): CentOS 9/10; RedHat 8/9/10;
 OracleLinux 8/9/10; Rocky 8/9/10; AlmaLinux 8/9/10.

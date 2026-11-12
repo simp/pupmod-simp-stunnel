@@ -79,6 +79,15 @@ describe 'stunnel::instance' do
         end
       end
 
+      context 'with stunnel::instance::rngd set in Hiera' do
+        let(:hieradata) { 'simp_options_haveged_rngd' }
+        let(:params) { { connect: [2049], accept: 20_490, pki: true } }
+
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to contain_class('rngd') }
+        it { is_expected.not_to contain_class('haveged') }
+      end
+
       context 'with default parameters' do
         let(:params) do
           {

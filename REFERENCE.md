@@ -1271,7 +1271,7 @@ Include the SIMP ``rngd`` module to assist with entropy generation
 * By default ``rngd`` only installs ``rng-tools``; set
   ``rngd::service_ensure`` and ``rngd::service_enable`` to run the service
 
-Default value: `false`
+Default value: `simplib::dlookup('stunnel::instance', 'rngd', $name, { 'default_value' => false })`
 
 ##### <a name="-stunnel--instance--firewall"></a>`firewall`
 
