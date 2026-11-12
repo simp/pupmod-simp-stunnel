@@ -15,7 +15,18 @@ class stunnel::install (
 ) {
   assert_private()
 
-  if $stunnel::haveged { include 'haveged' }
+  if $stunnel::haveged {
+    deprecation(
+      'stunnel::haveged',
+      "${module_name}: 'stunnel::haveged' is deprecated and will be removed in the next major release. Use 'stunnel::rngd' instead.",
+      false
+    )
+    simplib::assert_optional_dependency($module_name, 'simp/haveged')
+
+    include 'haveged'
+  }
+
+  if $stunnel::rngd { include 'rngd' }
 
   package { 'stunnel': ensure => $version }
 

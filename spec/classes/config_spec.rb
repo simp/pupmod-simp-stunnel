@@ -47,6 +47,31 @@ describe 'stunnel::config' do
     it { is_expected.to create_class('stunnel::service') }
   end
 
+  context 'with rngd or haveged enabled' do
+    on_supported_os.each do |os, os_facts|
+      context "on #{os}" do
+        let(:facts) { mock_selinux_false_facts(os_facts) }
+
+        context 'with rngd = true' do
+          let(:pre_condition) { "class { 'stunnel': rngd => true }" }
+
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to contain_class('rngd') }
+          it { is_expected.not_to contain_class('haveged') }
+          it { is_expected.to contain_class('rngd').that_notifies('Class[stunnel::service]') }
+        end
+
+        context 'with haveged = true (deprecated)' do
+          let(:pre_condition) { "class { 'stunnel': haveged => true }" }
+
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to contain_class('haveged').that_notifies('Class[stunnel::service]') }
+          it { is_expected.not_to contain_class('rngd') }
+        end
+      end
+    end
+  end
+
   context 'supported operating systems' do
     on_supported_os.each do |os, os_facts|
       context "on #{os}" do
