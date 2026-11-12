@@ -70,6 +70,7 @@
 #
 #   * ``simp/haveged`` is an optional dependency and must be installed
 #     separately
+#   * Defaults to ``simp_options::haveged``, unless ``rngd`` is ``true``
 #   * This parameter will be removed in the next major release
 #
 # @param rngd
@@ -98,8 +99,8 @@ class stunnel (
   Integer                        $gid                      = $uid,
   Boolean                        $syslog                   = simplib::lookup('simp_options::syslog', { 'default_value' => false }),
   Boolean                        $fips                     = simplib::lookup('simp_options::fips', { 'default_value' => pick($facts['fips_enabled'], false) }),
-  Boolean                        $haveged                  = simplib::lookup('simp_options::haveged', { 'default_value' => false }),
   Boolean                        $rngd                     = false,
+  Boolean                        $haveged                  = (simplib::lookup('simp_options::haveged', { 'default_value' => false }) and !$rngd),
   Variant[Enum['simp'],Boolean]  $pki                      = simplib::lookup('simp_options::pki', { 'default_value' => false }),
   Boolean                        $purge_instance_resources = true
 ) {

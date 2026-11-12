@@ -71,7 +71,8 @@
 #     separately
 #   * Defaults to ``simp_options::haveged``. When that is unset, it defaults to
 #     ``true`` if the ``simp/haveged`` module is installed (the previous
-#     behavior) unless ``rngd`` is ``true``, and ``false`` otherwise
+#     behavior), and ``false`` otherwise
+#   * Defaults to ``false`` when ``rngd`` is ``true``
 #   * This parameter will be removed in the next major release
 #
 # @param rngd
@@ -227,7 +228,7 @@ define stunnel::instance (
   Simplib::Netlist                            $trusted_nets            = simplib::dlookup('stunnel::instance', 'trusted_nets', $name, { 'default_value' => simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }) }),
   Boolean                                     $firewall                = simplib::dlookup('stunnel::instance', 'firewall', $name, { 'default_value' => simplib::lookup('simp_options::firewall', { 'default_value' => false }) }),
   Boolean                                     $rngd                    = false,
-  Boolean                                     $haveged                 = simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => simplib::lookup('simp_options::haveged', { 'default_value' => (simplib::module_exist('simp/haveged') and !$rngd) }) }),
+  Boolean                                     $haveged                 = simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => (simplib::lookup('simp_options::haveged', { 'default_value' => simplib::module_exist('simp/haveged') }) and !$rngd) }),
   Boolean                                     $tcpwrappers             = simplib::dlookup('stunnel::instance', 'tcpwrappers', $name, { 'default_value' => simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }) }),
   Variant[Enum['simp'],Boolean]               $pki                     = simplib::dlookup('stunnel::instance', 'pki', $name, { 'default_value' => simplib::lookup('simp_options::pki', { 'default_value' => false }) }),
   Stdlib::Absolutepath                        $app_pki_dir             = simplib::dlookup('stunnel::instance', 'app_pki_dir', $name, { 'default_value' => "/etc/pki/simp_apps/stunnel_${name}/x509" }),

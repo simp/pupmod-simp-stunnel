@@ -3,11 +3,14 @@
   include the `rngd` class, which replaces `haveged`. When `stunnel::rngd` is
   enabled, `rngd` is ordered before and notifies the stunnel service
 - Deprecate `stunnel::haveged` and `stunnel::instance::haveged`; they will be
-  removed in the next major release. Defaults are unchanged, except that
-  `stunnel::instance::haveged` now only defaults to `true` when `simp/haveged`
-  is installed and `stunnel::instance::rngd` is not `true`
+  removed in the next major release. Both now default to `false` when the
+  matching `rngd` parameter is `true`, even if `simp_options::haveged` is
+  `true`. When `simp_options::haveged` is unset, `stunnel::instance::haveged`
+  now only defaults to `true` when `simp/haveged` is installed
 - `simp/haveged` is now an optional dependency and must be installed
   separately to use the deprecated parameters
+- Raise the `puppetlabs/stdlib` floor to 9.2.0, for the 3-argument
+  `deprecation()`. Requiring OpenVox 8 already ruled out stdlib 8.x
 
 * Thu Oct 08 2026 Steven Pritchard <steve@sicura.us> - 9.1.0
 - Add support for OpenVox 9

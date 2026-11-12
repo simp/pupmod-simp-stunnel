@@ -194,9 +194,10 @@ assist with entropy generation
 
 * ``simp/haveged`` is an optional dependency and must be installed
   separately
+* Defaults to ``simp_options::haveged``, unless ``rngd`` is ``true``
 * This parameter will be removed in the next major release
 
-Default value: `simplib::lookup('simp_options::haveged', { 'default_value' => false })`
+Default value: `(simplib::lookup('simp_options::haveged', { 'default_value' => false }) and !$rngd`
 
 ##### <a name="-stunnel--rngd"></a>`rngd`
 
@@ -1255,10 +1256,11 @@ up stunnel
   separately
 * Defaults to ``simp_options::haveged``. When that is unset, it defaults to
   ``true`` if the ``simp/haveged`` module is installed (the previous
-  behavior) unless ``rngd`` is ``true``, and ``false`` otherwise
+  behavior), and ``false`` otherwise
+* Defaults to ``false`` when ``rngd`` is ``true``
 * This parameter will be removed in the next major release
 
-Default value: `simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => simplib::lookup('simp_options::haveged', { 'default_value' => (simplib::module_exist('simp/haveged') and !$rngd) }) })`
+Default value: `simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => (simplib::lookup('simp_options::haveged', { 'default_value' => simplib::module_exist('simp/haveged') }) and !$rngd) })`
 
 ##### <a name="-stunnel--instance--rngd"></a>`rngd`
 
