@@ -64,7 +64,22 @@
 #   * This only makes sense for servers
 #
 # @param haveged
-#   Include ``haveged`` support when setting up stunnel (highly recommended)
+#   Deprecated; use ``rngd`` instead. Include ``haveged`` support when setting
+#   up stunnel
+#
+#   * ``simp/haveged`` is an optional dependency and must be installed
+#     separately
+#   * Defaults to ``simp_options::haveged``. When that is unset, it defaults to
+#     ``true`` if the ``simp/haveged`` module is installed (the previous
+#     behavior), and ``false`` otherwise
+#   * Defaults to ``false`` when ``rngd`` is ``true``
+#   * This parameter will be removed in the next major release
+#
+# @param rngd
+#   Include the SIMP ``rngd`` module to assist with entropy generation
+#
+#   * By default ``rngd`` only installs ``rng-tools``; set
+#     ``rngd::service_ensure`` and ``rngd::service_enable`` to run the service
 #
 # @param firewall
 #   Include the SIMP ``iptables`` module to manage the firewall
@@ -209,7 +224,8 @@ define stunnel::instance (
 
   Simplib::Netlist                            $trusted_nets            = simplib::dlookup('stunnel::instance', 'trusted_nets', $name, { 'default_value' => simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }) }),
   Boolean                                     $firewall                = simplib::dlookup('stunnel::instance', 'firewall', $name, { 'default_value' => simplib::lookup('simp_options::firewall', { 'default_value' => false }) }),
-  Boolean                                     $haveged                 = simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => simplib::lookup('simp_options::haveged', { 'default_value' => true }) }),
+  Boolean                                     $rngd                    = simplib::dlookup('stunnel::instance', 'rngd', $name, { 'default_value' => false }),
+  Boolean                                     $haveged                 = simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => (simplib::lookup('simp_options::haveged', { 'default_value' => simplib::module_exist('simp/haveged') }) and !$rngd) }),
   Variant[Enum['simp'],Boolean]               $pki                     = simplib::dlookup('stunnel::instance', 'pki', $name, { 'default_value' => simplib::lookup('simp_options::pki', { 'default_value' => false }) }),
   Stdlib::Absolutepath                        $app_pki_dir             = simplib::dlookup('stunnel::instance', 'app_pki_dir', $name, { 'default_value' => "/etc/pki/simp_apps/stunnel_${name}/x509" }),
   String                                      $app_pki_external_source = simplib::dlookup('stunnel::instance', 'app_pki_external_source', $name, { 'default_value' => simplib::lookup('simp_options::pki::source', { 'default_value' => '/etc/pki/simp/x509' }) }),
@@ -278,7 +294,18 @@ define stunnel::instance (
 
   stunnel::instance::reserve_port { $_dport: }
 
-  if $haveged { include 'haveged' }
+  if $haveged {
+    deprecation(
+      'stunnel::instance::haveged',
+      "${module_name}: 'stunnel::instance::haveged' is deprecated and will be removed in the next major release. Use 'stunnel::instance::rngd' instead.",
+      false
+    )
+    simplib::assert_optional_dependency($module_name, 'simp/haveged')
+
+    include 'haveged'
+  }
+
+  if $rngd { include 'rngd' }
 
   include 'stunnel'
 
@@ -474,6 +501,7 @@ define stunnel::instance (
   service { "stunnel_managed_by_puppet_${_safe_name}":
     ensure    => 'running',
     enable    => true,
+    require   => Stunnel::Account[$setuid],
     subscribe => [
       Systemd::Unit_file["stunnel_managed_by_puppet_${_safe_name}.service"],
       File["/etc/stunnel/stunnel_managed_by_puppet_${_safe_name}.conf"]

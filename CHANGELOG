@@ -1,3 +1,48 @@
+* Fri Nov 13 2026 Steven Pritchard <steve@sicura.us> - 10.0.0
+- BREAKING: Remove the `tcpwrappers` parameter from `stunnel::connection` and
+  `stunnel::instance`. The archived `simp/tcpwrappers` module is no longer a
+  dependency, and stunnel no longer manages `/etc/hosts.allow` entries. Remove
+  any `stunnel::connection::tcpwrappers` or `stunnel::instance::tcpwrappers`
+  settings; existing `hosts.allow` entries are left in place.
+
+* Thu Nov 12 2026 Steven Pritchard <steve@sicura.us> - 9.2.0
+- Add `stunnel::rngd` and `stunnel::instance::rngd` (default `false`) to
+  include the `rngd` class, which replaces `haveged`. When `stunnel::rngd` is
+  enabled, `rngd` is ordered before and notifies the stunnel service
+- Deprecate `stunnel::haveged` and `stunnel::instance::haveged`; they will be
+  removed in the next major release. Both now default to `false` when the
+  matching `rngd` parameter is `true`, even if `simp_options::haveged` is
+  `true`. When `simp_options::haveged` is unset, `stunnel::instance::haveged`
+  now only defaults to `true` when `simp/haveged` is installed
+- `simp/haveged` is now an optional dependency and must be installed
+  separately to use the deprecated parameters
+- Require `puppetlabs/stdlib` >= 9.2.0, for the 3-argument `deprecation()`.
+  Environments on stdlib 9.0.x or 9.1.x must upgrade stdlib.
+
+* Thu Oct 08 2026 Steven Pritchard <steve@sicura.us> - 9.1.0
+- Add support for OpenVox 9
+- Update metadata.json dependency ranges from the Forge
+
+* Mon Aug 24 2026 Steven Pritchard <steve@sicura.us> - 9.0.2
+- [puppetsync] Update metadata.json dependency ranges from the Forge
+
+* Thu Jul 09 2026 Steven Pritchard <steve@sicura.us> - 9.0.1
+- Removed duplicate parameter documentation (puppet-lint)
+
+* Mon Jun 08 2026 Steven Pritchard <steven.pritchard@gmail.com> - 9.0.0
+- Switch `requirements` from `puppet` to `openvox` (>= 8 < 9)
+- Point `issues_url` at GitHub Issues
+- Drop end-of-life OS support (CentOS 8, EL7); list EL10 across all supported distros
+- Allow newer SIMP module dependencies (see metadata.json diff)
+- Sync Gemfile with current puppetsync baseline (adds OpenVox to test gems)
+- Drop Puppet 7 / Ruby 2.7 from GitHub Actions; use Ruby 3.2.11 with OpenVox 8 and 3.4.9 elsewhere
+
+* Mon May 11 2026 Steven Pritchard <steve@sicura.us> - 8.0.0
+- Remove unmaintained Compliance Engine data
+
+* Thu Apr 30 2026 Brideau, Patrick <patrick.brideau@teluq.ca> - 7.0.1
+- Fix ordering of account for instance service (#142)
+
 * Thu Mar 19 2026 Mike Riddle <mike@sicura.us> - 7.0.0
 - Removed el7 support
 - Added el10 support

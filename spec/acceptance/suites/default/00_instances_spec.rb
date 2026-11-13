@@ -36,6 +36,28 @@ describe 'instance' do
       }
     end
 
+    # Exercise noop from a clean state: on a fresh node the Sicura console
+    # previews the module with `puppet apply --noop`, which must not error. This
+    # runs before the applies below configure the stunnel instances, so it is
+    # the genuine fresh-node preview. A post-convergence noop check is omitted
+    # (`--noop --detailed-exitcodes` always exits 0). No package removal (as
+    # with fips/ssh).
+    #
+    # We noop a bare `include 'stunnel'` (the module class, pki/firewall
+    # default-off), NOT the suite's instance `manifest`: that manifest's
+    # `stunnel::instance { 'chroot' }` copies PKI cacerts from a
+    # `file { source => 'file:///etc/pki/simp_apps/.../cacerts' }` that does not
+    # exist on a clean node, and a file source is still fetched for metadata
+    # under --noop -> "Could not evaluate" -> exit 4. A bare `include 'stunnel'`
+    # is what the console previews for the module class anyway.
+    context 'in noop mode from a clean state' do
+      let(:noop_manifest) { "include 'stunnel'" }
+
+      it 'applies without errors in noop mode' do
+        apply_manifest_on(host, noop_manifest, catch_failures: true, noop: true)
+      end
+    end
+
     # This test verifies the validity of basic stunnel configurations
     # and ensures multiple connections can co-exist as advertised. It
     # does not test stunnel itself.
@@ -75,7 +97,7 @@ describe 'instance' do
           'stunnel',
         ].each do |service|
           result = on(host, "puppet resource service #{service}").stdout
-          expect(result).to match(%r{running})
+          expect(result).to include('running')
         end
         on(host, 'netstat -plant | grep `lsof -ti :20490` | grep stunnel', acceptable_exit_codes: [1])
         [30_490, 40_490].each do |port|
@@ -93,7 +115,7 @@ describe 'instance' do
           'stunnel_managed_by_puppet_nfs',
         ].each do |service|
           result = on(host, "puppet resource service #{service}").stdout
-          expect(result).to match(%r{running})
+          expect(result).to include('running')
         end
         on(host, 'netstat -plant | grep `lsof -ti :30490` | grep stunnel', acceptable_exit_codes: [1])
         [20_490, 40_490].each do |port|
@@ -103,13 +125,15 @@ describe 'instance' do
     end
 
     context 'renaming an stunnel session but keeping the same port' do
-      rename_manifest = <<~EOM
-        stunnel::instance { 'new_test_service':
-          client  => false,
-          connect => [5049],
-          accept  => 50490,
-        }
-      EOM
+      let(:rename_manifest) do
+        <<~EOM
+          stunnel::instance { 'new_test_service':
+            client  => false,
+            connect => [5049],
+            accept  => 50490,
+          }
+        EOM
+      end
 
       it 'succeeds' do
         apply_manifest_on(host, rename_manifest)

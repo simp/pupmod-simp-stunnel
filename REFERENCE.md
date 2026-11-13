@@ -53,7 +53,7 @@ The following parameters are available in the `stunnel` class:
 * [`syslog`](#-stunnel--syslog)
 * [`fips`](#-stunnel--fips)
 * [`haveged`](#-stunnel--haveged)
-* [`pki`](#-stunnel--pki)
+* [`rngd`](#-stunnel--rngd)
 * [`purge_instance_resources`](#-stunnel--purge_instance_resources)
 
 ##### <a name="-stunnel--pki"></a>`pki`
@@ -189,15 +189,26 @@ Default value: `simplib::lookup('simp_options::fips', { 'default_value' => pick(
 
 Data type: `Boolean`
 
-Include the SIMP ``haveged`` module to assist with entropy generation
+Deprecated; use ``rngd`` instead. Include the SIMP ``haveged`` module to
+assist with entropy generation
 
-Default value: `simplib::lookup('simp_options::haveged', { 'default_value' => false })`
+* ``simp/haveged`` is an optional dependency and must be installed
+  separately
+* Defaults to ``simp_options::haveged``, unless ``rngd`` is ``true``
+* This parameter will be removed in the next major release
 
-##### <a name="-stunnel--pki"></a>`pki`
+Default value: `(simplib::lookup('simp_options::haveged', { 'default_value' => false }) and !$rngd`
 
-Whether or not to use the SIMP PKI subsystem
+##### <a name="-stunnel--rngd"></a>`rngd`
 
-Default value: `simplib::lookup('simp_options::pki', { 'default_value' => false })`
+Data type: `Boolean`
+
+Include the SIMP ``rngd`` module to assist with entropy generation
+
+* By default ``rngd`` only installs ``rng-tools``; set
+  ``rngd::service_ensure`` and ``rngd::service_enable`` to run the service
+
+Default value: `false`
 
 ##### <a name="-stunnel--purge_instance_resources"></a>`purge_instance_resources`
 
@@ -416,7 +427,7 @@ Default value: `undef`
 Data type: `String`
 
 Sets the Hardware Engine to be used.
-This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
+This is ignored in EL10+ systems since stunnel in those versions does not support the engine option.
 
 Default value: `'auto'`
 
@@ -425,7 +436,7 @@ Default value: `'auto'`
 Data type: `Optional[String]`
 
 Sets the Hardware Engine Control parameters.
-This is ignored in EL9+ systems since stunnel in those versions does not support the engine option.
+This is ignored in EL10+ systems since stunnel in those versions does not support the engine option.
 
 Default value: `undef`
 
@@ -490,6 +501,8 @@ Data type: `Enum['engine','none']`
 The crypto backend to use.
 This is required since the options that are valid for the crypto backend depend on which backend is being used.
 Set this to 'engine' on el9 and earlier systems, and 'none' on el10 and later systems.
+
+Default value: `'none'`
 
 ### <a name="stunnel--install"></a>`stunnel::install`
 
@@ -697,7 +710,6 @@ The following parameters are available in the `stunnel::connection` defined type
 * [`timeout_idle`](#-stunnel--connection--timeout_idle)
 * [`trusted_nets`](#-stunnel--connection--trusted_nets)
 * [`firewall`](#-stunnel--connection--firewall)
-* [`tcpwrappers`](#-stunnel--connection--tcpwrappers)
 * [`exec`](#-stunnel--connection--exec)
 * [`execargs`](#-stunnel--connection--execargs)
 
@@ -1046,14 +1058,6 @@ Include the SIMP ``iptables`` module to manage the firewall
 
 Default value: `pick(simplib::dlookup('stunnel::connection', 'firewall', $name, { 'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false }))`
 
-##### <a name="-stunnel--connection--tcpwrappers"></a>`tcpwrappers`
-
-Data type: `Boolean`
-
-Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
-
-Default value: `pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, { 'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))`
-
 ##### <a name="-stunnel--connection--exec"></a>`exec`
 
 Data type: `Optional[String]`
@@ -1122,8 +1126,8 @@ The following parameters are available in the `stunnel::instance` defined type:
 * [`accept`](#-stunnel--instance--accept)
 * [`trusted_nets`](#-stunnel--instance--trusted_nets)
 * [`haveged`](#-stunnel--instance--haveged)
+* [`rngd`](#-stunnel--instance--rngd)
 * [`firewall`](#-stunnel--instance--firewall)
-* [`tcpwrappers`](#-stunnel--instance--tcpwrappers)
 * [`pki`](#-stunnel--instance--pki)
 * [`app_pki_external_source`](#-stunnel--instance--app_pki_external_source)
 * [`app_pki_dir`](#-stunnel--instance--app_pki_dir)
@@ -1235,9 +1239,29 @@ Default value: `simplib::dlookup('stunnel::instance', 'trusted_nets', $name, { '
 
 Data type: `Boolean`
 
-Include ``haveged`` support when setting up stunnel (highly recommended)
+Deprecated; use ``rngd`` instead. Include ``haveged`` support when setting
+up stunnel
 
-Default value: `simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => simplib::lookup('simp_options::haveged', { 'default_value' => true }) })`
+* ``simp/haveged`` is an optional dependency and must be installed
+  separately
+* Defaults to ``simp_options::haveged``. When that is unset, it defaults to
+  ``true`` if the ``simp/haveged`` module is installed (the previous
+  behavior), and ``false`` otherwise
+* Defaults to ``false`` when ``rngd`` is ``true``
+* This parameter will be removed in the next major release
+
+Default value: `simplib::dlookup('stunnel::instance', 'haveged', $name, { 'default_value' => (simplib::lookup('simp_options::haveged', { 'default_value' => simplib::module_exist('simp/haveged') }) and !$rngd) })`
+
+##### <a name="-stunnel--instance--rngd"></a>`rngd`
+
+Data type: `Boolean`
+
+Include the SIMP ``rngd`` module to assist with entropy generation
+
+* By default ``rngd`` only installs ``rng-tools``; set
+  ``rngd::service_ensure`` and ``rngd::service_enable`` to run the service
+
+Default value: `simplib::dlookup('stunnel::instance', 'rngd', $name, { 'default_value' => false })`
 
 ##### <a name="-stunnel--instance--firewall"></a>`firewall`
 
@@ -1246,14 +1270,6 @@ Data type: `Boolean`
 Include the SIMP ``iptables`` module to manage the firewall
 
 Default value: `simplib::dlookup('stunnel::instance', 'firewall', $name, { 'default_value' => simplib::lookup('simp_options::firewall', { 'default_value' => false }) })`
-
-##### <a name="-stunnel--instance--tcpwrappers"></a>`tcpwrappers`
-
-Data type: `Boolean`
-
-Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
-
-Default value: `simplib::dlookup('stunnel::instance', 'tcpwrappers', $name, { 'default_value' => simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }) })`
 
 ##### <a name="-stunnel--instance--pki"></a>`pki`
 
@@ -1842,4 +1858,3 @@ Alias of `Variant[Array[Simplib::Port], Array[Simplib::Netlist::Port], Simplib::
 Valid stunnel OCSP flag options
 
 Alias of `Tuple[Pattern[/(?i:NOCERTS|NOINTERN|NOSIGS|NOCHAIN|NOVERIFY|NOEXPLICIT|NOCASIGN|NODELEGATED|NOCHECKS|TRUSTOTHER|RESPID_KEY|NOTIME)/], 0]`
-

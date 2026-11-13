@@ -295,5 +295,4 @@ define stunnel::connection (
       dports       => [Integer($_dport)],
     }
   }
-
 }

@@ -17,34 +17,38 @@ describe 'instance connectivity' do
     context 'set up a bi-directional connection set' do
       hosts.each do |server|
         hosts.each do |client|
-          server_fqdn = fact_on(server, 'networking.fqdn')
-
-          hieradata = {
-            'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
-            'iptables::precise_match'    => true,
-            'simp_options::haveged'      => true,
-            'simp_options::firewall'     => true,
-            'simp_options::pki'          => true,
-            'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
-            'simp_options::trusted_nets' => [client.ip],
-          }
-
-          manifest = <<~EOF
-            stunnel::instance { 'mysvc':
-              client  => false,
-              connect => [1234],
-              accept  => 12345,
-            }
-
-            stunnel::instance { 'mysvc-client':
-              client  => true,
-              connect => ['#{server_fqdn}:12345'],
-              accept  => 1235,
-              require => Stunnel::Instance['mysvc'],
-            }
-          EOF
-
           context "with server #{server} and client #{client}" do
+            let(:server_fqdn) { fact_on(server, 'networking.fqdn') }
+
+            let(:hieradata) do
+              {
+                'iptables::ports'            => { 22 => { 'proto' => 'tcp', 'trusted_nets' => ['ALL'] } },
+                'iptables::precise_match'    => true,
+                'simp_options::haveged'      => true,
+                'simp_options::firewall'     => true,
+                'simp_options::pki'          => true,
+                'simp_options::pki::source'  => '/etc/pki/simp-testing/pki/',
+                'simp_options::trusted_nets' => [client.ip],
+              }
+            end
+
+            let(:manifest) do
+              <<~EOF
+                stunnel::instance { 'mysvc':
+                  client  => false,
+                  connect => [1234],
+                  accept  => 12345,
+                }
+
+                stunnel::instance { 'mysvc-client':
+                  client  => true,
+                  connect => ['#{server_fqdn}:12345'],
+                  accept  => 1235,
+                  require => Stunnel::Instance['mysvc'],
+                }
+              EOF
+            end
+
             [server, client].each do |host|
               it "cleans up #{host}" do
                 on(host, 'pkill -f nc', accept_all_exit_codes: true)

@@ -1,0 +1,4 @@
+---
+simp_options::haveged: true
+stunnel::rngd: true
+stunnel::instance::rngd: true

@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'support/hiera_data_helper'
 
 describe 'stunnel::instance' do
   def mock_selinux_false_facts(os_facts)
@@ -25,6 +26,66 @@ describe 'stunnel::instance' do
       let(:title) { 'nfs' }
       let(:facts) do
         mock_selinux_enforcing_facts(os_facts.merge(haveged__rngd_enabled: false))
+      end
+
+      context 'with rngd = true' do
+        let(:params) do
+          {
+            connect: [2049],
+            accept:  20_490,
+            pki:     true,
+            rngd:    true,
+          }
+        end
+
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to contain_class('rngd') }
+        it { is_expected.not_to contain_class('haveged') }
+      end
+
+      context 'with haveged = true (deprecated)' do
+        let(:params) do
+          {
+            connect: [2049],
+            accept:  20_490,
+            pki:     true,
+            haveged: true,
+          }
+        end
+
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to contain_class('haveged') }
+        it { is_expected.not_to contain_class('rngd') }
+      end
+
+      context 'with simp_options::haveged true' do
+        let(:hieradata) { 'simp_options_haveged' }
+
+        context 'by default' do
+          let(:params) { { connect: [2049], accept: 20_490, pki: true } }
+
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to contain_class('haveged') }
+          it { is_expected.not_to contain_class('rngd') }
+        end
+
+        context 'with rngd = true here and in stunnel' do
+          let(:pre_condition) { "class { 'stunnel': rngd => true }" }
+          let(:params) { { connect: [2049], accept: 20_490, pki: true, rngd: true } }
+
+          it { is_expected.to compile.with_all_deps }
+          it { is_expected.to contain_class('rngd') }
+          it { is_expected.not_to contain_class('haveged') }
+        end
+      end
+
+      context 'with stunnel::instance::rngd set in Hiera' do
+        let(:hieradata) { 'simp_options_haveged_rngd' }
+        let(:params) { { connect: [2049], accept: 20_490, pki: true } }
+
+        it { is_expected.to compile.with_all_deps }
+        it { is_expected.to contain_class('rngd') }
+        it { is_expected.not_to contain_class('haveged') }
       end
 
       context 'with default parameters' do

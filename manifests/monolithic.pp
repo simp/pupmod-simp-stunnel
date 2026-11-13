@@ -15,4 +15,8 @@ class stunnel::monolithic {
   if $stunnel::haveged {
     Class['haveged'] ~> Class['stunnel::service']
   }
+
+  if $stunnel::rngd {
+    Class['rngd'] ~> Class['stunnel::service']
+  }
 }
