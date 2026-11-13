@@ -710,7 +710,6 @@ The following parameters are available in the `stunnel::connection` defined type
 * [`timeout_idle`](#-stunnel--connection--timeout_idle)
 * [`trusted_nets`](#-stunnel--connection--trusted_nets)
 * [`firewall`](#-stunnel--connection--firewall)
-* [`tcpwrappers`](#-stunnel--connection--tcpwrappers)
 * [`exec`](#-stunnel--connection--exec)
 * [`execargs`](#-stunnel--connection--execargs)
 
@@ -1059,14 +1058,6 @@ Include the SIMP ``iptables`` module to manage the firewall
 
 Default value: `pick(simplib::dlookup('stunnel::connection', 'firewall', $name, { 'default_value' => undef }), simplib::lookup('simp_options::firewall', { 'default_value' => false }))`
 
-##### <a name="-stunnel--connection--tcpwrappers"></a>`tcpwrappers`
-
-Data type: `Boolean`
-
-Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
-
-Default value: `pick(simplib::dlookup('stunnel::connection', 'tcpwrappers', $name, { 'default_value' => undef }), simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }))`
-
 ##### <a name="-stunnel--connection--exec"></a>`exec`
 
 Data type: `Optional[String]`
@@ -1137,7 +1128,6 @@ The following parameters are available in the `stunnel::instance` defined type:
 * [`haveged`](#-stunnel--instance--haveged)
 * [`rngd`](#-stunnel--instance--rngd)
 * [`firewall`](#-stunnel--instance--firewall)
-* [`tcpwrappers`](#-stunnel--instance--tcpwrappers)
 * [`pki`](#-stunnel--instance--pki)
 * [`app_pki_external_source`](#-stunnel--instance--app_pki_external_source)
 * [`app_pki_dir`](#-stunnel--instance--app_pki_dir)
@@ -1280,14 +1270,6 @@ Data type: `Boolean`
 Include the SIMP ``iptables`` module to manage the firewall
 
 Default value: `simplib::dlookup('stunnel::instance', 'firewall', $name, { 'default_value' => simplib::lookup('simp_options::firewall', { 'default_value' => false }) })`
-
-##### <a name="-stunnel--instance--tcpwrappers"></a>`tcpwrappers`
-
-Data type: `Boolean`
-
-Include the SIMP ``tcpwrappers`` module to manage tcpwrappers
-
-Default value: `simplib::dlookup('stunnel::instance', 'tcpwrappers', $name, { 'default_value' => simplib::lookup('simp_options::tcpwrappers', { 'default_value' => false }) })`
 
 ##### <a name="-stunnel--instance--pki"></a>`pki`
 

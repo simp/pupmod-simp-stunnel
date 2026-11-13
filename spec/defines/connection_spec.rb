@@ -62,22 +62,6 @@ describe 'stunnel::connection' do
           }
         end
 
-        context 'using tcpwrappers' do
-          let(:title) { 'nfs' }
-          let(:params) do
-            {
-              tcpwrappers: true,
-              client: false,
-              connect: [2049],
-              accept: 20_490,
-              trusted_nets: ['any'],
-            }
-          end
-
-          it { is_expected.to compile.with_all_deps }
-          it { is_expected.to create_tcpwrappers__allow("allow_stunnel_#{title}").with_pattern(['ALL']) }
-        end
-
         context 'setting ocsp options' do
           let(:title) { 'nfs' }
           let(:params) do
@@ -218,7 +202,6 @@ describe 'stunnel::connection' do
                 sni: 'global.sni.server',
                 ssl_version: 'TLSv1',
                 stack: 1024,
-                tcpwrappers: true,
                 timeout_busy: 5,
                 timeout_close: 10,
                 timeout_connect: 15,
@@ -260,7 +243,6 @@ describe 'stunnel::connection' do
                 sni: 'global.sni.server',
                 ssl_version: 'TLSv1',
                 stack: 1024,
-                tcpwrappers: true,
                 timeout_busy: 5,
                 timeout_close: 10,
                 timeout_connect: 15,
