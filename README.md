@@ -54,6 +54,13 @@ the creation of stunnel connections for services.
 | this was deemed to be too risky for use across services that are not related.
 
 
+## Breaking changes in 10.0.0
+
+The `tcpwrappers` parameter of `stunnel::connection` and `stunnel::instance` has
+been removed, along with the dependency on the archived `simp/tcpwrappers`
+module. Remove any settings of those parameters before upgrading. Entries that
+earlier versions added to `/etc/hosts.allow` are not removed.
+
 ## Entropy: `rngd` replaces `haveged`
 
 `stunnel::rngd` (and `stunnel::instance::rngd`) include

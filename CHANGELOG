@@ -1,3 +1,10 @@
+* Fri Nov 13 2026 Steven Pritchard <steve@sicura.us> - 10.0.0
+- BREAKING: Remove the `tcpwrappers` parameter from `stunnel::connection` and
+  `stunnel::instance`. The archived `simp/tcpwrappers` module is no longer a
+  dependency, and stunnel no longer manages `/etc/hosts.allow` entries. Remove
+  any `stunnel::connection::tcpwrappers` or `stunnel::instance::tcpwrappers`
+  settings; existing `hosts.allow` entries are left in place.
+
 * Thu Nov 12 2026 Steven Pritchard <steve@sicura.us> - 9.2.0
 - Add `stunnel::rngd` and `stunnel::instance::rngd` (default `false`) to
   include the `rngd` class, which replaces `haveged`. When `stunnel::rngd` is

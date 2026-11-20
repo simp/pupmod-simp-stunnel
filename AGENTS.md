@@ -68,7 +68,7 @@ when `$purge_instance_resources` is true (the default), includes
 - **`stunnel::connection` (`manifests/connection.pp`, define)** — a tunnel in the
   **monolithic** model: appends a `concat::fragment` to `stunnel.conf`
   (`connection.pp`) and, for servers, opens the firewall
-  (`connection.pp`) and tcpwrappers (`connection.pp`).
+  (`connection.pp`).
 - **`stunnel::instance` (`manifests/instance.pp`, define)** — a tunnel in the
   **instance** model: its own conf file, chroot, `pki::copy`, systemd unit, and
   service (`instance.pp`). **Fails the compile on non-systemd systems**
@@ -136,9 +136,6 @@ when `$purge_instance_resources` is true (the default), includes
   `false` (`init.pp`). `$rngd` defaults to `false` in both (per instance it can
   be set in Hiera through `simplib::dlookup`). The `haveged`
   parameters are deprecated and will be removed in the next major release.
-- **`tcpwrappers::allow` pins `pattern => 'ALL'`** in both defines to work around
-  a bug in the EL7.9 stunnel build (`connection.pp`,
-  `instance.pp`).
 - **`simp/simp_options` is NOT a declared dependency** in `metadata.json`, yet
   the manifests consume the `simp_options::*` seam via `simplib::lookup` /
   `simplib::dlookup` (both provided by `simp/simplib`). Route SIMP feature
@@ -197,15 +194,13 @@ Required module dependencies (from `metadata.json` `dependencies`):
 - `simp/simplib` `>= 4.9.0 < 8.0.0` — `simplib::lookup`, `simplib::dlookup`,
   `simplib::validate_array_member`, the `Simplib::*` types, and the
   `fips_enabled` fact.
-- `simp/tcpwrappers` `>= 6.2.0 < 7.0.0` — `tcpwrappers::allow` for server-side
-  access control.
 
 Optional dependency (`simp.optional_dependencies`): `simp/haveged`
 `>= 0.4.5 < 1.0.0`, used only by the deprecated `$haveged` parameters and
 checked with `simplib::assert_optional_dependency`.
 
 `simp/rngd`, `simp/iptables`,
-`simp/pki`, and `simp/tcpwrappers` are hard runtime dependencies even though the
+and `simp/pki` are hard runtime dependencies even though the
 manifests only `include` them conditionally.
 
 Runtime requirement (from `metadata.json` `requirements`): `openvox
