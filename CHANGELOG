@@ -1,3 +1,6 @@
+* Mon Nov 23 2026 Steven Pritchard <steve@sicura.us> - 10.0.1
+- Allow simp/iptables 10.x
+
 * Fri Nov 13 2026 Steven Pritchard <steve@sicura.us> - 10.0.0
 - BREAKING: Remove the `tcpwrappers` parameter from `stunnel::connection` and
   `stunnel::instance`. The archived `simp/tcpwrappers` module is no longer a

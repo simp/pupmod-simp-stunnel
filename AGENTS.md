@@ -188,7 +188,7 @@ Required module dependencies (from `metadata.json` `dependencies`):
 - `puppetlabs/stdlib` `>= 9.2.0 < 11.0.0` — `ensure_resource(s)`, `dirname`,
   `regsubst`, etc.
 - `simp/rngd` `>= 0.2.0 < 1.0.0` — entropy daemon, `include`d when `$rngd`.
-- `simp/iptables` `>= 6.5.3 < 10.0.0` — `iptables::listen::tcp_stateful` for
+- `simp/iptables` `>= 6.5.3 < 11.0.0` — `iptables::listen::tcp_stateful` for
   server-side firewall rules.
 - `simp/pki` `>= 6.2.0 < 8.0.0` — `pki::copy` for certificate provisioning.
 - `simp/simplib` `>= 4.9.0 < 8.0.0` — `simplib::lookup`, `simplib::dlookup`,
